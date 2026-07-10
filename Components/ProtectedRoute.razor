@@ -1,0 +1,51 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
+
+<AuthorizeView Context="authContext">
+    <Authorized>
+        @if (CheckRole(authContext))
+        {
+            @ChildContent
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                You do not have the required role to access this content.
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-info">
+            <p>You need to log in to access this content.</p>
+            <a href="login" class="btn btn-primary">Go to Login</a>
+        </div>
+    </NotAuthorized>
+    <Authorizing>
+        <div class="alert alert-secondary">
+            <p>Checking authorization...</p>
+        </div>
+    </Authorizing>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string[]? AllowedRoles { get; set; }
+
+    private bool CheckRole(AuthenticationState authState)
+    {
+        if (AllowedRoles == null || AllowedRoles.Length == 0)
+        {
+            return true;
+        }
+
+        if (authState?.User == null)
+        {
+            return false;
+        }
+
+        return AllowedRoles.Any(role => authState.User.IsInRole(role));
+    }
+}

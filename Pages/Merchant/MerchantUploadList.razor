@@ -1,0 +1,393 @@
+﻿@page "/upload/files"
+
+@inject NavigationManager Nav
+@inject IJSRuntime JsRuntime;
+
+
+@inject IMerchantService merchantService
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+           
+         <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Payment</h3>
+                    <small class="text-muted">Upload Payment List</small>
+                </div>
+            </div>
+
+            <div class="card-body">
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <div class="mt-2">Loading Merchant Upload List...</div>
+                    </div>
+                }
+                else if (hasError)
+                {
+                    <div class="alert alert-danger">
+                        Failed to load Merchant Upload List. Please try again.
+                    </div>
+                }
+                else if (merchantUploadResponse == null || !merchantUploadResponse.data.Any())
+                {
+                    <div class="text-center text-muted py-4">
+                        No Merchant Upload List found
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" data-tables="basic">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Batch Name</th>
+                                    <th>Payment Name</th>
+                                    <th>From Date</th>
+                                    <th>To Date</th>
+                                    <th>Row Count</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var merchantUpload in merchantUploadResponse.data)
+                                {
+                                    <tr>
+                                        <td>@merchantUpload.batch.name</td>
+                                        <td>@merchantUpload.payment.name</td>
+                                        <td>@merchantUpload.fromDate.ToString("dd/MM/yyyy")</td>
+                                        <td>@merchantUpload.toDate.ToString("dd/MM/yyyy")</td>
+                                        <td>@merchantUpload.rowCount</td>
+                                       
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-success" title="Download Original File"
+                                                    @onclick="() => DownloadFile(merchantUpload)">
+                                                <i class="ti ti-download me-1"></i>
+                                            </button>
+                                            
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    // ======================== STATE VARIABLES ========================
+    private bool isLoading = false;
+    private bool hasError = false;
+    private bool dataReady = false;
+
+    private MerchantUploadResponse merchantUploadResponse = new();
+
+    // Detail modal state
+    
+    private bool isDetailLoading = false;
+    private string? detailError;
+    private UploadDetail? uploadDetail;
+    private string selectedBatchName = "";
+    private string selectedPaymentName = "";
+    private int selectedUploadId;
+
+    // Search & Pagination
+    private string searchTerm = "";
+    private int pageSize = 25;
+    private int currentPage = 1;
+    private IJSObjectReference? _module;
+
+    // ======================== LIFECYCLE ========================
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStaticData();
+    }
+
+    private async Task LoadStaticData()
+    {
+        try
+        {
+            isLoading = true;
+            hasError = false;
+            merchantUploadResponse = await merchantService.GetAllMerchantUploadData();
+
+            dataReady = true;
+        }
+        catch
+        {
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    // ======================== VIEW / DETAIL LOGIC ========================
+   
+    private async Task InitDataTableAsync()
+    {
+        if (_module != null)
+        {
+            await _module.InvokeVoidAsync("loadDataTableAjax");
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/css/datatables/datatables-ajax.js"
+            );
+        }
+        if (dataReady && !isLoading && _module != null)
+        {
+            dataReady = false; // prevent re-run
+
+            await _module.InvokeVoidAsync("initDataTable");
+        }
+    }
+    private UploadDetail MapTransactionLinesToUploadDetail(List<TransactionLine> lines)
+    {
+        var headers = new List<string>
+    {
+        "Order ID",
+        "Store ID",
+        "Amount",
+        "Tender Type",
+        "Auth Code",
+        "Transaction Date",
+        "Business Day",
+        "Recon Status",
+        "Exception Type",
+        "Variance Amount"
+    };
+
+        var rows = new List<UploadDetailRow>();
+
+        foreach (var line in lines)
+        {
+            var row = new UploadDetailRow();
+
+            // Add a cell for each property
+            row.Cells.Add(new UploadDetailCell { Value = line.orderId, HasError = false });
+            row.Cells.Add(new UploadDetailCell { Value = line.storeId, HasError = false });
+            row.Cells.Add(new UploadDetailCell { Value = line.amount.ToString("F2"), HasError = false });
+            row.Cells.Add(new UploadDetailCell { Value = line.tenderType, HasError = false });
+            row.Cells.Add(new UploadDetailCell { Value = line.authCode, HasError = false });
+            row.Cells.Add(new UploadDetailCell { Value = line.transactionDate.ToString("yyyy-MM-dd HH:mm"), HasError = false });
+            row.Cells.Add(new UploadDetailCell { Value = line.businessDay.ToString("yyyy-MM-dd"), HasError = false });
+            row.Cells.Add(new UploadDetailCell
+            {
+                Value = line.varianceAmount?.ToString("F2"),
+                HasError = line.varianceAmount != 0
+            });
+
+            // Optionally mark row as error if any cell has error
+            // but row.HasError is computed from cells automatically in your model
+
+            rows.Add(row);
+        }
+
+        return new UploadDetail
+        {
+            Headers = headers,
+            Rows = rows
+        };
+    }
+    @* private UploadDetail GetStaticUploadDetail(int uploadId)
+    {
+        // Common headers
+        var headers = new List<string> { "Transaction ID", "Amount", "Currency", "Transaction Date", "Status" };
+        var rows = new List<UploadDetailRow>();
+        var rnd = new Random();
+
+        // Number of rows depends on uploadId
+        int totalRows = uploadId switch
+        {
+            1 => 150,
+            2 => 42,
+            3 => 87,
+            _ => 20
+        };
+
+        for (int i = 1; i <= totalRows; i++)
+        {
+            var row = new UploadDetailRow();
+
+            // Simulate errors on every 7th row for ID 1 & 3
+            bool isError = (uploadId != 2) && (i % 7 == 0);
+
+            row.Cells.Add(new UploadDetailCell
+            {
+                Value = $"TXN-{i:D6}",
+                HasError = isError && i % 2 == 0,
+                ErrorMessage = (isError && i % 2 == 0) ? "Duplicate transaction ID" : null
+            });
+            row.Cells.Add(new UploadDetailCell
+            {
+                Value = (rnd.Next(10, 999) + rnd.NextDouble()).ToString("F2"),
+                HasError = false
+            });
+            row.Cells.Add(new UploadDetailCell
+            {
+                Value = new[] { "USD", "EUR", "GBP" }[rnd.Next(3)],
+                HasError = isError && i % 3 == 0,
+                ErrorMessage = (isError && i % 3 == 0) ? "Invalid currency code" : null
+            });
+            row.Cells.Add(new UploadDetailCell
+            {
+                Value = DateTime.Now.AddDays(-rnd.Next(1, 90)).ToString("yyyy-MM-dd"),
+                HasError = isError && i % 5 == 0,
+                ErrorMessage = (isError && i % 5 == 0) ? "Date out of allowed range" : null
+            });
+            row.Cells.Add(new UploadDetailCell
+            {
+                Value = new[] { "Completed", "Pending", "Failed" }[rnd.Next(3)],
+                HasError = false
+            });
+
+            rows.Add(row);
+        }
+
+        return new UploadDetail { Headers = headers, Rows = rows };
+    } *@
+
+    private void CloseDetailView()
+    {
+        uploadDetail = null;
+        detailError = null;
+    }
+
+    private void HandleModalKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+            CloseDetailView();
+    }
+
+    // ======================== SEARCH & PAGINATION ========================
+    private IEnumerable<UploadDetailRow> GetFilteredRows()
+    {
+        if (uploadDetail == null || !uploadDetail.Rows.Any())
+            return Enumerable.Empty<UploadDetailRow>();
+
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return uploadDetail.Rows;
+
+        return uploadDetail.Rows.Where(r =>
+            r.Cells.Any(c => c.Value?.ToString()?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true)
+        );
+    }
+
+    private IEnumerable<UploadDetailRow> GetPagedRows(IEnumerable<UploadDetailRow>? filtered = null)
+    {
+        var source = filtered ?? GetFilteredRows();
+        return source.Skip((currentPage - 1) * pageSize).Take(pageSize);
+    }
+
+    private void ChangePage(int page)
+    {
+        var totalPages = (int)Math.Ceiling((double)GetFilteredRows().Count() / pageSize);
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        currentPage = page;
+    }
+
+    // ======================== ACTION HANDLERS ========================
+    private async Task DownloadFile(UploadedData merchant)
+    {
+        try
+        {
+
+            var fileBytes = await merchantService.DownloadMerchantFile(merchant.id);
+            if (fileBytes == null)
+                return;
+
+            var base64 = Convert.ToBase64String(fileBytes);
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/js/downloadMerchant.js"
+            );
+            await JsRuntime.InvokeVoidAsync(
+                "downloadFileFromBytes",
+                $"Merchant_{merchant.batch.name}.xlsx",
+                base64);
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DownloadErrorsOnly()
+    {
+        if (uploadDetail == null || uploadDetail.ErrorCount == 0) return;
+        await Task.Delay(300);
+        Console.WriteLine($"Downloading error rows only for upload ID: {selectedUploadId}");
+    }
+
+    private async Task ExportAllToCsv()
+    {
+        if (uploadDetail == null) return;
+        await Task.Delay(300);
+        Console.WriteLine($"Exporting all {uploadDetail.TotalRows} rows to CSV for upload ID: {selectedUploadId}");
+    }
+
+    // ======================== DATA MODELS (nested) ========================
+    public class MerchantUpload
+    {
+        public int Id { get; set; }
+        public Batch Batch { get; set; } = new();
+        public Payment Payment { get; set; } = new();
+        public DateTime FromDate { get; set; }
+        public DateTime ToDate { get; set; }
+        public int RowCount { get; set; }
+        public int ErrorCount { get; set; }
+    }
+
+    public class Batch
+    {
+        public string Name { get; set; } = "";
+    }
+
+    public class Payment
+    {
+        public string Name { get; set; } = "";
+    }
+
+    public class UploadDetail
+    {
+        public List<string> Headers { get; set; } = new();
+        public List<UploadDetailRow> Rows { get; set; } = new();
+        public int TotalRows => Rows.Count;
+        public int ErrorCount => Rows.Count(r => r.HasError);
+    }
+
+    public class UploadDetailRow
+    {
+        public List<UploadDetailCell> Cells { get; set; } = new();
+        public bool HasError => Cells.Any(c => c.HasError);
+    }
+
+    public class UploadDetailCell
+    {
+        public object? Value { get; set; }
+        public bool HasError { get; set; }
+        public string? ErrorMessage { get; set; }
+    }
+}

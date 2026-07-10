@@ -1,0 +1,218 @@
+﻿@page "/merchant/exception"
+
+@inject NavigationManager Navigation
+@inject IBatchesService BatchesService
+@inject IExceptionService ExceptionService
+
+@inject IJSRuntime JsRuntime;
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Reconciliation</h3>
+                    <small class="text-muted">Manage and reconcile batches</small>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Alert -->
+                @if (showAlert)
+                {
+                    <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                        @alertMessage
+                        <button type="button" class="btn-close" @onclick="() => showAlert = false"></button>
+                    </div>
+                }
+
+                <!-- Batch selection -->
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Batch</label>
+                        <select @bind="SelectedBatchId" @bind:after="LoadExceptionsAsync" class="form-select">
+                            <option value="0" selected disabled>Select Batch</option>
+                            @foreach (var batch in batchDataDTOs)
+                            {
+                                <option value="@batch.id">@batch.name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Exceptions Table -->
+                @if (isLoadingExceptions)
+                {
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading exceptions...</p>
+                    </div>
+                }
+                else if (exceptionlistDTO?.data == null || !exceptionlistDTO.data.Any())
+                {
+                    <div class="text-center py-4">
+                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <p class="mt-2">No exceptions found for this batch.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" data-tables="basic">
+                            <thead class="table-light">
+                                <tr>
+                                   
+                                    <th>Exception Type</th>
+                                    <th>Description</th>
+                                    <th>Invoice Line ID</th>
+                                    <th>Merchant Line ID</th>
+                                    <th>Created At</th>
+                                    <th style="width: 120px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var exception in exceptionlistDTO.data.Select((item, index) => new
+                                {
+                                    item,
+                                    index
+                                }))
+                                {
+                                    <tr>
+                                       
+                                        <td>
+                                            <span class="badge @GetBadgeClass(exception.item.exceptionType)">
+                                                @exception.item.exceptionType
+                                            </span>
+                                        </td>
+                                        <td>@(exception.item.exceptionDescription ?? "—")</td>
+                                        <td>@(exception.item.invoiceLineId?.ToString() ?? "—")</td>
+                                        <td>@(exception.item.merchantLineId?.ToString() ?? "—")</td>
+                                        <td>@exception.item.createdAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                        <td>
+                                            
+                                            <button class="btn btn-sm btn-outline-primary" disabled>Resolve</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool showAlert = false;
+    private string alertMessage = "";
+    private string alertType = "success";
+    private int SelectedBatchId { get; set; } = 0;
+    private bool isLoading = true;
+    private bool dataReady = true;
+    private bool isLoadingExceptions = false;
+    private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
+    private ExceptionlistDTO exceptionlistDTO = new();
+    private IJSObjectReference? _module;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            batchDataDTOs = await BatchesService.GetAllAsync();
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load batches", "danger");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    } 
+    private async Task InitDataTableAsync()
+    {
+        if (_module != null)
+        {
+            await _module.InvokeVoidAsync("loadDataTableAjax");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/css/datatables/datatables-ajax.js"
+            );
+        }
+        if (dataReady && !isLoading && _module != null)
+        {
+            dataReady = false; // prevent re-run
+
+            await _module.InvokeVoidAsync("initDataTable");
+        }
+    }
+
+    private async Task OnBatchSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int id))
+        {
+            SelectedBatchId = id;
+            await LoadExceptionsAsync();
+        }
+    }
+
+    private async Task LoadExceptionsAsync()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            exceptionlistDTO = null;
+            StateHasChanged();
+            return;
+        }
+
+        isLoadingExceptions = true;
+        StateHasChanged();
+
+        try
+        {
+            exceptionlistDTO = await ExceptionService.GetExceptionlist(SelectedBatchId.ToString());
+            
+            dataReady = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load exceptions", "danger");
+            exceptionlistDTO = null;
+        }
+        finally
+        {
+            isLoadingExceptions = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetBadgeClass(string exceptionType)
+    {
+        return exceptionType switch
+        {
+            "Duplicate" => "badge-soft-warning text-dark",
+            "No Match Found" => "badge-soft-danger",
+            _ => "badge-soft-secondary"
+        };
+    }
+
+    private void ShowAlert(string message, string type = "success")
+    {
+        alertMessage = message;
+        alertType = type;
+        showAlert = true;
+        StateHasChanged();
+    }
+}

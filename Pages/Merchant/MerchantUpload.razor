@@ -1,0 +1,306 @@
+﻿@page "/payment/upload"
+@inject IBatchesService BatchesService
+@inject IPaymentService PaymentService
+@inject IMerchantService MerchantService
+
+@inject NavigationManager Navigation
+@inject IJSRuntime JsRuntime
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Payment</h3>
+                    <small class="text-muted">Upload Payment</small>
+                </div>
+            </div>
+
+            <div class="card-body">
+                @if (showAlert)
+                {
+                    <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                        @alertMessage
+                        <button type="button" class="btn-close" @onclick="() => showAlert = false"></button>
+                    </div>
+                }
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Batch</label>
+                        <select class="form-select" @bind="SelectedBatchId">
+                            <option value="0"  selected disabled>Select Batch</option>
+                            @foreach (var batch in batches)
+                            {
+                                <option value="@batch.id">@batch.name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Payment</label>
+                        <select class="form-select" @bind="SelectedPaymentId">
+                            <option value="">Select Payment</option>
+                            @foreach (var payment in Paymentes)
+                            {
+                                <option value="@payment.id">@payment.name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">From Date</label>
+                        <input class="form-control" type="date" readonly @bind="FromDate" />
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label">To Date</label>
+                        <input class="form-control" type="date" readonly @bind="ToDate" />
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">File Upload</label>
+                        <div class="mb-3">
+                            <div class="filepond-uploader">
+                                <InputFile class="filepond filepond-input-multiple" data-allow-reorder="true"
+                                           accept=".xlsx,.xls" data-max-file-size="3MB" data-max-files="5" multiple
+                                           name="filepond" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                        <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
+                        @* <button class="btn btn-success btn-sm" type="button" @onclick="ReconcileBatchAsync"
+                                disabled="@isReconciling">
+                            @if (isReconciling)
+                            {
+                                <span>Reconciling...</span>
+                            }
+                            else
+                            {
+
+                                <span>Reconcile Batch</span>
+                            }
+                        </button> *@
+                        <button class="btn btn-primary btn-sm" type="button" @onclick="SaveAsync"
+                                disabled="@ispostLoading">
+                            @if (ispostLoading)
+                            {
+                                <span>Saving...</span>
+                            }
+                            else
+                            {
+
+                                <span>Save</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<byte[]> fileBytes = new();
+    private List<string> fileNames = new();
+    private List<string> contentTypes = new();
+    private bool isReconciling = false;
+    private bool isLoading = true;
+    private bool ispostLoading = false;
+    private bool showAlert = false;
+    private string alertMessage = "";
+    private string alertType = "success";
+
+
+    private List<Models.Batch.BatchDataDTO> batches = new();
+    private List<PaymentData> Paymentes = new();  
+    
+    private int _selectedBatchId= 0;
+    private int _selectedPaymentId;
+    private DateTime? FromDate { get; set; }
+    private DateTime? ToDate { get; set; }
+
+    private IJSObjectReference? _module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+                await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
+                await JsRuntime.InvokeVoidAsync("loadConfig");
+                await JsRuntime.InvokeVoidAsync("loadApps");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            batches = await BatchesService.GetAllAsync();
+            Paymentes = await PaymentService.GetAllAsync();
+        }   
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load data", "danger");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private int SelectedBatchId
+    {
+        get => _selectedBatchId;
+        set
+        {
+            _selectedBatchId = value;
+            var batch = batches.FirstOrDefault(x => x.id == value);
+            if (batch != null)
+            {
+                FromDate = Convert.ToDateTime(batch.FromDate);
+                ToDate = Convert.ToDateTime(batch.ToDate);
+                StateHasChanged();
+            }
+        }
+    }
+
+    private int SelectedPaymentId
+    {
+        get => _selectedPaymentId;
+        set => _selectedPaymentId = value;
+    }
+
+    // Call this from FilePond's onaddfile or similar via JS if needed.
+    // For now we fetch on save (defensive)
+    private async Task LoadFileDataAsync()
+    {
+        fileBytes.Clear();
+        fileNames.Clear();
+        contentTypes.Clear();
+
+        try
+        {
+            var jsFiles = await JsRuntime.InvokeAsync<List<FileData>>("getFilePondFiles");
+
+            if (jsFiles == null || jsFiles.Count == 0)
+            {
+                ShowAlert("No files found from FilePond", "danger");
+                return;
+            }
+
+            foreach (var file in jsFiles)
+            {
+                if (string.IsNullOrWhiteSpace(file?.name))
+                    continue;
+
+                // Critical: Read bytes via JS interop
+                var base64 = await JsRuntime.InvokeAsync<string>("getFilePondFileBase64", file.name);
+                if (string.IsNullOrWhiteSpace(base64))
+                {
+                    Console.WriteLine($"Failed to read file: {file.name}");
+                    continue;
+                }
+
+                var bytes = Convert.FromBase64String(base64);
+
+                if (bytes.Length == 0)
+                    continue;
+
+                fileBytes.Add(bytes);
+                fileNames.Add(file.name);
+                contentTypes.Add(file.contentType ?? "application/octet-stream");
+            }
+            if (fileBytes.Count == 0)
+            {
+                ShowAlert("Failed to load any file data", "danger");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"File load error: {ex}");
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        ispostLoading = true;
+
+        try
+        {
+            await LoadFileDataAsync(); // Ensure data is fresh
+
+            if (fileBytes.Count == 0)
+            {
+                ShowAlert("Please select a valid file", "danger");
+                return;
+            }
+
+            if (SelectedBatchId <= 0 || SelectedPaymentId <= 0 || !FromDate.HasValue || !ToDate.HasValue)
+            {
+                ShowAlert("Please fill all required fields", "danger");
+                return;
+            }
+
+            var model = new MerchantCreate
+            {
+                batchId = SelectedBatchId,
+                paymentId = SelectedPaymentId,
+                fromDate = FromDate.Value,
+                toDate = ToDate.Value
+            };
+
+            var result = await MerchantService.CreateAsync(
+                model,
+                fileBytes[0],
+                fileNames[0],
+                contentTypes[0]);
+
+            ShowAlert(result.data.message,
+                      result.success ? "success" : "danger");
+        }
+        catch (Exception ex)
+        {
+            ShowAlert(ex.Message ?? "Failed to save", "danger");
+            Console.WriteLine(ex); // full stack trace
+        }
+        finally
+        {
+            ispostLoading = false;
+        }
+    }
+
+    private void ShowAlert(string message, string type = "success")
+    {
+        alertMessage = message;
+        alertType = type;
+        showAlert = true;
+        StateHasChanged();
+    }
+
+    
+    public class FileData
+    {
+        public string name { get; set; } = "";
+        public string contentType { get; set; } = "";
+        public List<int> bytes { get; set; } = new(); // probably not used
+    }
+}

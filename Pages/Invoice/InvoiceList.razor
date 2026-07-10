@@ -1,0 +1,361 @@
+﻿@page "/invoice/view-invoice-types"
+@inject IInvoiceTypeService invoiceService
+@inject NavigationManager Nav
+@inject IJSRuntime JsRuntime;
+
+@if (showMessage)
+{
+    <div class="alert @messageClass alert-dismissible fade show shadow-sm mb-3" role="alert">
+        @messageText
+
+        <button type="button" class="btn-close" @onclick="CloseMessage">
+        </button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card  shadow-sm">
+            @* <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Payment</h4>
+
+                <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 px-3" @onclick="OpenCreate">
+                    + New Payment
+                </button>
+            </div> *@
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Invoice Types</h3>
+                    <small class="text-muted">Manage Invoice Types</small>
+                </div>
+
+                <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 px-3" @onclick="OpenCreate">
+                    <i class="bi bi-plus-lg"></i>
+                       New Invoice Type
+                </button>
+            </div>
+
+
+            <div class="card-body">
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <div class="mt-2">Loading Invoice Types...</div>
+                    </div>
+                }
+                else if (hasError)
+                {
+                    Console.WriteLine("Error loading Invoice Types.");
+                    Console.WriteLine("InvoiceTypes: " + (InvoiceTypes == null ? "null" : InvoiceTypes.data.Count.ToString()));
+                    <div class="alert alert-danger">
+                        Failed to load Invoice Types.
+                    </div>
+                }
+                else if (InvoiceTypes.data.Count == 0)
+                {
+                    <div class="text-center text-muted py-4">
+                        No Invoice Types found
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" data-tables="basic">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var InvoiceType in InvoiceTypes.data)
+                                {
+                                    <tr>
+                                        <td>@InvoiceType.name</td>
+
+                                        
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-primary btn-sm me-1"
+                                                    @onclick="() => OpenEdit(InvoiceType)">
+                                                Edit
+                                            </button>
+
+                                            <button class="btn btn-sm btn-danger"
+                                                    @onclick="() => ConfirmDelete(InvoiceType.id, InvoiceType.name)">
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private InvoiceTypeList InvoiceTypes = new();
+    private bool showDeleteDialog = false;
+    private bool showEditDialog = false;
+    private InvoiceType editModel = new();
+    private int selectedInvoiceTypeId;
+    private string selectedInvoiceTypeName = "";
+    private IJSObjectReference? _module;
+
+    private bool showMessage;
+    private string messageText = "";
+    private string messageClass = "";
+    private bool isLoading = true;
+    private bool hasError = false;
+    private bool dataReady = false;
+
+    private async Task InitDataTableAsync()
+    {
+        if (_module != null)
+        {
+            await _module.InvokeVoidAsync("loadDataTableAjax");
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            hasError = false;
+
+            InvoiceTypes = await invoiceService.GetAllAsync();
+
+            
+            dataReady = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenEdit(InvoiceType InvoiceType)
+    {
+        editModel = new InvoiceType
+        {
+            id = InvoiceType.id,
+            name = InvoiceType.name
+        };
+
+        showEditDialog = true;
+    }
+
+    private void CancelEdit()
+    {
+        showEditDialog = false;
+    }
+
+    private async Task LoadInvoiceTypes()
+    {
+        InvoiceTypes = await invoiceService.GetAllAsync();
+        StateHasChanged();
+    }
+    private void OpenCreate()
+    {
+        Nav.NavigateTo("/invoice-type/add");
+    }
+
+    private void ConfirmDelete(int id, string name)
+    {
+        selectedInvoiceTypeId = id;
+        selectedInvoiceTypeName = name;
+        showDeleteDialog = true;
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteDialog = false;
+    }
+
+
+    private async Task DeleteInvoice(int InvoiceId)
+    {
+        var result = await invoiceService.DeleteAsync(InvoiceId.ToString());
+
+        if (result?.success == true)
+        {
+            showDeleteDialog = false;
+            await LoadInvoiceTypes();
+
+            await ShowMessage(
+                result.message ?? "Invoice deleted successfully.",
+                "alert-success"
+            );
+        }
+        else
+        {
+            await ShowMessage(
+                result?.message ?? "Delete failed.",
+                "alert-danger"
+            );
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/css/datatables/datatables-ajax.js"
+            );
+        }
+        if (dataReady && !isLoading && _module != null)
+        {
+            dataReady = false; // prevent re-run
+
+            await _module.InvokeVoidAsync("initDataTable");
+        }
+    }
+
+    private async Task UpdateInvoice()
+    {
+
+        editModel.name = editModel.name?.Trim() ?? "";
+
+        if (string.IsNullOrWhiteSpace(editModel.name))
+        {
+            await ShowMessage(
+                "Invoice name is required.",
+                "alert-danger");
+            return;
+        }
+
+        var result = await invoiceService.UpdateAsync(editModel.id, editModel);
+
+        showEditDialog = false;
+
+        if (result?.success == true)
+        {
+            await LoadInvoiceTypes();
+
+            await ShowMessage(
+                result.message ?? "Invoice updated successfully.",
+                "alert-success"
+            );
+
+        }
+        else
+        {
+
+            await ShowMessage(
+                result?.message ?? "Failed to update Invoice.",
+                "alert-danger"
+            );
+        }
+    }
+
+    private async Task ShowMessage(string text, string cssClass)
+    {
+        messageText = text;
+        messageClass = cssClass;
+        showMessage = true;
+
+        StateHasChanged();
+
+        await Task.Delay(3000);
+
+        showMessage = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void CloseMessage()
+    {
+        showMessage = false;
+    }
+
+    
+}
+
+
+@if (showDeleteDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+
+        <div class="modal-dialog modal-dialog-centered" style="z-index: 1055;">
+            <div class="modal-content shadow">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Invoice</h5>
+                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                </div>
+
+                <div class="modal-body py-4">
+                    <p class="mb-2">You are about to delete:</p>
+
+                    <div class="alert alert-warning mb-3">
+                        <strong>@selectedInvoiceTypeName</strong>
+                    </div>
+
+                    <small class="text-muted">
+                        This action cannot be undone.
+                    </small>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelDelete">
+                        Cancel
+                    </button>
+
+                    <button class="btn btn-danger" @onclick="() => DeleteInvoice(selectedInvoiceTypeId)">
+                        Yes, delete
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+@if (showEditDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+
+        <div class="modal-dialog modal-dialog-centered" style="z-index: 1055;">
+            <div class="modal-content shadow">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Invoice</h5>
+                    <button type="button" class="btn-close" @onclick="CancelEdit"></button>
+                </div>
+
+                <EditForm Model="@editModel" OnValidSubmit="UpdateInvoice">
+                    <DataAnnotationsValidator />
+
+                    <div class="modal-body py-4">
+                        <label class="form-label">Name</label>
+                        <input class="form-control" @bind="editModel.name" />
+                        <ValidationMessage For="@(() => editModel.name)" />
+                    </div>
+
+                  
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            Update
+                        </button>
+                    </div>
+                </EditForm>
+
+            </div>
+        </div>
+    </div>
+}

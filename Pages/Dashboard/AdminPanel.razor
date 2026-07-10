@@ -1,0 +1,186 @@
+@page "/dashboard"
+
+@layout MainLayout
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components
+@inject AppState AppState
+@attribute [Authorize(Roles = "Admin")]
+
+
+@inject IDashboardService DashboardService
+
+<div class="row row-cols-xxl-4 row-cols-md-2 row-cols-1">
+
+    <!-- Batch -->
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+
+                @if (isLoading)
+                {
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="skeleton skeleton-circle"></div>
+
+                        <div class="text-end">
+                            <div class="skeleton skeleton-number"></div>
+                            <div class="skeleton skeleton-text"></div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="avatar fs-60 avatar-img-size flex-shrink-0">
+                            <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-24">
+                                <i class="ti ti-rotate-clockwise-2"></i>
+                            </span>
+                        </div>
+
+                        <div class="text-end">
+                            <h3 class="mb-2 fw-normal">@dashboardresponse.data.batchCount</h3>
+                            <p class="mb-0 text-muted">Total Batch</p>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Store -->
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+
+                @if (isLoading)
+                {
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="skeleton skeleton-circle"></div>
+
+                        <div class="text-end">
+                            <div class="skeleton skeleton-number"></div>
+                            <div class="skeleton skeleton-text"></div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="avatar fs-60 avatar-img-size flex-shrink-0">
+                            <span class="avatar-title bg-success-subtle text-success rounded-circle fs-24">
+                                <i class="ti ti-shopping-cart"></i>
+                            </span>
+                        </div>
+
+                        <div class="text-end">
+                            <h3 class="mb-2 fw-normal">@dashboardresponse.data.storeCount</h3>
+                            <p class="mb-0 text-muted">Total Store</p>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <!-- User -->
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+
+                @if (isLoading)
+                {
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="skeleton skeleton-circle"></div>
+
+                        <div class="text-end">
+                            <div class="skeleton skeleton-number"></div>
+                            <div class="skeleton skeleton-text"></div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="avatar fs-60 avatar-img-size flex-shrink-0">
+                            <span class="avatar-title bg-info-subtle text-info rounded-circle fs-24">
+                                <i class="ti ti-users"></i>
+                            </span>
+                        </div>
+
+                        <div class="text-end">
+                            <h3 class="mb-2 fw-normal">@dashboardresponse.data.userCount</h3>
+                            <p class="mb-0 text-muted">Active User</p>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment -->
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+
+                @if (isLoading)
+                {
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="skeleton skeleton-circle"></div>
+
+                        <div class="text-end">
+                            <div class="skeleton skeleton-number"></div>
+                            <div class="skeleton skeleton-text"></div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="avatar fs-60 avatar-img-size flex-shrink-0">
+                            <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-24">
+                                <i class="ti ti-credit-card"></i>
+                            </span>
+                        </div>
+
+                        <div class="text-end">
+                            <h3 class="mb-2 fw-normal">@dashboardresponse.data.paymentCount</h3>
+                            <p class="mb-0 text-muted">Total Payment</p>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+</div>
+@code {
+    
+    private bool isLoading = true;
+    private bool hasError = false;
+    private bool dataReady = false;
+    private DashboardResponse dashboardresponse = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+         Console.WriteLine($"Dashboard AppState: {AppState.GetHashCode()}");
+
+        try
+        {
+            isLoading = true;
+            hasError = false;
+            dashboardresponse = await DashboardService.GetAllAsync();
+            dataReady = true;
+        }
+        catch
+        {
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

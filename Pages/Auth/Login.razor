@@ -1,0 +1,247 @@
+@page "/"
+
+@layout BlankLayout
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Reconciliation.Blazor.Services
+@using Reconciliation.Blazor.Models.Auth
+@inject TokenServices TokenService
+
+@inject IAuthenticationService AuthService
+
+@inject NavigationManager Navigation
+@* @inject CustomAuthenticationStateProvider AuthStateProvider *@
+@inject JwtAuthStateProvider AuthStateProvider
+
+<PageTitle>Login </PageTitle>
+
+
+<link href="css/login.css" rel="stylesheet" />
+
+<div class="login-container">
+
+    <div class="login-card">
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">
+                @errorMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success">
+                @successMessage
+            </div>
+        }
+
+        <!-- Logo -->
+        <div class="login-header">
+
+            <div class="login-logo">
+                <img src="/images/logos/logo-reconciliation.png"
+                     alt="Reconciliation Logo" />
+            </div>
+
+            <h1 class="login-title">
+                Welcome Back! 👋
+            </h1>
+
+            <p class="login-subtitle">
+                Please sign in to your account
+            </p>
+
+        </div>
+
+        <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+
+            <DataAnnotationsValidator />
+
+            <!-- Email -->
+
+            <div class="input-group">
+
+                <label>Email Address</label>
+
+                @* <div class="input-wrapper"> *@
+
+                     @* <i class="bi bi-envelope"></i>  *@
+
+                    <InputText class="input-field"
+                               @bind-Value="loginModel.Email"
+                               placeholder="Enter your email" />
+
+                @* </div> *@
+
+                <ValidationMessage For="@(() => loginModel.Email)"
+                                   class="field-error" />
+
+            </div>
+
+            <!-- Password -->
+
+            <div class="input-group">
+
+                <label>Password</label>
+
+                @* <div class="input-wrapper"> *@
+
+                
+
+                    <InputText type="password"
+                               class="input-field"
+                               @bind-Value="loginModel.Password"
+                               placeholder="Enter your password" />
+
+                    
+
+                @* </div> *@
+
+                <ValidationMessage For="@(() => loginModel.Password)"
+                                   class="field-error" />
+
+            </div>
+
+            <div class="login-options">
+
+                <label class="checkbox-label">
+                    <InputCheckbox @bind-Value="rememberMe" />
+                    Remember me
+                </label>
+
+                <a href="/forgot-password"
+                   class="forgot-link">
+                    Forgot Password?
+                </a>
+
+            </div>
+
+            <button class="login-button"
+                    disabled="@isLoading">
+
+                @if (isLoading)
+                {
+                    <span>Loading...</span>
+                }
+                else
+                {
+                 
+                        <i class="bi bi-lock-fill"></i>
+                        <span>Sign In</span>
+                  
+                }
+
+            </button>
+
+        </EditForm>
+
+        <!-- Divider -->
+
+        <div class="divider">
+
+            <span></span>
+
+            <p>or</p>
+
+            <span></span>
+
+        </div>
+
+        <div class="signup-prompt">
+
+            Don't have an account?
+
+            <a href="/signup">
+                Sign up
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    private LoginRequest loginModel = new();
+    private string? successMessage;
+    private string? errorMessage;
+
+    private bool isLoading = false;
+    private bool rememberMe = false;
+
+    [Inject] private AppState AppState { get; set; }
+    [Inject] private TokenServices TokenServices { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private HttpClient HttpClient { get; set; }
+    
+    private async Task HandleLogin()
+    {
+        isLoading = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            var response = await AuthService.LoginAsync(loginModel);
+            switch (response.StatusCode)
+            {
+                case 401:
+                    errorMessage = response.Message;
+                    break;
+
+                case 423:
+                    errorMessage = response.Message;
+                    break;
+
+                case 400:
+                    errorMessage = response.Message;
+                    break;
+
+                case 500:
+                    errorMessage = "An unexpected server error occurred.";
+                    break;
+
+                default:
+                    await TokenServices.SaveToken(response.Data!.accessToken);
+                    await AuthStateProvider.NotifyUserAuthentication(response.Data.accessToken);
+            
+                    successMessage = "Login successful!";
+                    StateHasChanged();
+                    await Task.Delay(800);
+                    Navigation.NavigateTo("/dashboard"); 
+                    break;
+            }
+            
+        }
+        catch
+        {
+           errorMessage = "Server error. Try again later.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ShowSuccess(string message)
+    {
+        successMessage = message;
+        errorMessage = null;
+    }
+
+    private void ShowError(string message)
+    {
+        errorMessage = message;
+        successMessage = null;
+    }
+    private async Task AutoClear()
+    {
+        await Task.Delay(3000);
+        errorMessage = null;
+        successMessage = null;
+        StateHasChanged();
+    }
+}
+

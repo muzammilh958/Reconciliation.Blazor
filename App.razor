@@ -1,0 +1,25 @@
+﻿@using Reconciliation.Blazor.Pages.Dashboard
+@using Reconciliation.Blazor.Pages.Shared
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+
+                <Authorizing>
+                    <div class="auth-loading">
+                        <div class="spinner"></div>
+                        <p>Signing you in...</p>
+                    </div>
+                </Authorizing>
+
+                <NotAuthorized>
+                    <RedirectToLogin />
+                </NotAuthorized>
+
+            </AuthorizeRouteView>
+
+        </Found>
+    </Router>
+</CascadingAuthenticationState>

@@ -1,0 +1,134 @@
+@page "/signup"
+@layout BlankLayout
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Reconciliation.Blazor.Services
+@using Reconciliation.Blazor.Models.Auth
+@inject NavigationManager Navigation
+@inject IAuthenticationService AuthService
+@inject CustomAuthenticationStateProvider AuthStateProvider
+
+<link href="css/signup.css" rel="stylesheet" />
+
+<div class="signup-container">
+    <div class="signup-card">
+        <div class="signup-header">
+            <h1 class="signup-title">Create Account 🎉</h1>
+            <p class="signup-subtitle">Join us and get started today</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="error-message">
+                @errorMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="success-message">
+                @successMessage
+            </div>
+        }
+
+        <EditForm Model="@signupModel" OnValidSubmit="@HandleSignUp">
+            <DataAnnotationsValidator />
+            
+            <div class="input-group">
+                <label for="firstname">First Name</label>
+                <InputText id="firstname" class="input-field" @bind-Value="signupModel.FirstName" placeholder="Enter your first name" />
+                <ValidationMessage For="@(() => signupModel.FirstName)" />
+            </div>
+
+            <div class="input-group">
+                <label for="lastname">Last Name</label>
+                <InputText id="lastname" class="input-field" @bind-Value="signupModel.LastName" placeholder="Enter your last name" />
+                <ValidationMessage For="@(() => signupModel.LastName)" />
+            </div>
+
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <InputText id="email" class="input-field" @bind-Value="signupModel.Email" placeholder="Enter your email" />
+                <ValidationMessage For="@(() => signupModel.Email)" />
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <InputText id="password" type="password" class="input-field" @bind-Value="signupModel.Password" placeholder="Create a strong password" />
+                <ValidationMessage For="@(() => signupModel.Password)" />
+            </div>
+
+            <div class="input-group">
+                <label for="confirmpassword">Confirm Password</label>
+                <InputText id="confirmpassword" type="password" class="input-field" @bind-Value="signupModel.ConfirmPassword" placeholder="Re-enter your password" />
+                <ValidationMessage For="@(() => signupModel.ConfirmPassword)" />
+            </div>
+
+            <div class="terms-agreement">
+                <label class="checkbox-label">
+                    <InputCheckbox @bind-Value="agreedToTerms" />
+                    <span>I agree to the Terms & Conditions</span>
+                </label>
+            </div>
+
+            <button type="submit" class="signup-button" disabled="@(isLoading || !agreedToTerms)">
+                @if (isLoading)
+                {
+                    <span>Creating Account...</span>
+                }
+                else
+                {
+                    <span>Sign Up</span>
+                }
+            </button>
+        </EditForm>
+
+        <div class="login-prompt">
+            Already have an account? <a href="/">Sign in</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private SignUpRequest signupModel = new();
+    private string? errorMessage;
+    private string? successMessage;
+    private bool isLoading = false;
+    private bool agreedToTerms = false;
+
+    private async Task HandleSignUp()
+    {
+        if (!agreedToTerms)
+        {
+            errorMessage = "❌ You must agree to the Terms & Conditions";
+            return;
+        }
+
+        if (signupModel.Password != signupModel.ConfirmPassword)
+        {
+            errorMessage = "❌ Passwords do not match";
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = null;
+        successMessage = null;
+
+        var response = await AuthService.SignUpAsync(signupModel);
+
+        if (response.Success && !string.IsNullOrEmpty(response.AccessToken))
+        {
+            await AuthStateProvider.MarkUserAsAuthenticated(response.AccessToken, response.RefreshToken ?? string.Empty);
+            successMessage = "✅ Account created successfully! Redirecting to home...";
+            await Task.Delay(2000);
+            Navigation.NavigateTo("/", true);
+        }
+        else
+        {
+            errorMessage = $"❌ {response.Message}";
+        }
+
+        isLoading = false;
+    }
+}

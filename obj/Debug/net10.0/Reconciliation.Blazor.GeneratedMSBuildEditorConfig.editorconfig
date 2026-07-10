@@ -1,0 +1,190 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = 
+build_property.EnableTrimAnalyzer = false
+build_property.IncludeAllContentForSelfExtract = 
+build_property.VerifyReferenceTrimCompatibility = 
+build_property.VerifyReferenceAotCompatibility = 
+build_property.TargetFramework = net10.0
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v10.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EntryPointFilePath = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = Reconciliation.Blazor
+build_property.RootNamespace = Reconciliation.Blazor
+build_property.ProjectDir = E:\Project\ReconciliationSystem\Reconciliation.Blazor\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = false
+build_property.RazorLangVersion = 10.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = E:\Project\ReconciliationSystem\Reconciliation.Blazor
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 10.0
+build_property.EnableCodeStyleSeverity = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Components/AdminOnly.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBZG1pbk9ubHkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Components/ProtectedRoute.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQcm90ZWN0ZWRSb3V0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Layout/BlankLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XEJsYW5rTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Layout/Partials/Customizer.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XFBhcnRpYWxzXEN1c3RvbWl6ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Layout/Partials/HorizontalNav.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XFBhcnRpYWxzXEhvcml6b250YWxOYXYucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Layout/Partials/Sidenav.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XFBhcnRpYWxzXFNpZGVuYXYucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Layout/Partials/Topbar.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XFBhcnRpYWxzXFRvcGJhci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Auth/ForgetPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxGb3JnZXRQYXNzd29yZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Auth/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxMb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Auth/ResetPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxSZXNldFBhc3N3b3JkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Auth/SignUp.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aFxTaWduVXAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Batch/AddBatch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQmF0Y2hcQWRkQmF0Y2gucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Batch/BatchList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQmF0Y2hcQmF0Y2hMaXN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Dashboard/AdminPanel.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXEFkbWluUGFuZWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Dashboard/UserProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkXFVzZXJQcm9maWxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Invoice/AddInvoice.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxBZGRJbnZvaWNlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Invoice/InvoiceList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxJbnZvaWNlTGlzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Invoice/InvoiceUpload.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxJbnZvaWNlVXBsb2FkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Invoice/InvoiceUploadList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxJbnZvaWNlVXBsb2FkTGlzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Merchant/ExceptionList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVyY2hhbnRcRXhjZXB0aW9uTGlzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Merchant/MerchantUpload.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVyY2hhbnRcTWVyY2hhbnRVcGxvYWQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Merchant/MerchantUploadList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVyY2hhbnRcTWVyY2hhbnRVcGxvYWRMaXN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Merchant/ReconciliationScreen.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVyY2hhbnRcUmVjb25jaWxpYXRpb25TY3JlZW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/NotFound.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90Rm91bmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Payment/AddPayment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxBZGRQYXltZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Payment/PaymentList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxQYXltZW50TGlzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Shared/RedirectToLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXFJlZGlyZWN0VG9Mb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/SignUp.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2lnblVwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Store/AddStore.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3RvcmVcQWRkU3RvcmUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Store/StoreList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3RvcmVcU3RvcmVMaXN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/SystemSetting/Settings.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3lzdGVtU2V0dGluZ1xTZXR0aW5ncy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/UserManagement/AddUser.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1hbmFnZW1lbnRcQWRkVXNlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/UserManagement/UserList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1hbmFnZW1lbnRcVXNlckxpc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Weather.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2VhdGhlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-bt9yo8upbh
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-2egs7tf9po

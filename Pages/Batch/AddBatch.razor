@@ -1,0 +1,158 @@
+﻿@page "/batches/add"
+@inject IBatchesService BatchService
+@inject NavigationManager Nav
+
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Add Batch</h3>
+                    <small class="text-muted">Batch</small>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <EditForm Model="@model" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    @* <ValidationSummary /> *@
+                    @if (!string.IsNullOrEmpty(message))
+                    {
+                        <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">
+                            @message
+                        </div>
+                    }
+                    <div class="mb-3">
+                        <label class="form-label">Batch Name</label>
+                        <InputText class="form-control" @bind-Value="model.name" placeholder="Enter batch name" />
+                        <ValidationMessage For="@(() => model.name)" />
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">From Date</label>
+                        <InputDate class="form-control" @bind-Value="model.FromDate" />
+                        <ValidationMessage For="@(() => model.FromDate)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">To Date</label>
+                        <InputDate class="form-control" @bind-Value="model.ToDate" />
+                        <ValidationMessage For="@(() => model.ToDate)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex">
+
+                            <div class="form-check form-switch fs-lg">
+                                <input id="isLocked" type="checkbox" class="form-check-input" @bind="model.IsLocked" />
+
+                            </div>
+                            <h5 class="mb-0"><label class="fw-bold " for="sidebaruser-check">Locked</label></h5>
+
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
+                                Cancel
+                            </button>
+                            <button class="btn btn-primary btn-sm" type="submit" disabled="@isLoading">
+                                @if (isLoading)
+                                {
+                                    <span>Saving...</span>
+                                }
+                                else
+                                {
+                                    <span>Save</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                    @* <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm" type="submit" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span>Saving...</span>
+                    }
+                    else
+                    {
+                        <span>Save</span>
+                    }
+                </button>
+
+                <button class="btn btn-secondary" type="button" @onclick="Cancel">
+                    Cancel
+                </button>
+            </div> *@
+
+                </EditForm>
+
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    private Models.Batch.BatchDataDTO model = new();
+    private bool isLoading = false;
+    private string? message;
+    private bool isSuccess;
+
+    private bool showMessage;
+    private string messageText = "";
+    private string messageClass = "";
+    private async Task HandleSubmit()
+    {
+        isLoading = true;
+
+        try
+        {
+            var result = await BatchService.CreateAsync(model);
+            if (model.FromDate != null && model.ToDate != null &&
+                       model.FromDate > model.ToDate)
+            {
+                message = "From Date cannot be greater than To Date";
+                isLoading = false;
+                return;
+            }
+            isSuccess = result?.success ?? false;
+            message = result?.message ?? "No response received";
+
+            if (isSuccess)
+            {
+                await ShowMessage( result.message ?? "Batch deleted successfully.", "alert-success");
+                await Task.Delay(1500);
+                // optional redirect
+                Nav.NavigateTo("/batch/list");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    private async Task ShowMessage(string text, string cssClass)
+    {
+        messageText = text;
+        messageClass = cssClass;
+        showMessage = true;
+
+        StateHasChanged();
+
+        await Task.Delay(1000);
+
+        showMessage = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void Cancel()
+    {
+        Nav.NavigateTo("/batches");
+    }
+}

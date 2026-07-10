@@ -1,0 +1,297 @@
+﻿@page "/merchant/reconciliation"
+
+@inject IBatchesService BatchesService
+
+@inject NavigationManager NavigationManager
+
+@inject IJSRuntime JsRuntime;
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Reconciliation</h3>
+                    <small class="text-muted">Manage and reconcile batches</small>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (showAlert)
+                {
+                    <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                        @alertMessage
+                        <button type="button" class="btn-close" @onclick="() => showAlert = false"></button>
+                    </div>
+                }
+
+                <!-- Batch selection row (correct) -->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Batch</label>
+                        <select class="form-select" @bind="SelectedBatchId">
+                            <option value="0" selected disabled>Select Batch</option>
+                            @foreach (var batch in batchDataDTOs)
+                            {
+                                <option value="@batch.id">@batch.name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                @if (showResults && reconciliationResult?.data != null)
+                {
+                    <div class="mt-4">
+                        <h5 class="fw-semibold">Reconciliation Results</h5>
+
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white shadow">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Matched</h6>
+                                        <h4 class="mb-0">@reconciliationResult.data.Count(d => d.reconStatus == "Matched")</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-danger text-white shadow"  style="cursor: pointer;" 
+         @onclick="GoToException">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Exceptions</h6>
+                                        <h4 class="mb-0">@reconciliationResult.data.Count(d => d.reconStatus == "Exception")</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-dark shadow">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Variance</h6>
+                                        <h4 class="mb-0 text-white">
+                                          @reconciliationResult.data.Where(d => d.varianceAmount.HasValue &&
+                                                                                    d.varianceAmount != 0).Sum(d => d.varianceAmount.Value).ToString("C")
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                          
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white shadow">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Refund Matched</h6>
+                                        <h4 class="mb-0">@reconciliationResult.data.Count(d => d.reconStatus == "Refund Matched")</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-secondary text-white shadow">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Duplicate</h6>
+                                        <h4 class="mb-0">@reconciliationResult.data.Count(d => d.exceptionType == "Duplicate")</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+
+                        
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered table-hover" id="reconTable" data-tables="basic">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Source</th>
+                                                <th>Order ID</th>
+                                                <th>Store</th>
+                                                <th>Amount</th>
+                                                <th>Tender</th>
+                                                <th>Auth Code</th>
+                                                <th>Transaction Date</th>
+                                                <th>Status</th>
+                                                <th>Variance</th>
+                                                <th>Matched Line</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in reconciliationResult.data.Where(m=>m.reconStatus=="Matched") )
+                                            {
+                                                <tr>
+                                                    <td>@item.invoiceLine?.sourceType</td>
+                                                    <td>@item.merchantLine?.orderId</td>
+                                                    <td>@item.invoiceLine?.storeId</td>
+                                                    <td>@item.invoiceLine?.amount.ToString("C")</td>
+                                                    <td>@item.invoiceLine?.tenderType</td>
+                                                    <td>@item.invoiceLine?.authCode</td>
+                                                    <td>@item.invoiceLine?.transactionDate.ToString("g")</td>
+                                                    <td ><span class="badge badge-soft-success">@item.reconStatus</span></td>
+                                                    <td class="@GetVarianceClass(item)">@item.varianceAmount?.ToString("C")</td>
+                                                    <td>@(item.matchedAt?.ToString("g") ?? "-")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="text-muted small">
+                                    Total records: @reconciliationResult.data.Count
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (showResults && reconciliationResult?.data == null)
+                {
+                    <div class="mt-4 text-muted">No data returned.</div>
+                }
+
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                            <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
+                            <button class="btn btn-primary btn-sm" type="button" @onclick="ReconcileBatchAsync" disabled="@isReconciling">
+                                @if (isReconciling)
+                                {
+                                    <span>Reconciling...</span>
+                                }
+                                else
+                                {
+                                    <span>Reconcile Batch</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div> 
+</div> 
+@code {
+
+    private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
+    private bool isLoading = true;
+    private bool showAlert = false;
+    private string alertMessage = "";
+    private string alertType = "success";
+    private bool isReconciling = false;
+    private int _selectedBatchId = 0;
+    private ReconciliationResult? reconciliationResult = new ReconciliationResult();
+    private bool showResults = false;
+
+    private bool dataReady = false;
+    private IJSObjectReference? _module;
+
+    private int SelectedBatchId
+    {
+        get => _selectedBatchId;
+        set
+        {
+            _selectedBatchId = value;
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            batchDataDTOs = await BatchesService.GetAllAsync();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load data", "danger");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (dataReady)
+        {
+            dataReady = false; // prevent infinite loops
+            if (_module == null)
+            {
+                _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "/css/datatables/datatables-ajax.js");
+            }
+            await _module.InvokeVoidAsync("initDataTable");
+        }
+
+    }
+
+    private void ShowAlert(string message, string type = "success")
+    {
+        alertMessage = message;
+        alertType = type;
+        showAlert = true;
+        StateHasChanged();
+    }
+
+    private async Task ReconcileBatchAsync()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+
+        isReconciling = true;
+        showResults = false; // hide previous results
+        try
+        {
+            reconciliationResult = await BatchesService.ReconcileBatchAsync(SelectedBatchId);
+            Console.WriteLine($"Result Status: {reconciliationResult?.statusCode}");
+
+            if (reconciliationResult == null)
+            {
+                ShowAlert("No response from server.", "danger");
+                return;
+            }
+
+            switch (reconciliationResult.statusCode)
+            {
+                case 200:
+                    showResults = true; // <<--- set BEFORE alert
+                    dataReady = true;
+                    ShowAlert("Reconciliation completed!", "success");
+                    break;
+
+                case 400:
+                case 404:
+                case 500:
+                    ShowAlert(reconciliationResult.message!, "danger");
+                    break;
+
+                default:
+                    ShowAlert(reconciliationResult.message ?? "Unknown error.", "danger");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error: {ex.Message}", "danger");
+            showResults = false;
+        }
+        finally
+        {
+            isReconciling = false;
+            // StateHasChanged is already called inside ShowAlert,
+            // but calling it here ensures UI updates if no alert was shown.
+            StateHasChanged();
+        }
+    }
+
+
+
+    private string GetVarianceClass(Datum item)
+    {
+        return item.varianceAmount.HasValue && item.varianceAmount.Value != 0
+         ? "fw-bold text-danger"
+         : "";
+    }
+
+    private void GoToException()
+    {
+        NavigationManager.NavigateTo("/merchant/exception");
+    }
+}

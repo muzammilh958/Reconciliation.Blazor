@@ -1,0 +1,107 @@
+﻿@page "/settings"
+@inject IGlobalSettings GlobalSettings
+
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Settings</h5>
+            </div>
+            <div class="card-body">
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <div class="mt-2">Loading Settings...</div>
+                    </div>
+                }
+                else if (hasError)
+                {
+                    <div class="alert alert-danger">
+                        Failed to load Settings.
+                    </div>
+                }
+                else if (GlobalSettingConfigurations == null)
+                {
+                    <div class="text-center text-muted py-4">
+                        No Settings found
+                    </div>
+                }
+                else
+                {
+
+                    <div class="row">
+                        @foreach (var setting in GlobalSettingConfigurations)
+                        {
+                            <div class="col-lg-6 mb-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <label class="form-label fw-semibold" for="@($"setting-{setting.id}")">
+                                            @setting.settingKey
+                                        </label>
+
+                                        @if (!string.IsNullOrWhiteSpace(setting.description))
+                                        {
+                                            <div class="text-muted small mb-2">
+                                                @setting.description
+                                            </div>
+                                        }
+
+                                        <input class="form-control" id="@($"setting-{setting.id}")" type="text"
+                                               @bind="setting.settingValue" />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- FIXED BUTTON ROW -->
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    Cancel
+                                </button>
+                                <button class="btn btn-primary btn-sm">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    
+    private List<GlobalSetting> GlobalSettingConfigurations = new();
+    private bool isLoading = true;
+    private bool hasError = false;
+    private bool dataReady = false;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            hasError = false;
+            GlobalSettingConfigurations = await GlobalSettings.GetAllAsync();
+
+            Console.Write(GlobalSettingConfigurations);
+            dataReady = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

@@ -1,0 +1,125 @@
+﻿@page "/invoice-type/add"
+
+@inject IInvoiceTypeService invoiceService
+@inject NavigationManager Nav
+
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card shadow-sm">
+            
+
+             <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Add Invoice Type</h3>
+                    <small class="text-muted">Invoice Type</small>
+                </div>
+
+            </div>
+            <div class="card-body">
+
+                <EditForm Model="@model" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    @* <ValidationSummary /> *@
+                    @if (!string.IsNullOrEmpty(message))
+                    {
+                        <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">
+                            @message
+                        </div>
+                    }
+                    <div class="mb-3">
+                        <label class="form-label">Invoice Type Name</label>
+                        <InputText class="form-control" @bind-Value="model.name" placeholder="Enter Invoice Type name" />
+                        <ValidationMessage For="@(() => model.name)" />
+                    </div>
+
+         
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
+                                Cancel
+                            </button>
+                            <button class="btn btn-primary btn-sm" type="submit" disabled="@isLoading">
+                                @if (isLoading)
+                                {
+                                    <span>Saving...</span>
+                                }
+                                else
+                                {
+                                    <span>Save</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+
+                </EditForm>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private InvoiceType model = new();
+    private bool isLoading = false;
+    private string? message;
+    private bool isSuccess;
+
+    private bool showMessage;
+    private string messageText = "";
+    private string messageClass = "";
+    private async Task HandleSubmit()
+    {
+        isLoading = true;
+
+        try
+        {
+            var result = await invoiceService.CreateAsync(model);
+
+            isSuccess = result?.success ?? false;
+            message = result?.message ?? "No response received";
+
+            if (isSuccess)
+            {
+                await ShowMessage(
+                        result!.message ?? "Invoice Type created successfully.",
+          "alert-success"
+      );
+                await Task.Delay(1500);
+                // optional redirect
+                Nav.NavigateTo("/invoice-type/list");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    private async Task ShowMessage(string text, string cssClass)
+    {
+        messageText = text;
+        messageClass = cssClass;
+        showMessage = true;
+
+        StateHasChanged();
+
+        await Task.Delay(1000);
+
+        showMessage = false;
+        await InvokeAsync(StateHasChanged);
+    }
+    private void OpenCreate()
+    {
+        Nav.NavigateTo("/invoice-types/add");
+    }
+    private void Cancel()
+    {
+        Nav.NavigateTo("/invoice-type/list");
+    }
+}
+
