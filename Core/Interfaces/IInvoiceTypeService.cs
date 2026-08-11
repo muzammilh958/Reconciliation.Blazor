@@ -3,7 +3,7 @@
 public interface IInvoiceTypeService
 {
     Task<InvoiceTypeList> GetAllAsync();
-    Task<InvoiceType?> GetByIdAsync(int id);
+    Task<SingleInvoiceTypeResponse?> GetByIdAsync(int id);
 
     Task<InvoiceCreateResponse> CreateAsync(InvoiceType model);
 

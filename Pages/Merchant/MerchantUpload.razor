@@ -28,19 +28,21 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <label class="form-label">Select Batch</label>
-                        <select class="form-select" @bind="SelectedBatchId">
-                            <option value="0"  selected disabled>Select Batch</option>
+                        <select id="batchSelect" class="form-control form-select select2" @bind="SelectedBatchId">
+                            <option value="0" disabled>Select Batch</option>
                             @foreach (var batch in batches)
                             {
                                 <option value="@batch.id">@batch.name</option>
                             }
                         </select>
+                        
                     </div>
 
                     <div class="col-sm-6">
                         <label class="form-label">Select Payment</label>
-                        <select class="form-select" @bind="SelectedPaymentId">
-                            <option value="">Select Payment</option>
+                            
+                       <select id="paymentSelect" class="form-control form-select select2" @bind="SelectedPaymentId">
+                            <option value="0" disabled>Select Payment</option>
                             @foreach (var payment in Paymentes)
                             {
                                 <option value="@payment.id">@payment.name</option>
@@ -61,6 +63,8 @@
                     </div>
                 </div>
 
+              
+
                 <div class="row mt-3">
                     <div class="col-sm-6">
                         <label class="form-label">File Upload</label>
@@ -72,7 +76,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> 
 
                 <div class="col-12">
                     <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
@@ -93,12 +97,12 @@
                                 disabled="@ispostLoading">
                             @if (ispostLoading)
                             {
-                                <span>Saving...</span>
+                                <span>Importing...</span>
                             }
                             else
                             {
 
-                                <span>Save</span>
+                                <span>Import</span>
                             }
                         </button>
                     </div>
@@ -107,6 +111,7 @@
         </div>
     </div>
 </div>
+@implements IDisposable
 
 @code {
     private List<byte[]> fileBytes = new();
@@ -125,10 +130,23 @@
     
     private int _selectedBatchId= 0;
     private int _selectedPaymentId;
+
+    private string orderId =""; 
+    private string TransactionDate = "";
+    private string Tender = "";
+    private string TransactionAmount = "";
+    private string AuthorizationCode  = "";
+    private string MerchantID   = "";
+
     private DateTime? FromDate { get; set; }
     private DateTime? ToDate { get; set; }
 
     private IJSObjectReference? _module;
+
+    // --- Added for Select2 ---
+    private DotNetObjectReference<MerchantUpload>? _dotNetRef; // TODO: replace "Upload" with your actual @code class name
+    private bool _select2Initialized = false;
+    // --------------------------
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -147,6 +165,16 @@
                 Console.WriteLine($"JS load error: {ex.Message}");
             }
         }
+
+        // --- Added for Select2 ---
+        // Wait until batches/payments have actually loaded and rendered as <option>s
+        if (!_select2Initialized && !isLoading && batches.Any() && Paymentes.Any())
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetRef);
+            _select2Initialized = true;
+        }
+        // --------------------------
     }
 
     protected override async Task OnInitializedAsync()
@@ -188,6 +216,22 @@
         get => _selectedPaymentId;
         set => _selectedPaymentId = value;
     }
+
+    // --- Added for Select2: JS calls these back when the dropdown changes ---
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
+    {
+        SelectedBatchId = batchId; // reuses your existing setter logic (updates FromDate/ToDate)
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnPaymentSelected(int paymentId)
+    {
+        SelectedPaymentId = paymentId;
+        StateHasChanged();
+    }
+    // --------------------------------------------------------------------
 
     // Call this from FilePond's onaddfile or similar via JS if needed.
     // For now we fetch on save (defensive)
@@ -246,14 +290,9 @@
 
         try
         {
-            await LoadFileDataAsync(); // Ensure data is fresh
+            await LoadFileDataAsync();  
 
-            if (fileBytes.Count == 0)
-            {
-                ShowAlert("Please select a valid file", "danger");
-                return;
-            }
-
+            
             if (SelectedBatchId <= 0 || SelectedPaymentId <= 0 || !FromDate.HasValue || !ToDate.HasValue)
             {
                 ShowAlert("Please fill all required fields", "danger");
@@ -265,17 +304,20 @@
                 batchId = SelectedBatchId,
                 paymentId = SelectedPaymentId,
                 fromDate = FromDate.Value,
-                toDate = ToDate.Value
+                toDate = ToDate.Value,
+                
             };
 
-            var result = await MerchantService.CreateAsync(
-                model,
-                fileBytes[0],
-                fileNames[0],
-                contentTypes[0]);
+            var result = await MerchantService.CreateAsync(model, fileBytes, fileNames, contentTypes);
 
-            ShowAlert(result.data.message,
-                      result.success ? "success" : "danger");
+            if (result.success)
+            {
+                ShowAlert(result.data?.message ?? result.message  ?? "Success.", "success");
+            }
+            else
+            {
+                ShowAlert(result.message ?? "Failed to save", "danger");
+            }
         }
         catch (Exception ex)
         {
@@ -296,7 +338,13 @@
         StateHasChanged();
     }
 
-    
+    // --- Added for Select2 ---
+    public void Dispose()
+    {
+        _dotNetRef?.Dispose();
+    }
+    // --------------------------
+
     public class FileData
     {
         public string name { get; set; } = "";

@@ -65,6 +65,12 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Name</th>
+                                    <th>Authorization Code</th>
+                                    <th>Merchant ID</th>
+                                    <th>Order Id</th>
+                                    <th>Tender</th>
+                                    <th>Transaction Amount</th>
+                                    <th>Transaction Date</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -74,8 +80,14 @@
                                 {
                                     <tr>
                                         <td>@Payment.name</td>
-
+                                        <td>@Payment.AuthorizationCode</td>
+                                        <td>@Payment.MerchantID</td>
+                                        <td>@Payment.OrderId</td>
+                                        <td>@Payment.Tender</td>
+                                        <td>@Payment.TransactionAmount</td>
+                                        <td>@Payment.TransactionDate</td>
                                         
+
                                         <td class="text-end">
                                             <button class="btn btn-sm btn-primary btn-sm me-1"
                                                     @onclick="() => OpenEdit(Payment)">
@@ -83,7 +95,7 @@
                                             </button>
 
                                             <button class="btn btn-sm btn-danger"
-                                                    @onclick="() => ConfirmDelete(Payment.id, Payment.name)">
+                                                    @onclick="() => ConfirmDelete(Payment.id, Payment.name!)">
                                                 Delete
                                             </button>
                                         </td>
@@ -105,7 +117,6 @@
 @code {
     private List<PaymentData> Paymentes = new();
     private bool showDeleteDialog = false;
-    private bool showEditDialog = false;
     private PaymentData editModel = new();
     private int selectedPaymentId;
     private string selectedPaymentName = "";
@@ -150,20 +161,10 @@
 
     private void OpenEdit(PaymentData Payment)
     {
-        editModel = new PaymentData
-        {
-            id = Payment.id,
-            name = Payment.name
-        };
-
-        showEditDialog = true;
+        Nav.NavigateTo($"/payment/edit/{Payment.id}");
     }
 
-    private void CancelEdit()
-    {
-        showEditDialog = false;
-    }
-
+  
     private async Task LoadPaymentes()
     {
         Paymentes = await PaymentService.GetAllAsync();
@@ -228,7 +229,7 @@
 
     private async Task UpdatePayment()
     {
-
+        isLoading = true;
         editModel.name = editModel.name?.Trim() ?? "";
 
         if (string.IsNullOrWhiteSpace(editModel.name))
@@ -241,7 +242,7 @@
 
         var result = await PaymentService.UpdateAsync(editModel.id, editModel);
 
-        showEditDialog = false;
+       
 
         if (result?.success == true)
         {
@@ -261,6 +262,7 @@
                 "alert-danger"
             );
         }
+        isLoading = false;
     }
 
     private async Task ShowMessage(string text, string cssClass)
@@ -319,43 +321,6 @@
                         Yes, delete
                     </button>
                 </div>
-
-            </div>
-        </div>
-    </div>
-}
-@if (showEditDialog)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
-
-        <div class="modal-dialog modal-dialog-centered" style="z-index: 1055;">
-            <div class="modal-content shadow">
-
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Payment</h5>
-                    <button type="button" class="btn-close" @onclick="CancelEdit"></button>
-                </div>
-
-                <EditForm Model="@editModel" OnValidSubmit="UpdatePayment">
-                    <DataAnnotationsValidator />
-
-                    <div class="modal-body py-4">
-                        <label class="form-label">Name</label>
-                        <input class="form-control" @bind="editModel.name" />
-                        <ValidationMessage For="@(() => editModel.name)" />
-                    </div>
-
-                  
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">
-                            Cancel
-                        </button>
-
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            Update
-                        </button>
-                    </div>
-                </EditForm>
 
             </div>
         </div>

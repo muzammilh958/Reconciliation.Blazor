@@ -6,7 +6,7 @@ namespace Reconciliation.Blazor;
 public class MerchantUploadResponse
 {
     public bool success { get; set; }
-    public string message { get; set; }
+    public string? message { get; set; }
     public List<UploadedData> data { get; set; } = new();
     public int statusCode { get; set; }
     public object? errors { get; set; }
@@ -28,7 +28,7 @@ public class UploadedData
     public DateTime createdAt { get; set; }
     public DateTime updatedAt { get; set; }
     [JsonPropertyName("batch")]
-    public BatchDataDTO batch { get; set; }
+    public BatchDataDTO? batch { get; set; }
     [JsonPropertyName("payment")]
-    public PaymentData payment { get; set; }
+    public PaymentData? payment { get; set; }
 }

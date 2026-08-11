@@ -108,6 +108,12 @@ using Reconciliation.Blazor.Layout.Partials
 
 #nullable disable
     ;
+#nullable restore
+#line (2,2)-(2,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+using System.Text.Json
+
+#nullable disable
+    ;
     #line default
     #line hidden
     [global::Microsoft.AspNetCore.Components.RouteAttribute(
@@ -130,24 +136,27 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (94,8)-(120,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (107,8)-(136,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 
     private bool isLoading = true;
     private bool ispostLoading = false;
     private bool showAlert = false;
     private string alertMessage = "";
     private string alertType = "success";
-    private int _selectedInvoiceId= 0;
+    private int _selectedInvoiceId = 0;
     private DateTime? FromDate { get; set; }
     private DateTime? ToDate { get; set; }
-    private int _selectedBatchId= 0;
+    private int _selectedBatchId = 0;
+
+    private List<PaymentData> Paymentes = new();
+    private int _selectedPaymentId;
     private List<Models.Batch.BatchDataDTO> batches = new();
 
     private IJSObjectReference? _module;
     private InvoiceTypeList invoiceType = new();
-     private List<byte[]> fileBytes = new();
-    private List<string> fileNames = new();
-    private List<string> contentTypes = new();
+
+    private DotNetObjectReference<InvoiceUpload>? _dotNetRef; // TODO: replace "Upload" with your actual @code class name
+    private bool _select2Initialized = false;
     private int SelectedInvoiceId
     {
         get => _selectedInvoiceId;
@@ -164,11 +173,21 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (121,64)-(289,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (137,64)-(294,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 
                 StateHasChanged();
             }
         }
+    }
+    private int SelectedPaymentId
+    {
+        get => _selectedPaymentId;
+        set => _selectedPaymentId = value;
+    }
+
+    private async Task OnInvoiceSelected(int invoiceId)
+    {
+        SelectedInvoiceId = invoiceId;
     }
 
     private int SelectedBatchId
@@ -197,6 +216,13 @@ using Reconciliation.Blazor.Layout.Partials
                 await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
                 await JsRuntime.InvokeVoidAsync("loadConfig");
                 await JsRuntime.InvokeVoidAsync("loadApps");
+
+                if (!_select2Initialized && !isLoading && batches.Any())
+                {
+                    _dotNetRef = DotNetObjectReference.Create(this);
+                    await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetRef);
+                    _select2Initialized = true;
+                }
             }
             catch (Exception ex)
             {
@@ -211,6 +237,7 @@ using Reconciliation.Blazor.Layout.Partials
         {
             batches = await BatchesService.GetAllAsync();
             invoiceType = await InvoiceService.GetAllAsync();
+            Paymentes = await PaymentService.GetAllAsync();
         }
         catch (Exception ex)
         {
@@ -232,20 +259,16 @@ using Reconciliation.Blazor.Layout.Partials
     }
 
     private async Task SaveAsync()
-    { 
+    {
         ispostLoading = true;
 
         try
         {
-            await LoadFileDataAsync(); // Ensure data is fresh
 
-            if (fileBytes.Count == 0)
-            {
-                ShowAlert("Please select a valid file", "danger");
-                return;
-            }
 
-            if (SelectedBatchId <= 0 || SelectedInvoiceId <= 0 || !FromDate.HasValue || !ToDate.HasValue)
+            Console.WriteLine($"SelectedBatchId: {SelectedBatchId}, SelectedPaymentId: {SelectedPaymentId}, FromDate: {FromDate}, ToDate: {ToDate}");
+
+            if (SelectedBatchId <= 0 || SelectedPaymentId <= 0 || !FromDate.HasValue || !ToDate.HasValue)
             {
                 ShowAlert("Please fill all required fields", "danger");
                 return;
@@ -254,23 +277,35 @@ using Reconciliation.Blazor.Layout.Partials
             var model = new InvoiceUploadRequest
             {
                 batchId = SelectedBatchId,
-                invoiceId = SelectedInvoiceId,
+                PaymentId = SelectedPaymentId,
                 fromDate = FromDate.Value,
                 toDate = ToDate.Value
             };
 
             InvoiceUploadResponse? result = await InvoiceServices.CreateAsync(
-                model,
-                fileBytes[0],
-                fileNames[0],
-                contentTypes[0]); 
+                model);
 
-          ShowAlert(result.message,
-                      result.success ? "success" : "danger");
+            if (result != null)
+            {
+                // Directly use the message from the response
+                if (!result.success)
+                {
+                    ShowAlert(result.message ?? "Failed to save", "danger");
+                }
+                else
+                {
+                    ShowAlert(result.message ?? "Saved successfully", "success");
+                }
+            }
+            else
+            {
+                ShowAlert("No response from server", "danger");
+            }
         }
         catch (Exception ex)
         {
-            ShowAlert(ex.Message ?? "Failed to save", "danger");
+            
+            ShowAlert(ExtractFriendlyMessage(ex), "danger");
             Console.WriteLine(ex); // full stack trace
         }
         finally
@@ -279,60 +314,23 @@ using Reconciliation.Blazor.Layout.Partials
         }
     }
 
-    private async Task LoadFileDataAsync()
+    private static string ExtractFriendlyMessage(Exception ex)
     {
-        fileBytes.Clear();
-        fileNames.Clear();
-        contentTypes.Clear();
-
-        try
+        var start = ex.Message.IndexOf('{');
+        if (start >= 0)
         {
-            var jsFiles = await JsRuntime.InvokeAsync<List<FileData>>("getFilePondFiles");
-
-            if (jsFiles == null || jsFiles.Count == 0)
+            try
             {
-                ShowAlert("No files found from FilePond", "danger");
-                return;
+                var resp = JsonSerializer.Deserialize<InvoiceUploadResponse>(ex.Message[start..]);
+                if (resp != null && !string.IsNullOrWhiteSpace(resp.message))
+                    return resp.message;
             }
-
-            foreach (var file in jsFiles)
-            {
-                if (string.IsNullOrWhiteSpace(file?.name))
-                    continue;
-
-                // Critical: Read bytes via JS interop
-                var base64 = await JsRuntime.InvokeAsync<string>("getFilePondFileBase64", file.name);
-                if (string.IsNullOrWhiteSpace(base64))
-                {
-                    Console.WriteLine($"Failed to read file: {file.name}");
-                    continue;
-                }
-
-                var bytes = Convert.FromBase64String(base64);
-
-                if (bytes.Length == 0)
-                    continue;
-
-                fileBytes.Add(bytes);
-                fileNames.Add(file.name);
-                contentTypes.Add(file.contentType ?? "application/octet-stream");
-            }
-            if (fileBytes.Count == 0)
-            {
-                ShowAlert("Failed to load any file data", "danger");
-            }
+            catch { }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"File load error: {ex}");
-        }
+        return "Something went wrong. Please try again.";
     }
-    public class FileData
-    {
-        public string name { get; set; } = "";
-        public string contentType { get; set; } = "";
-        public List<int> bytes { get; set; } = new(); // probably not used
-    }
+
+    
 
 #line default
 #line hidden
@@ -340,7 +338,7 @@ using Reconciliation.Blazor.Layout.Partials
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (7,9)-(7,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (9,9)-(9,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 IJSRuntime
 
 #line default
@@ -348,7 +346,7 @@ IJSRuntime
 #nullable disable
          
 #nullable restore
-#line (7,20)-(7,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (9,20)-(9,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 JsRuntime
 
 #line default
@@ -358,7 +356,7 @@ JsRuntime
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (6,9)-(6,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (8,9)-(8,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 IBatchesService
 
 #line default
@@ -366,7 +364,7 @@ IBatchesService
 #nullable disable
          
 #nullable restore
-#line (6,25)-(6,39) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (8,25)-(8,39) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 BatchesService
 
 #line default
@@ -376,7 +374,7 @@ BatchesService
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (5,9)-(5,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (7,9)-(7,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 IInvoiceService
 
 #line default
@@ -384,7 +382,7 @@ IInvoiceService
 #nullable disable
          
 #nullable restore
-#line (5,25)-(5,40) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (7,25)-(7,40) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 InvoiceServices
 
 #line default
@@ -394,7 +392,25 @@ InvoiceServices
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (3,9)-(3,28) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (6,9)-(6,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+IPaymentService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (6,25)-(6,39) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+PaymentService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (4,9)-(4,28) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 IInvoiceTypeService
 
 #line default
@@ -402,7 +418,7 @@ IInvoiceTypeService
 #nullable disable
          
 #nullable restore
-#line (3,29)-(3,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (4,29)-(4,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 InvoiceService
 
 #line default

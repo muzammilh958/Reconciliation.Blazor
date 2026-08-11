@@ -189,7 +189,7 @@ using Reconciliation.Blazor.Layout.Partials
             await _module.InvokeVoidAsync("loadDataTableAjax");
         }
     }
-     protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {

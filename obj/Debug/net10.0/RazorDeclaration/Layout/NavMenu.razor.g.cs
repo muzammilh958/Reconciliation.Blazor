@@ -128,7 +128,7 @@ LayoutComponentBase
         }
         #pragma warning restore 1998
 #nullable restore
-#line (67,8)-(85,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\NavMenu.razor"
+#line (67,8)-(86,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\NavMenu.razor"
 
     private bool collapseNavMenu = true;
 
@@ -145,6 +145,7 @@ LayoutComponentBase
     private async Task OnLogout()
     {
         await AuthStateProvider.NotifyUserLogout();
+        
         Navigation.NavigateTo("/");
     }
 

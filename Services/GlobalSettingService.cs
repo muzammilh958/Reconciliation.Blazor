@@ -44,7 +44,7 @@ public class GlobalSettingService : IGlobalSettings
         catch (System.Exception ex)
         {
             Console.WriteLine($"GetAllAsync error: {ex.Message}");
-            throw ex;
+            throw ;
         }
 
     }

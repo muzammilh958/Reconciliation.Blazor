@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (97,8)-(158,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\AddBatch.razor"
+#line (81,8)-(142,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\AddBatch.razor"
 
     private Models.Batch.BatchDataDTO model = new();
     private bool isLoading = false;

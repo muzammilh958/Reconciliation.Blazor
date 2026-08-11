@@ -12,5 +12,5 @@ public interface IBatchesService
     Task<BatchUpdateResponse> UpdateAsync(int id, BatchDataDTO request);
 
     Task<BatchDeleteResponse> DeleteAsync(string id);
-    Task<ReconciliationResult> ReconcileBatchAsync(int batchId);
+    Task<ReconciliationResult> ReconcileBatchAsync(DateTime FromDate, DateTime ToDate ,int batchId, int paymentId);
 }

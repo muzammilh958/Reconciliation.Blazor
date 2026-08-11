@@ -22,7 +22,7 @@
           "buildMultiTargeting/Blazored.Toast.props": {}
         }
       },
-      "Microsoft.AspNetCore.App.Internal.Assets/10.0.8": {
+      "Microsoft.AspNetCore.App.Internal.Assets/10.0.10": {
         "type": "package",
         "build": {
           "build/Microsoft.AspNetCore.App.Internal.Assets.props": {},
@@ -691,13 +691,13 @@
           }
         }
       },
-      "Microsoft.NET.ILLink.Tasks/10.0.8": {
+      "Microsoft.NET.ILLink.Tasks/10.0.10": {
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
-      "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.8": {
+      "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.10": {
         "type": "package",
         "build": {
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.props": {},
@@ -743,7 +743,7 @@
           "buildMultiTargeting/Blazored.Toast.props": {}
         }
       },
-      "Microsoft.AspNetCore.App.Internal.Assets/10.0.8": {
+      "Microsoft.AspNetCore.App.Internal.Assets/10.0.10": {
         "type": "package",
         "build": {
           "build/Microsoft.AspNetCore.App.Internal.Assets.props": {},
@@ -1412,13 +1412,13 @@
           }
         }
       },
-      "Microsoft.NET.ILLink.Tasks/10.0.8": {
+      "Microsoft.NET.ILLink.Tasks/10.0.10": {
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
-      "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.8": {
+      "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.10": {
         "type": "package",
         "build": {
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.props": {},
@@ -1466,10 +1466,10 @@
         "staticwebassets/Blazored.Toast.bundle.scp.css"
       ]
     },
-    "Microsoft.AspNetCore.App.Internal.Assets/10.0.8": {
-      "sha512": "v6KocthydFtUHBIRI29YsOHKOgsqcQubkNywVOxiYr4GSDSv+XO/AeyMJywlX+1tGUTGdydu/X7V+Tzeq4SsoA==",
+    "Microsoft.AspNetCore.App.Internal.Assets/10.0.10": {
+      "sha512": "8k0KoYKvNrSqP8E3oDJMBVKavlTEE6BacdLGtEDcxv9Hz0XxWFkD6JdLJsxXUlGeAfZ6YfvWmxKenl73qeCTSA==",
       "type": "package",
-      "path": "microsoft.aspnetcore.app.internal.assets/10.0.8",
+      "path": "microsoft.aspnetcore.app.internal.assets/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1485,7 +1485,7 @@
         "build/Microsoft.AspNetCore.App.Internal.Assets.targets",
         "buildMultiTargeting/Microsoft.AspNetCore.App.Internal.Assets.targets",
         "buildTransitive/Microsoft.AspNetCore.App.Internal.Assets.targets",
-        "microsoft.aspnetcore.app.internal.assets.10.0.8.nupkg.sha512",
+        "microsoft.aspnetcore.app.internal.assets.10.0.10.nupkg.sha512",
         "microsoft.aspnetcore.app.internal.assets.nuspec"
       ]
     },
@@ -2581,10 +2581,10 @@
         "microsoft.net.http.headers.nuspec"
       ]
     },
-    "Microsoft.NET.ILLink.Tasks/10.0.8": {
-      "sha512": "dVbSXGIFNR5nZcv2tOLoWI+a9T4jtFd77IYjuND+QVe360qWgAF7H0WtoopYhRw/+SgpGUTyrkrh+65+ClNnfw==",
+    "Microsoft.NET.ILLink.Tasks/10.0.10": {
+      "sha512": "f5VCIE7AJpd5YvzNTeMGVzQIgyE9tX+AreTYwQF+REbu+DZo/2Ae+jNSwhPEYrVz6RRkd7y8ubXjk6Nn6Ka+Cg==",
       "type": "package",
-      "path": "microsoft.net.illink.tasks/10.0.8",
+      "path": "microsoft.net.illink.tasks/10.0.10",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -2597,7 +2597,7 @@
         "build/Microsoft.NET.ILLink.Analyzers.props",
         "build/Microsoft.NET.ILLink.Tasks.props",
         "build/Microsoft.NET.ILLink.targets",
-        "microsoft.net.illink.tasks.10.0.8.nupkg.sha512",
+        "microsoft.net.illink.tasks.10.0.10.nupkg.sha512",
         "microsoft.net.illink.tasks.nuspec",
         "tools/net/ILLink.Tasks.deps.json",
         "tools/net/ILLink.Tasks.dll",
@@ -2631,10 +2631,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.8": {
-      "sha512": "xQ05xw4t8wjFxwD7a/Nye/IPEihIyUkZIbRzTytVFqko6Ows3UvjqHIEjk3gCOIZloNFOLykYPsTyKRCvEs6ng==",
+    "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.10": {
+      "sha512": "MLMHGePFHjRNjiA58lJo8dvEyU762yJohOWNBIs1AjHOgP9jL/MxZ5oHebEvXhfbknbyJUz/rT05bCY4PdqDLw==",
       "type": "package",
-      "path": "microsoft.net.sdk.webassembly.pack/10.0.8",
+      "path": "microsoft.net.sdk.webassembly.pack/10.0.10",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -2664,7 +2664,7 @@
         "build/Microsoft.NET.Sdk.WebAssembly.Pack.targets",
         "build/Wasm.web.config",
         "build/browser.runtimeconfig.template.json",
-        "microsoft.net.sdk.webassembly.pack.10.0.8.nupkg.sha512",
+        "microsoft.net.sdk.webassembly.pack.10.0.10.nupkg.sha512",
         "microsoft.net.sdk.webassembly.pack.nuspec",
         "tools/net10.0/Microsoft.NET.Sdk.WebAssembly.Pack.Tasks.dll",
         "tools/net10.0/Microsoft.NET.WebAssembly.Webcil.dll",
@@ -2699,19 +2699,20 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "Blazored.Toast >= 4.2.1",
-      "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.8",
+      "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.10",
       "Microsoft.AspNetCore.Components.WebAssembly >= 10.0.8",
       "Microsoft.AspNetCore.Components.WebAssembly.Authentication >= 10.0.8",
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 10.0.8",
       "Microsoft.AspNetCore.WebUtilities >= 10.0.9",
       "Microsoft.Extensions.Http >= 10.0.9",
-      "Microsoft.NET.ILLink.Tasks >= 10.0.8",
-      "Microsoft.NET.Sdk.WebAssembly.Pack >= 10.0.8",
+      "Microsoft.NET.ILLink.Tasks >= 10.0.10",
+      "Microsoft.NET.Sdk.WebAssembly.Pack >= 10.0.10",
       "System.IdentityModel.Tokens.Jwt >= 8.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\": {}
+    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
@@ -2722,8 +2723,12 @@
       "packagesPath": "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\",
       "outputPath": "E:\\Project\\ReconciliationSystem\\Reconciliation.Blazor\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
         "C:\\Users\\muhammad.muzammil\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2731,6 +2736,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2764,7 +2770,7 @@
           "Microsoft.AspNetCore.App.Internal.Assets": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[10.0.8, )",
+            "version": "[10.0.10, )",
             "autoReferenced": true
           },
           "Microsoft.AspNetCore.Components.WebAssembly": {
@@ -2791,13 +2797,13 @@
           "Microsoft.NET.ILLink.Tasks": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[10.0.8, )",
+            "version": "[10.0.10, )",
             "autoReferenced": true
           },
           "Microsoft.NET.Sdk.WebAssembly.Pack": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[10.0.8, )",
+            "version": "[10.0.10, )",
             "autoReferenced": true
           },
           "System.IdentityModel.Tokens.Jwt": {
@@ -2816,18 +2822,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
-            "version": "[10.0.8, 10.0.8]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

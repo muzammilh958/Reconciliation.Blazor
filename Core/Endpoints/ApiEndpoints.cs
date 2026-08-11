@@ -15,12 +15,12 @@ namespace Reconciliation.Blazor.Core.Endpoints
             public const string UserDelete = Base + "/UserManagement/delete";
             public const string UserUpdate = Base + "/UserManagement/update/";
             public const string RoleList = Base + "/Role/all";
-
         }
 
         public static class Batch
         {
             public const string GetAll = Base + "/batch/get-all";
+            public const string GetById = Base + "/batch/get-by-id/";
 
             public const string Create = Base + "/batch/create";
             public const string Delete = Base + "/batch/delete/";
@@ -34,6 +34,7 @@ namespace Reconciliation.Blazor.Core.Endpoints
             public const string Create = Base + "/Store/create";
             public const string Delete = Base + "/Store/delete/";
             public const string Update = Base + "/Store/update/";
+            public const string GetById = Base + "/Store/get-by-id/";                                                   
 
         }
 
@@ -49,6 +50,7 @@ namespace Reconciliation.Blazor.Core.Endpoints
             public const string Create = Base + "/Payment/create";
             public const string Delete = Base + "/Payment/delete/";
             public const string Update = Base + "/Payment/update/";
+            public const string GetById = Base + "/Payment/get-by-id/";
 
         }
 
@@ -69,7 +71,7 @@ namespace Reconciliation.Blazor.Core.Endpoints
 
         public static class ReconciliationAPI
         {
-            public const string StartReconciliation = Base + "/Reconciliation/StartReconciliation/";
+            public const string StartReconciliation = Base + "/Reconciliation/start";
             public const string GetException = Base + "/Reconciliation/GetException/";
 
         }

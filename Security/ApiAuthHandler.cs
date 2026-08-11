@@ -4,45 +4,49 @@ using Microsoft.AspNetCore.Components;
 
 namespace Reconciliation.Blazor;
 
-public class ApiAuthHandler : DelegatingHandler
-{
-    private readonly TokenServices _tokenService;
-    private readonly NavigationManager _nav;
-
-    public ApiAuthHandler(TokenServices tokenService, NavigationManager nav)
+ public class ApiAuthHandler : DelegatingHandler
     {
-        _tokenService = tokenService;
-        _nav = nav;
-    }
+        private readonly TokenServices _tokenServices;
+        private readonly NavigationManager _navigationManager;
 
-    protected override async Task<HttpResponseMessage> SendAsync(
-        HttpRequestMessage request,
-        CancellationToken cancellationToken)
-    {
-        var token = await _tokenService.GetToken();
-
-        if (!string.IsNullOrWhiteSpace(token))
+        public ApiAuthHandler(TokenServices tokenServices, NavigationManager navigationManager)
         {
-            if (JwtParser.GetExpiry(token) < DateTime.UtcNow)
+            _tokenServices = tokenServices;
+            _navigationManager = navigationManager;
+            InnerHandler = new HttpClientHandler();
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, 
+            CancellationToken cancellationToken)
+        {
+            try
             {
-                await _tokenService.ClearToken();
-                _nav.NavigateTo("/login", true);
+                var token = await _tokenServices.GetToken();
+                
+                if (!string.IsNullOrEmpty(token))
+                {
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+
+                var response = await base.SendAsync(request, cancellationToken);
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    // Clear invalid token
+                    await _tokenServices.RemoveToken();
+                    
+                    // Redirect to login
+                    _navigationManager.NavigateTo("/", true);
+                }
+
+                return response;
+            }
+            catch
+            {
+                // If any error, redirect to login
+                _navigationManager.NavigateTo("/", true);
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
             }
-
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
         }
-
-        var response = await base.SendAsync(request, cancellationToken);
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            await _tokenService.ClearToken();
-            _nav.NavigateTo("/login", true);
-        }
-
-        return response;
     }
-
-}

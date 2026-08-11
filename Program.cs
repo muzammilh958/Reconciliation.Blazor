@@ -44,10 +44,8 @@ builder.Services.AddScoped<AuthorizedHttpClient>();
 // Add Authorization
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<TokenServices>();
-// builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthStateProvider>();
-builder.Services.AddScoped<CustomAuthenticationStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
-    sp.GetRequiredService<CustomAuthenticationStateProvider>());
+
+
     
 builder.Services.AddTransient<ApiAuthHandler>();
 
@@ -56,5 +54,8 @@ builder.Services.AddHttpClient("Api", client =>
     client.BaseAddress = new Uri(ApiEndpoints.Base);
 })
 .AddHttpMessageHandler<ApiAuthHandler>();
-
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("http://localhost:5186") // Your API URL
+});
 await builder.Build().RunAsync();

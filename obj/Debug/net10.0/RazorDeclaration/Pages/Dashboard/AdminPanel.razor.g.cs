@@ -116,7 +116,15 @@ using Microsoft.AspNetCore.Components
     #line default
     #line hidden
 #nullable restore
-#line (7,12)-(7,40) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (7,12)-(7,23) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+[Authorize]
+
+#line default
+#line hidden
+#nullable disable
+
+#nullable restore
+#line (8,12)-(8,40) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 [Authorize(Roles = "Admin")]
 
 #line default
@@ -152,7 +160,7 @@ MainLayout
         }
         #pragma warning restore 1998
 #nullable restore
-#line (159,8)-(186,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (160,8)-(187,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 
     
     private bool isLoading = true;
@@ -187,7 +195,7 @@ MainLayout
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (10,9)-(10,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (11,9)-(11,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 IDashboardService
 
 #line default
@@ -195,7 +203,7 @@ IDashboardService
 #nullable disable
          
 #nullable restore
-#line (10,27)-(10,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (11,27)-(11,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 DashboardService
 
 #line default
@@ -205,7 +213,7 @@ DashboardService
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (6,9)-(6,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (10,9)-(10,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 AppState
 
 #line default
@@ -213,7 +221,7 @@ AppState
 #nullable disable
          
 #nullable restore
-#line (6,18)-(6,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (10,18)-(10,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 AppState
 
 #line default

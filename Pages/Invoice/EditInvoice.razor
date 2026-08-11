@@ -1,0 +1,171 @@
+﻿@page "/invoice/edit/{Id:int}"
+
+@inject IInvoiceTypeService invoiceService
+@inject NavigationManager Nav
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Edit Invoice Type</h3>
+                    <small class="text-muted">Invoice Types</small>
+                </div>
+            </div>
+
+            <div class="card-body">
+
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <div class="mt-2">Loading Invoice Type...</div>
+                    </div>
+                }
+                else if (hasError)
+                {
+                    <div class="alert alert-danger">
+                        Failed to load Invoice Type.
+                    </div>
+                }
+                else
+                {
+                    <EditForm Model="@model" OnValidSubmit="HandleSubmit">
+                        <DataAnnotationsValidator />
+                    
+                        @if (!string.IsNullOrEmpty(message))
+                        {
+                            <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">
+                                @message
+                            </div>
+                        }
+
+                        <div class="row g-3">
+
+                            <!-- Name -->
+                            <div class="col-md-6">
+                                <label class="form-label">Name</label>
+                                <InputText class="form-control" @bind-Value="model.name" placeholder="Enter invoice type name" />
+                                <ValidationMessage For="@(() => model.name)" />
+                            </div>
+
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
+                                Cancel
+                            </button>
+
+                            <button class="btn btn-primary btn-sm" type="submit" disabled="@isSaving">
+
+                                @if (isSaving)
+                                {
+                                    <span>Saving...</span>
+                                }
+                                else
+                                {
+                                    <span>Update</span>
+                                }
+
+                            </button>
+                        </div>
+
+                    </EditForm>
+                }
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private InvoiceType model = new();
+    private bool isLoading = true;
+    private bool hasError = false;
+    private bool isSaving = false;
+    private string? message;
+    private bool isSuccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            hasError = false;
+
+            var existing = await invoiceService.GetByIdAsync(Id);
+            Console.WriteLine($"Fetched Invoice Type: {existing?.data.name}");    
+            if (existing is null)
+            {
+                hasError = true;
+            }
+            else
+            {
+                model = new InvoiceType
+                {
+                    id = existing.data.id,
+                    name = existing.data.name
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        isSaving = true;
+        model.name = model.name?.Trim() ?? "";
+
+        if (string.IsNullOrWhiteSpace(model.name))
+        {
+            message = "Invoice type name is required.";
+            isSuccess = false;
+            isSaving = false;
+            return;
+        }
+
+        try
+        {
+            var result = await invoiceService.UpdateAsync(model.id, model);
+
+            isSuccess = result?.success ?? false;
+            message = result?.message ?? "No response received";
+
+            if (isSuccess)
+            {
+                await Task.Delay(1000);
+                Nav.NavigateTo("/invoice/view-invoice-types");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            isSuccess = false;
+            message = "Failed to update Invoice Type.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Nav.NavigateTo("/invoice/view-invoice-types");
+    }
+}

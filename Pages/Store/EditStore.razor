@@ -1,0 +1,177 @@
+﻿@page "/store/edit/{Id:int}"
+
+@inject IStoreService StoreService
+@inject NavigationManager Nav
+@inject IJSRuntime JsRuntime;
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Edit Store</h3>
+                    <small class="text-muted">Store</small>
+                </div>
+            </div>
+
+            <div class="card-body">
+
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <div class="mt-2">Loading Store...</div>
+                    </div>
+                }
+                else if (hasError)
+                {
+                    <div class="alert alert-danger">
+                        Failed to load Store.
+                    </div>
+                }
+                else
+                {
+                    <EditForm Model="@editModel" OnValidSubmit="UpdateBatch">
+                        <DataAnnotationsValidator />
+
+                        @if (!string.IsNullOrEmpty(messageText))
+                        {
+                            <div class="alert @(messageClass)">
+                                @messageText
+                            </div>
+                        }
+
+                        <div class="row g-3">
+
+                            <!-- Store Name -->
+                            <div class="col-md-6">
+                                <label class="form-label">Store Name</label>
+                                <InputText class="form-control" @bind-Value="editModel.data.name" placeholder="Enter store name" />
+                                <ValidationMessage For="@(() => editModel.data.name)" />
+                            </div>
+
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                                <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="CancelEdit">
+                                    Cancel
+                                </button>
+                                <button class="btn btn-primary btn-sm" type="submit" disabled="@isLoading">
+                                    @if (isLoading)
+                                    {
+                                        <span>Saving...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Save</span>
+                                    }
+                                </button>
+                            </div>
+                        </div>
+
+                    </EditForm>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    private string messageText = "";
+    private string messageClass = "";
+    private bool showMessage = false;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private StoreEditDTO editModel = new();
+    private bool isLoading = true;
+    private bool hasError = false;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var store = await StoreService.GetByIdAsync(Id);
+            Console.WriteLine($"Store fetched: {store?.data?.name}");
+            if (store?.data != null)
+            {
+                editModel = store;
+            }
+            else
+            {
+                hasError = true;
+            }
+        }
+        catch
+        {
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void CancelEdit()
+    {
+        Nav.NavigateTo("/store/list");
+    }
+    private async Task UpdateBatch()
+    {
+
+        editModel.data.name = editModel.data.name?.Trim() ?? "";
+
+        if (string.IsNullOrWhiteSpace(editModel.data.name))
+        {
+            await ShowMessage(
+                "Batch name is required.",
+                "alert-danger");
+            return;
+        }
+
+        var result = await StoreService.UpdateAsync(editModel.data.id, editModel.data);
+
+     
+
+        if (result?.success == true)
+        {
+            await ShowMessage(
+                result.message ?? "Store updated successfully.",
+                "alert-success"
+            );
+            await Task.Delay(1000);
+            Nav.NavigateTo("/store/list");
+        }
+        else
+        {
+
+            await ShowMessage(
+                result?.message ?? "Failed to update batch.",
+                "alert-danger"
+            );
+        }
+    }
+
+     private async Task ShowMessage(string text, string cssClass)
+    {
+        messageText = text;
+        messageClass = cssClass;
+        showMessage = true;
+
+        StateHasChanged();
+
+        await Task.Delay(3000);
+
+        showMessage = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

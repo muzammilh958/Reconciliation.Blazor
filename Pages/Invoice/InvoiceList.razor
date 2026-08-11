@@ -83,7 +83,7 @@
                                             </button>
 
                                             <button class="btn btn-sm btn-danger"
-                                                    @onclick="() => ConfirmDelete(InvoiceType.id, InvoiceType.name)">
+                                                    @onclick="() => ConfirmDelete(InvoiceType.id, InvoiceType.name!)">
                                                 Delete
                                             </button>
                                         </td>
@@ -103,8 +103,6 @@
 @code {
     private InvoiceTypeList InvoiceTypes = new();
     private bool showDeleteDialog = false;
-    private bool showEditDialog = false;
-    private InvoiceType editModel = new();
     private int selectedInvoiceTypeId;
     private string selectedInvoiceTypeName = "";
     private IJSObjectReference? _module;
@@ -148,20 +146,11 @@
 
     private void OpenEdit(InvoiceType InvoiceType)
     {
-        editModel = new InvoiceType
-        {
-            id = InvoiceType.id,
-            name = InvoiceType.name
-        };
-
-        showEditDialog = true;
+        Nav.NavigateTo($"/invoice/edit/{InvoiceType.id}");
     }
+   
 
-    private void CancelEdit()
-    {
-        showEditDialog = false;
-    }
-
+   
     private async Task LoadInvoiceTypes()
     {
         InvoiceTypes = await invoiceService.GetAllAsync();
@@ -224,42 +213,7 @@
         }
     }
 
-    private async Task UpdateInvoice()
-    {
-
-        editModel.name = editModel.name?.Trim() ?? "";
-
-        if (string.IsNullOrWhiteSpace(editModel.name))
-        {
-            await ShowMessage(
-                "Invoice name is required.",
-                "alert-danger");
-            return;
-        }
-
-        var result = await invoiceService.UpdateAsync(editModel.id, editModel);
-
-        showEditDialog = false;
-
-        if (result?.success == true)
-        {
-            await LoadInvoiceTypes();
-
-            await ShowMessage(
-                result.message ?? "Invoice updated successfully.",
-                "alert-success"
-            );
-
-        }
-        else
-        {
-
-            await ShowMessage(
-                result?.message ?? "Failed to update Invoice.",
-                "alert-danger"
-            );
-        }
-    }
+   
 
     private async Task ShowMessage(string text, string cssClass)
     {
@@ -317,43 +271,6 @@
                         Yes, delete
                     </button>
                 </div>
-
-            </div>
-        </div>
-    </div>
-}
-@if (showEditDialog)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
-
-        <div class="modal-dialog modal-dialog-centered" style="z-index: 1055;">
-            <div class="modal-content shadow">
-
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Invoice</h5>
-                    <button type="button" class="btn-close" @onclick="CancelEdit"></button>
-                </div>
-
-                <EditForm Model="@editModel" OnValidSubmit="UpdateInvoice">
-                    <DataAnnotationsValidator />
-
-                    <div class="modal-body py-4">
-                        <label class="form-label">Name</label>
-                        <input class="form-control" @bind="editModel.name" />
-                        <ValidationMessage For="@(() => editModel.name)" />
-                    </div>
-
-                  
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">
-                            Cancel
-                        </button>
-
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            Update
-                        </button>
-                    </div>
-                </EditForm>
 
             </div>
         </div>

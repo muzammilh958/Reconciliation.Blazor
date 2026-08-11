@@ -130,21 +130,27 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (166,8)-(297,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
+#line (190,8)-(379,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
 
 
     private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
+    private List<PaymentData> Paymentes = new();    
     private bool isLoading = true;
     private bool showAlert = false;
+    private DateTime FromDate = DateTime.Now;
+    private DateTime ToDate = DateTime.Now + TimeSpan.FromDays(7);
     private string alertMessage = "";
     private string alertType = "success";
     private bool isReconciling = false;
     private int _selectedBatchId = 0;
+    private int _selectedPaymentId = 0;
     private ReconciliationResult? reconciliationResult = new ReconciliationResult();
     private bool showResults = false;
 
     private bool dataReady = false;
     private IJSObjectReference? _module;
+
+    private DotNetObjectReference<ReconciliationScreen>? _dotNetHelper;
 
     private int SelectedBatchId
     {
@@ -154,11 +160,42 @@ using Reconciliation.Blazor.Layout.Partials
             _selectedBatchId = value;
         }
     }
+    
+    private int SelectedPaymentId
+    {
+        get => _selectedPaymentId;
+        set
+        {
+            _selectedPaymentId = value;
+        }
+    }
+
+    [JSInvokable]
+    public void OnPaymentSelected(int paymentId)
+    {
+        Console.WriteLine($"Payment selected: {paymentId}");
+        _selectedPaymentId = paymentId;
+        StateHasChanged();
+    }
+    
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
+    {
+        Console.WriteLine($"Batch selected: {batchId}");
+        _selectedBatchId = batchId;
+
+        FromDate=batchDataDTOs.Where(b => b.id == batchId).Select(b => b.FromDate).FirstOrDefault() ?? DateTime.Now;
+        ToDate=batchDataDTOs.Where(b => b.id == batchId).Select(b => b.ToDate).FirstOrDefault() ?? DateTime.Now;
+
+        StateHasChanged();
+    }
     protected override async Task OnInitializedAsync()
     {
         try
         {
             batchDataDTOs = await BatchesService.GetAllAsync();
+            Paymentes = await PaymentService.GetAllAsync();
+
 
         }
         catch (Exception ex)
@@ -174,6 +211,26 @@ using Reconciliation.Blazor.Layout.Partials
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            try
+            {
+                  _dotNetHelper = DotNetObjectReference.Create(this);
+                _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+                await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
+                
+                await JsRuntime.InvokeVoidAsync("loadConfig");
+                await JsRuntime.InvokeVoidAsync("loadApps");
+
+                await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+            
+        }
         if (dataReady)
         {
             dataReady = false; // prevent infinite loops
@@ -184,7 +241,7 @@ using Reconciliation.Blazor.Layout.Partials
             }
             await _module.InvokeVoidAsync("initDataTable");
         }
-
+        
     }
 
     private void ShowAlert(string message, string type = "success")
@@ -207,7 +264,8 @@ using Reconciliation.Blazor.Layout.Partials
         showResults = false; // hide previous results
         try
         {
-            reconciliationResult = await BatchesService.ReconcileBatchAsync(SelectedBatchId);
+            Console.WriteLine($"Date Status: {FromDate}, {ToDate} SelectedBatchId: {SelectedBatchId}, SelectedPaymentId: {SelectedPaymentId}");
+            reconciliationResult = await BatchesService.ReconcileBatchAsync(FromDate,ToDate,SelectedBatchId,SelectedPaymentId);
             Console.WriteLine($"Result Status: {reconciliationResult?.statusCode}");
 
             if (reconciliationResult == null)
@@ -269,7 +327,7 @@ using Reconciliation.Blazor.Layout.Partials
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (7,9)-(7,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
+#line (9,9)-(9,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
 IJSRuntime
 
 #line default
@@ -277,7 +335,7 @@ IJSRuntime
 #nullable disable
          
 #nullable restore
-#line (7,20)-(7,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
+#line (9,20)-(9,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
 JsRuntime
 
 #line default
@@ -287,7 +345,7 @@ JsRuntime
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (5,9)-(5,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
+#line (7,9)-(7,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
 NavigationManager
 
 #line default
@@ -295,8 +353,26 @@ NavigationManager
 #nullable disable
          
 #nullable restore
-#line (5,27)-(5,44) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
+#line (7,27)-(7,44) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
 NavigationManager
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (5,9)-(5,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
+IPaymentService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (5,25)-(5,39) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
+PaymentService
 
 #line default
 #line hidden

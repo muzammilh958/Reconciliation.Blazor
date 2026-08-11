@@ -130,11 +130,10 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (105,8)-(286,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
+#line (117,8)-(288,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
 
     private List<PaymentData> Paymentes = new();
     private bool showDeleteDialog = false;
-    private bool showEditDialog = false;
     private PaymentData editModel = new();
     private int selectedPaymentId;
     private string selectedPaymentName = "";
@@ -179,20 +178,10 @@ using Reconciliation.Blazor.Layout.Partials
 
     private void OpenEdit(PaymentData Payment)
     {
-        editModel = new PaymentData
-        {
-            id = Payment.id,
-            name = Payment.name
-        };
-
-        showEditDialog = true;
+        Nav.NavigateTo($"/payment/edit/{Payment.id}");
     }
 
-    private void CancelEdit()
-    {
-        showEditDialog = false;
-    }
-
+  
     private async Task LoadPaymentes()
     {
         Paymentes = await PaymentService.GetAllAsync();
@@ -257,7 +246,7 @@ using Reconciliation.Blazor.Layout.Partials
 
     private async Task UpdatePayment()
     {
-
+        isLoading = true;
         editModel.name = editModel.name?.Trim() ?? "";
 
         if (string.IsNullOrWhiteSpace(editModel.name))
@@ -270,7 +259,7 @@ using Reconciliation.Blazor.Layout.Partials
 
         var result = await PaymentService.UpdateAsync(editModel.id, editModel);
 
-        showEditDialog = false;
+       
 
         if (result?.success == true)
         {
@@ -290,6 +279,7 @@ using Reconciliation.Blazor.Layout.Partials
                 "alert-danger"
             );
         }
+        isLoading = false;
     }
 
     private async Task ShowMessage(string text, string cssClass)

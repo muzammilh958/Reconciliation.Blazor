@@ -3,10 +3,10 @@
 public class DashboardResponse
 {
     public bool success { get; set; }
-    public string message { get; set; }
-    public Dashboard data { get; set; }
+    public string? message { get; set; }
+    public Dashboard? data { get; set; }
     public int statusCode { get; set; }
-    public object errors { get; set; }    
+    public object? errors { get; set; }    
 }
 
 public class Dashboard

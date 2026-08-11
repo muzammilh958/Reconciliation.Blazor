@@ -136,11 +136,19 @@ using Reconciliation.Blazor.Models.Batch
         }
         #pragma warning restore 1998
 #nullable restore
-#line (123,8)-(307,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+#line (107,8)-(110,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
 
     private List<BatchDataDTO> batches = new();
     private bool showDeleteDialog = false;
-    private bool showEditDialog = false;
+    
+
+#line default
+#line hidden
+#nullable disable
+
+#nullable restore
+#line (110,47)-(241,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+
     private BatchDataDTO editModel = new();
     private int selectedBatchId;
     private string selectedBatchName = "";
@@ -160,6 +168,7 @@ using Reconciliation.Blazor.Models.Batch
             await _module.InvokeVoidAsync("loadDataTableAjax");
         }
     }
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -169,7 +178,6 @@ using Reconciliation.Blazor.Models.Batch
 
             batches = await BatchesService.GetAllAsync();
 
-            
             dataReady = true;
         }
         catch (Exception ex)
@@ -185,28 +193,17 @@ using Reconciliation.Blazor.Models.Batch
 
     private void OpenEdit(BatchDataDTO batch)
     {
-        editModel = new BatchDataDTO
-        {
-            id = batch.id,
-            name = batch.name,
-            FromDate = batch.FromDate,
-            ToDate=batch.ToDate,
-            IsLocked = batch.IsLocked
-        };
-
-        showEditDialog = true;
+        Nav.NavigateTo($"/batch/edit/{batch.id}");
+       
     }
 
-    private void CancelEdit()
-    {
-        showEditDialog = false;
-    }
-
+   
     private async Task LoadBatches()
     {
         batches = await BatchesService.GetAllAsync();
         StateHasChanged();
     }
+
     private void OpenCreate()
     {
         Nav.NavigateTo("/batches/add");
@@ -223,7 +220,6 @@ using Reconciliation.Blazor.Models.Batch
     {
         showDeleteDialog = false;
     }
-
 
     private async Task DeleteBatch(int batchId)
     {
@@ -247,6 +243,7 @@ using Reconciliation.Blazor.Models.Batch
             );
         }
     }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -259,48 +256,11 @@ using Reconciliation.Blazor.Models.Batch
         if (dataReady && !isLoading && _module != null)
         {
             dataReady = false; // prevent re-run
-
             await _module.InvokeVoidAsync("initDataTable");
         }
     }
 
-    private async Task UpdateBatch()
-    {
-
-        editModel.name = editModel.name?.Trim() ?? "";
-
-        if (string.IsNullOrWhiteSpace(editModel.name))
-        {
-            await ShowMessage(
-                "Batch name is required.",
-                "alert-danger");
-            return;
-        }
-
-        var result = await BatchesService.UpdateAsync(editModel.id, editModel);
-
-        showEditDialog = false;
-
-        if (result?.success == true)
-        {
-            await LoadBatches();
-
-            await ShowMessage(
-                result.message ?? "Batch updated successfully.",
-                "alert-success"
-            );
-
-        }
-        else
-        {
-
-            await ShowMessage(
-                result?.message ?? "Failed to update batch.",
-                "alert-danger"
-            );
-        }
-    }
-
+   
     private async Task ShowMessage(string text, string cssClass)
     {
         messageText = text;
@@ -319,8 +279,6 @@ using Reconciliation.Blazor.Models.Batch
     {
         showMessage = false;
     }
-
-    
 
 #line default
 #line hidden

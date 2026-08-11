@@ -2,7 +2,7 @@
 @inject IUserService UserService
 @inject NavigationManager Nav
 
-<div class="row">
+@* <div class="row">
     <div class="col-12">
 
         <div class="card shadow-sm">
@@ -65,7 +65,112 @@
                     </div>
 
                     @* <button class="btn btn-success" type="submit">Save</button>
-            <button class="btn btn-secondary" type="button" @onclick="Cancel">Cancel</button> *@
+            <button class="btn btn-secondary" type="button" @onclick="Cancel">Cancel</button> 
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
+                                Cancel
+                            </button>
+                            <button class="btn btn-primary btn-sm" type="submit" disabled="@isLoading">
+                                @if (isLoading)
+                                {
+                                    <span>Saving...</span>
+                                }
+                                else
+                                {
+                                    <span>Save</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </EditForm>
+
+            </div>
+        </div>
+    </div>
+</div> *@
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Add Users</h3>
+                    <small class="text-muted">Users</small>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <EditForm Model="@Model" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    @if (errors.Any())
+                    {
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach (var e in errors)
+                                {
+                                    <li>@e</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    
+                    <!-- Grid Layout Start -->
+                    <div class="row g-3">
+                        <!-- Full Name - Full Width -->
+                        <div class="col-md-6">
+                           
+                                <label class="form-label">Full Name</label>
+                                <InputText class="form-control" @bind-Value="Model.FullName" />
+                           
+                        </div>
+
+                        <!-- Email and Password - Two Columns -->
+                        <div class="col-md-6">
+                            
+                                <label class="form-label">Email</label>
+                                <InputText class="form-control" @bind-Value="Model.Email" />
+                           
+                        </div>
+
+                        <div class="col-md-6">
+                        
+                                <label class="form-label">Password</label>
+                                <InputText type="password" class="form-control" @bind-Value="Model.Password" />
+                                <small class="text-muted d-block mt-1">
+                                    Must contain uppercase, lowercase, and a special character.
+                                </small>
+                          
+                        </div>
+
+                        <!-- Role and Is Locked - Two Columns -->
+                        <div class="col-md-6">
+                           
+                                <label class="form-label">Role</label>
+                                <InputSelect class="form-control" @bind-Value="selectedRole">
+                                    <option value="">Select Role</option>
+                                    @foreach (var role in roles)
+                                    {
+                                        <option value="@role.Name">@role.Name</option>
+                                    }
+                                </InputSelect>
+                        
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center" >
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input" @bind-Value="Model.IsLocked" />
+                                    <label class="form-check-label">Is Locked</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Grid Layout End -->
+
+                    <!-- Buttons -->
                     <div class="col-12">
                         <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
                             <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">

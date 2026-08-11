@@ -121,7 +121,15 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
     )]
     #nullable restore
-    public partial class MerchantUpload : global::Microsoft.AspNetCore.Components.ComponentBase
+    public partial class MerchantUpload : global::Microsoft.AspNetCore.Components.ComponentBase, 
+#nullable restore
+#line (114,13)-(114,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
+IDisposable
+
+#line default
+#line hidden
+#nullable disable
+
     #nullable disable
     {
         #pragma warning disable 1998
@@ -130,7 +138,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (111,8)-(306,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
+#line (116,8)-(354,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
 
     private List<byte[]> fileBytes = new();
     private List<string> fileNames = new();
@@ -148,10 +156,23 @@ using Reconciliation.Blazor.Layout.Partials
     
     private int _selectedBatchId= 0;
     private int _selectedPaymentId;
+
+    private string orderId =""; 
+    private string TransactionDate = "";
+    private string Tender = "";
+    private string TransactionAmount = "";
+    private string AuthorizationCode  = "";
+    private string MerchantID   = "";
+
     private DateTime? FromDate { get; set; }
     private DateTime? ToDate { get; set; }
 
     private IJSObjectReference? _module;
+
+    // --- Added for Select2 ---
+    private DotNetObjectReference<MerchantUpload>? _dotNetRef; // TODO: replace "Upload" with your actual @code class name
+    private bool _select2Initialized = false;
+    // --------------------------
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -170,6 +191,16 @@ using Reconciliation.Blazor.Layout.Partials
                 Console.WriteLine($"JS load error: {ex.Message}");
             }
         }
+
+        // --- Added for Select2 ---
+        // Wait until batches/payments have actually loaded and rendered as <option>s
+        if (!_select2Initialized && !isLoading && batches.Any() && Paymentes.Any())
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetRef);
+            _select2Initialized = true;
+        }
+        // --------------------------
     }
 
     protected override async Task OnInitializedAsync()
@@ -211,6 +242,22 @@ using Reconciliation.Blazor.Layout.Partials
         get => _selectedPaymentId;
         set => _selectedPaymentId = value;
     }
+
+    // --- Added for Select2: JS calls these back when the dropdown changes ---
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
+    {
+        SelectedBatchId = batchId; // reuses your existing setter logic (updates FromDate/ToDate)
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnPaymentSelected(int paymentId)
+    {
+        SelectedPaymentId = paymentId;
+        StateHasChanged();
+    }
+    // --------------------------------------------------------------------
 
     // Call this from FilePond's onaddfile or similar via JS if needed.
     // For now we fetch on save (defensive)
@@ -269,14 +316,9 @@ using Reconciliation.Blazor.Layout.Partials
 
         try
         {
-            await LoadFileDataAsync(); // Ensure data is fresh
+            await LoadFileDataAsync();  
 
-            if (fileBytes.Count == 0)
-            {
-                ShowAlert("Please select a valid file", "danger");
-                return;
-            }
-
+            
             if (SelectedBatchId <= 0 || SelectedPaymentId <= 0 || !FromDate.HasValue || !ToDate.HasValue)
             {
                 ShowAlert("Please fill all required fields", "danger");
@@ -288,17 +330,20 @@ using Reconciliation.Blazor.Layout.Partials
                 batchId = SelectedBatchId,
                 paymentId = SelectedPaymentId,
                 fromDate = FromDate.Value,
-                toDate = ToDate.Value
+                toDate = ToDate.Value,
+                
             };
 
-            var result = await MerchantService.CreateAsync(
-                model,
-                fileBytes[0],
-                fileNames[0],
-                contentTypes[0]);
+            var result = await MerchantService.CreateAsync(model, fileBytes, fileNames, contentTypes);
 
-            ShowAlert(result.data.message,
-                      result.success ? "success" : "danger");
+            if (result.success)
+            {
+                ShowAlert(result.data?.message ?? result.message  ?? "Success.", "success");
+            }
+            else
+            {
+                ShowAlert(result.message ?? "Failed to save", "danger");
+            }
         }
         catch (Exception ex)
         {
@@ -319,7 +364,13 @@ using Reconciliation.Blazor.Layout.Partials
         StateHasChanged();
     }
 
-    
+    // --- Added for Select2 ---
+    public void Dispose()
+    {
+        _dotNetRef?.Dispose();
+    }
+    // --------------------------
+
     public class FileData
     {
         public string name { get; set; } = "";

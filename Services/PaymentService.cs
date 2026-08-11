@@ -112,9 +112,31 @@ public class PaymentService : IPaymentService
         }
     }
 
-    public Task<PaymentData?> GetByIdAsync(int id)
+    public async Task<PaymentData?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var token = await _tokenProvider.GetAccessTokenAsync();
+            var request = new HttpRequestMessage(HttpMethod.Get, ApiEndpoints.Payment.GetById + id);
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _http.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API failed: {response.StatusCode} - {error}");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<PaymentData>>();
+
+            return result?.Data ?? new PaymentData();
+        }
+        catch (Exception ex)
+        {
+            return new PaymentData();
+        }
     }
 
     public async Task<PaymentUpdateResponse> UpdateAsync(int id, PaymentData model)

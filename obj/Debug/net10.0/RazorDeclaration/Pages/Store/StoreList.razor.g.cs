@@ -130,11 +130,11 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (99,8)-(279,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\StoreList.razor"
+#line (99,8)-(235,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\StoreList.razor"
 
     private List<StoreDTO> stores = new();
     private bool showDeleteDialog = false;
-    private bool showEditDialog = false;
+
     private StoreDTO editModel = new();
     private int selectedBatchId;
     private string selectedBatchName = "";
@@ -178,19 +178,10 @@ using Reconciliation.Blazor.Layout.Partials
 
     private void OpenEdit(StoreDTO store)
     {
-        editModel = new StoreDTO
-        {
-            id = store.id,
-            name = store.name
-        };
-
-        showEditDialog = true;
+         Nav.NavigateTo($"/store/edit/{store.id}");
     }
 
-    private void CancelEdit()
-    {
-        showEditDialog = false;
-    }
+   
 
     private async Task LoadBatches()
     {
@@ -254,42 +245,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
     }
 
-    private async Task UpdateBatch()
-    {
-
-        editModel.name = editModel.name?.Trim() ?? "";
-
-        if (string.IsNullOrWhiteSpace(editModel.name))
-        {
-            await ShowMessage(
-                "Batch name is required.",
-                "alert-danger");
-            return;
-        }
-
-        var result = await StoreService.UpdateAsync(editModel.id, editModel);
-
-        showEditDialog = false;
-
-        if (result?.success == true)
-        {
-            await LoadBatches();
-
-            await ShowMessage(
-                result.message ?? "Batch updated successfully.",
-                "alert-success"
-            );
-
-        }
-        else
-        {
-
-            await ShowMessage(
-                result?.message ?? "Failed to update batch.",
-                "alert-danger"
-            );
-        }
-    }
+   
 
     private async Task ShowMessage(string text, string cssClass)
     {

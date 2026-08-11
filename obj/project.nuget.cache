@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "J8sMx13uLck=",
+  "dgSpecHash": "2TSBiz5i1Xg=",
   "success": true,
   "projectFilePath": "E:\\Project\\ReconciliationSystem\\Reconciliation.Blazor\\Reconciliation.Blazor.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\blazored.toast\\4.2.1\\blazored.toast.4.2.1.nupkg.sha512",
-    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.8\\microsoft.aspnetcore.app.internal.assets.10.0.8.nupkg.sha512",
+    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.10\\microsoft.aspnetcore.app.internal.assets.10.0.10.nupkg.sha512",
     "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.aspnetcore.authorization\\10.0.8\\microsoft.aspnetcore.authorization.10.0.8.nupkg.sha512",
     "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.aspnetcore.components\\10.0.8\\microsoft.aspnetcore.components.10.0.8.nupkg.sha512",
     "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\10.0.8\\microsoft.aspnetcore.components.analyzers.10.0.8.nupkg.sha512",
@@ -43,10 +43,9 @@
     "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.jsinterop\\10.0.8\\microsoft.jsinterop.10.0.8.nupkg.sha512",
     "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.jsinterop.webassembly\\10.0.8\\microsoft.jsinterop.webassembly.10.0.8.nupkg.sha512",
     "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.net.http.headers\\10.0.9\\microsoft.net.http.headers.10.0.9.nupkg.sha512",
-    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.net.illink.tasks\\10.0.8\\microsoft.net.illink.tasks.10.0.8.nupkg.sha512",
-    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.net.sdk.webassembly.pack\\10.0.8\\microsoft.net.sdk.webassembly.pack.10.0.8.nupkg.sha512",
-    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.0.0\\system.identitymodel.tokens.jwt.8.0.0.nupkg.sha512",
-    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\10.0.8\\microsoft.netcore.app.runtime.mono.browser-wasm.10.0.8.nupkg.sha512"
+    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.net.illink.tasks\\10.0.10\\microsoft.net.illink.tasks.10.0.10.nupkg.sha512",
+    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\microsoft.net.sdk.webassembly.pack\\10.0.10\\microsoft.net.sdk.webassembly.pack.10.0.10.nupkg.sha512",
+    "C:\\Users\\muhammad.muzammil\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.0.0\\system.identitymodel.tokens.jwt.8.0.0.nupkg.sha512"
   ],
   "logs": []
 }

@@ -108,9 +108,38 @@ public class StoreService : IStoreService
         return result?.Data ?? new List<StoreDTO>();
     }
 
-    public Task<StoreDTO?> GetByIdAsync(int id)
+    public async Task<StoreEditDTO?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+       try
+       {
+            var token = await _tokenProvider.GetAccessTokenAsync(); // wherever you store it
+
+            
+            var request = new HttpRequestMessage(HttpMethod.Get, ApiEndpoints.Store.GetById + id);
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await _http.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                return new StoreEditDTO
+                {
+                    success = false,
+                    message = "Failed to fetch Store"
+                };
+            }
+            Console.WriteLine($"Response status code: {response.Content.ReadAsStringAsync()}");
+            var result = await response.Content.ReadFromJsonAsync<StoreEditDTO>();
+            Console.WriteLine($"Fetched Store: {result?.data?.name}");
+            return result;
+       }
+       catch (Exception e)
+       {
+            return new StoreEditDTO
+            {
+                success = false,
+                message = $"Unable to fetch Store {e.Message}"
+            };
+       }
     }
 
     public async Task<StoreUpdateResponse> UpdateAsync(int id, StoreDTO model)
@@ -142,7 +171,7 @@ public class StoreService : IStoreService
             };
         }
         catch (Exception ex)
-        {
+        {   
             return new StoreUpdateResponse
             {
                 success = false,

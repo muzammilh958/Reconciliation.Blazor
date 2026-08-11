@@ -130,12 +130,10 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (103,8)-(284,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
+#line (103,8)-(238,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
 
     private InvoiceTypeList InvoiceTypes = new();
     private bool showDeleteDialog = false;
-    private bool showEditDialog = false;
-    private InvoiceType editModel = new();
     private int selectedInvoiceTypeId;
     private string selectedInvoiceTypeName = "";
     private IJSObjectReference? _module;
@@ -179,20 +177,11 @@ using Reconciliation.Blazor.Layout.Partials
 
     private void OpenEdit(InvoiceType InvoiceType)
     {
-        editModel = new InvoiceType
-        {
-            id = InvoiceType.id,
-            name = InvoiceType.name
-        };
-
-        showEditDialog = true;
+        Nav.NavigateTo($"/invoice/edit/{InvoiceType.id}");
     }
+   
 
-    private void CancelEdit()
-    {
-        showEditDialog = false;
-    }
-
+   
     private async Task LoadInvoiceTypes()
     {
         InvoiceTypes = await invoiceService.GetAllAsync();
@@ -255,42 +244,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
     }
 
-    private async Task UpdateInvoice()
-    {
-
-        editModel.name = editModel.name?.Trim() ?? "";
-
-        if (string.IsNullOrWhiteSpace(editModel.name))
-        {
-            await ShowMessage(
-                "Invoice name is required.",
-                "alert-danger");
-            return;
-        }
-
-        var result = await invoiceService.UpdateAsync(editModel.id, editModel);
-
-        showEditDialog = false;
-
-        if (result?.success == true)
-        {
-            await LoadInvoiceTypes();
-
-            await ShowMessage(
-                result.message ?? "Invoice updated successfully.",
-                "alert-success"
-            );
-
-        }
-        else
-        {
-
-            await ShowMessage(
-                result?.message ?? "Failed to update Invoice.",
-                "alert-danger"
-            );
-        }
-    }
+   
 
     private async Task ShowMessage(string text, string cssClass)
     {

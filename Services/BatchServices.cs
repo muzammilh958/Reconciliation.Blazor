@@ -119,9 +119,31 @@ public class BatchServices : IBatchesService
         }
     }
 
-    public Task<BatchDataDTO?> GetByIdAsync(int id)
+    public async Task<BatchDataDTO?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var token = await _tokenProvider.GetAccessTokenAsync();
+            var request = new HttpRequestMessage(HttpMethod.Get, ApiEndpoints.Batch.GetById + id);
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _http.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API failed: {response.StatusCode} - {error}");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<BatchDataDTO>>();
+
+            return result?.Data ?? new BatchDataDTO();
+        }
+        catch (Exception ex)
+        {
+            return new BatchDataDTO();
+        }
     }
 
     public async Task<BatchUpdateResponse> UpdateAsync(int id, BatchDataDTO model)
@@ -164,17 +186,27 @@ public class BatchServices : IBatchesService
     }
 
 
-    public async Task<ReconciliationResult> ReconcileBatchAsync(int batchId)
+    public async Task<ReconciliationResult> ReconcileBatchAsync(DateTime StartDate, DateTime EndDate, int batchId, int paymentId)
     {
         try
         {
             var token = await _tokenProvider.GetAccessTokenAsync(); // wherever you store it
 
 
-            var request = new HttpRequestMessage(HttpMethod.Post, ApiEndpoints.ReconciliationAPI.StartReconciliation + batchId);
+            var request = new HttpRequestMessage(HttpMethod.Post, ApiEndpoints.ReconciliationAPI.StartReconciliation);
             request.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             // request.Content = JsonContent.Create(id);
+
+            request.Content = JsonContent.Create(new
+            {
+                StartDate,
+                EndDate,
+                batchId,
+                paymentId
+            });
+
+
             var response = await _http.SendAsync(request);
             var contentString = await response.Content.ReadAsStringAsync();
             Console.WriteLine(contentString);

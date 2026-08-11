@@ -2,6 +2,8 @@
 
 @inject IBatchesService BatchesService
 
+@inject IPaymentService PaymentService
+
 @inject NavigationManager NavigationManager
 
 @inject IJSRuntime JsRuntime;
@@ -11,7 +13,7 @@
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h3 class="mb-0 fw-semibold">Reconciliation</h3>
+                    <h3 class="mb-0 fw-semibold">Reconciliation Wizard</h3>
                     <small class="text-muted">Manage and reconcile batches</small>
                 </div>
             </div>
@@ -28,7 +30,7 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <label class="form-label">Select Batch</label>
-                        <select class="form-select" @bind="SelectedBatchId">
+                        <select class="form-control form-select select2" id="batchSelect" >
                             <option value="0" selected disabled>Select Batch</option>
                             @foreach (var batch in batchDataDTOs)
                             {
@@ -36,9 +38,31 @@
                             }
                         </select>
                     </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Payment</label>
+                        <select class="form-control form-select select2" id="paymentSelect" >
+                            <option value="0" selected disabled>Select Payment</option>
+                            <option value="-1">All Payments (Reconcile All)</option>
+                            @foreach (var payment in Paymentes)
+                            {
+                                <option value="@payment.id">@payment.name</option>
+                            }
+                        </select>
+                    </div>
                 </div>
 
-                @if (showResults && reconciliationResult?.data != null)
+                <div class="row mt-3">
+                     <div class="col-sm-6">
+                     <label class="form-label">Date Range</label>
+                        <div class="input-group">
+                            <input type="date" class="form-control" @bind="FromDate" />
+                            <span class="input-group-text">to</span>
+                            <input type="date" class="form-control" @bind="ToDate" />
+                        </div>
+                    </div>
+                </div>
+
+                @* @if (showResults && reconciliationResult?.data != null)
                 {
                     <div class="mt-4">
                         <h5 class="fw-semibold">Reconciliation Results</h5>
@@ -139,7 +163,7 @@
                 else if (showResults && reconciliationResult?.data == null)
                 {
                     <div class="mt-4 text-muted">No data returned.</div>
-                }
+                } *@
 
                 
                 <div class="row">
@@ -149,11 +173,11 @@
                             <button class="btn btn-primary btn-sm" type="button" @onclick="ReconcileBatchAsync" disabled="@isReconciling">
                                 @if (isReconciling)
                                 {
-                                    <span>Reconciling...</span>
+                                    <span>Processing...</span>
                                 }
                                 else
                                 {
-                                    <span>Reconcile Batch</span>
+                                    <span>Process</span>
                                 }
                             </button>
                         </div>
@@ -166,17 +190,23 @@
 @code {
 
     private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
+    private List<PaymentData> Paymentes = new();    
     private bool isLoading = true;
     private bool showAlert = false;
+    private DateTime FromDate = DateTime.Now;
+    private DateTime ToDate = DateTime.Now + TimeSpan.FromDays(7);
     private string alertMessage = "";
     private string alertType = "success";
     private bool isReconciling = false;
     private int _selectedBatchId = 0;
+    private int _selectedPaymentId = 0;
     private ReconciliationResult? reconciliationResult = new ReconciliationResult();
     private bool showResults = false;
 
     private bool dataReady = false;
     private IJSObjectReference? _module;
+
+    private DotNetObjectReference<ReconciliationScreen>? _dotNetHelper;
 
     private int SelectedBatchId
     {
@@ -186,11 +216,42 @@
             _selectedBatchId = value;
         }
     }
+    
+    private int SelectedPaymentId
+    {
+        get => _selectedPaymentId;
+        set
+        {
+            _selectedPaymentId = value;
+        }
+    }
+
+    [JSInvokable]
+    public void OnPaymentSelected(int paymentId)
+    {
+        Console.WriteLine($"Payment selected: {paymentId}");
+        _selectedPaymentId = paymentId;
+        StateHasChanged();
+    }
+    
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
+    {
+        Console.WriteLine($"Batch selected: {batchId}");
+        _selectedBatchId = batchId;
+
+        FromDate=batchDataDTOs.Where(b => b.id == batchId).Select(b => b.FromDate).FirstOrDefault() ?? DateTime.Now;
+        ToDate=batchDataDTOs.Where(b => b.id == batchId).Select(b => b.ToDate).FirstOrDefault() ?? DateTime.Now;
+
+        StateHasChanged();
+    }
     protected override async Task OnInitializedAsync()
     {
         try
         {
             batchDataDTOs = await BatchesService.GetAllAsync();
+            Paymentes = await PaymentService.GetAllAsync();
+
 
         }
         catch (Exception ex)
@@ -206,6 +267,26 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            try
+            {
+                  _dotNetHelper = DotNetObjectReference.Create(this);
+                _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+                await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
+                
+                await JsRuntime.InvokeVoidAsync("loadConfig");
+                await JsRuntime.InvokeVoidAsync("loadApps");
+
+                await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+            
+        }
         if (dataReady)
         {
             dataReady = false; // prevent infinite loops
@@ -216,7 +297,7 @@
             }
             await _module.InvokeVoidAsync("initDataTable");
         }
-
+        
     }
 
     private void ShowAlert(string message, string type = "success")
@@ -239,7 +320,8 @@
         showResults = false; // hide previous results
         try
         {
-            reconciliationResult = await BatchesService.ReconcileBatchAsync(SelectedBatchId);
+            Console.WriteLine($"Date Status: {FromDate}, {ToDate} SelectedBatchId: {SelectedBatchId}, SelectedPaymentId: {SelectedPaymentId}");
+            reconciliationResult = await BatchesService.ReconcileBatchAsync(FromDate,ToDate,SelectedBatchId,SelectedPaymentId);
             Console.WriteLine($"Result Status: {reconciliationResult?.statusCode}");
 
             if (reconciliationResult == null)

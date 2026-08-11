@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (110,8)-(201,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"
+#line (110,8)-(204,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"
 
     private IJSObjectReference? _module;
     private List<UserDto> Users = new();
@@ -191,7 +191,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
     }
 
-  
+
     private async Task DeleteUser(Guid userId)
     {
         var confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete this user?");
@@ -212,106 +212,13 @@ using Reconciliation.Blazor.Layout.Partials
 
     private void OpenEdit(UserDto user)
     {
-        isLoading = true;
-        // clone to avoid direct mutation
-        editUser = new UserDto
-        {
-            Id = user.Id,
-            FullName = user.FullName,
-            Email = user.Email,
-            Roles = user.Roles?.ToList(),
-            IsLocked = user.IsLocked
-        };
-        
-
-#line default
-#line hidden
-#nullable disable
-
-#nullable restore
-#line (202,12)-(258,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"
-
-        var roleName = editUser.Roles?.FirstOrDefault();
-        SelectedRole = AvailableRoles.FirstOrDefault(r => r.Name == roleName)?.Id;
-
-        isEditModalOpen = true;
-        isLoading = false;
+        Nav.NavigateTo($"/users/edit/{user.Id}");
     }
 
     private void CloseEdit()
     {
         isEditModalOpen = false;
     }
-
-    private async Task SaveEdit()
-    {
-        try
-        {
-            // Set role from selected role ID
-            var selectedRoleName = AvailableRoles.FirstOrDefault(r => r.Id == SelectedRole)?.Name;
-            if (!string.IsNullOrEmpty(selectedRoleName))
-            {
-                editUser.Roles = new List<string> { selectedRoleName };
-            }
-            else
-            {
-                editUser.Roles = new List<string>();
-            }
-
-            editUser.RoleName = selectedRoleName!;
-
-            // Split full name into first and last name
-            var parts = editUser.FullName?.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts != null && parts.Length > 0)
-            {
-                editUser.FirstName = parts[0];
-                editUser.LastName = parts.Length > 1
-                    ? string.Join(" ", parts.Skip(1))
-                    : string.Empty;
-            }
-
-            // Update via API
-            var result = await UserService.UpdateUserAsync(editUser);
-            Console.WriteLine(result);
-            if (result is bool ok && ok)
-            {
-                isEditModalOpen = false;
-
-                Users = await UserService.GetUsersAsync();
-
-                await InvokeAsync(StateHasChanged);
-
-                if (_module != null)
-                {
-                    await _module.InvokeVoidAsync("reloadDataTable");
-                }
-                // If your service already returns bool, use this
-                
-
-#line default
-#line hidden
-#nullable disable
-
-#nullable restore
-#line (272,21)-(283,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"
-
-            }
-        }
-        catch (Exception ex)
-        {
-            // Log the actual error for debugging
-            Console.Error.WriteLine($"SaveEdit error: {ex}");
-            await JsRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
-        }
-    }
-
-
-#line default
-#line hidden
-#nullable disable
-
-#nullable restore
-#line (335,8)-(341,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"
 
 
     private void OpenCreate()

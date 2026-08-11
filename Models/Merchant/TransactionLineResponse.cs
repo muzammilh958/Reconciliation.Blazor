@@ -5,7 +5,7 @@ namespace Reconciliation.Blazor;
 public class TransactionLineResponse
 {
     public bool success { get; set; }
-    public string message { get; set; }
+    public string? message { get; set; }
     public List<TransactionLine> data { get; set; } = new();
     public int statusCode { get; set; }
     public object? errors { get; set; }

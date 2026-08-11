@@ -85,6 +85,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQmF0Y2hcQmF0Y2hMaXN0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Batch/EditBatch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQmF0Y2hcRWRpdEJhdGNoLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Counter.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -103,6 +107,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Invoice/AddInvoice.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxBZGRJbnZvaWNlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Invoice/EditInvoice.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52b2ljZVxFZGl0SW52b2ljZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Invoice/InvoiceList.razor]
@@ -141,12 +149,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxBZGRQYXltZW50LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Payment/PaymentList.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxQYXltZW50TGlzdC5yYXpvcg==
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Payment/EditPayment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxFZGl0UGF5bWVudC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Shared/RedirectToLogin.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXFJlZGlyZWN0VG9Mb2dpbi5yYXpvcg==
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Payment/PaymentList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxQYXltZW50TGlzdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/SignUp.razor]
@@ -155,6 +163,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Store/AddStore.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3RvcmVcQWRkU3RvcmUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Store/EditStore.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3RvcmVcRWRpdFN0b3JlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Store/StoreList.razor]
@@ -169,12 +181,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1hbmFnZW1lbnRcQWRkVXNlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/UserManagement/EditUser.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1hbmFnZW1lbnRcRWRpdFVzZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/UserManagement/UserList.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1hbmFnZW1lbnRcVXNlckxpc3QucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Project/ReconciliationSystem/Reconciliation.Blazor/Pages/Weather.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2VhdGhlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Project/ReconciliationSystem/Reconciliation.Blazor/RedirectToLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = UmVkaXJlY3RUb0xvZ2luLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Project/ReconciliationSystem/Reconciliation.Blazor/_Imports.razor]

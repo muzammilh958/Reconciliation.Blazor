@@ -1,8 +1,10 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components.Forms;
 using Reconciliation.Blazor.Core.Endpoints;
 using Reconciliation.Blazor.Services;
+using static Reconciliation.Blazor.Pages.Merchant.MerchantUpload;
 
 namespace Reconciliation.Blazor;
 
@@ -18,16 +20,11 @@ public class MerchantService : IMerchantService
         _http = http;
         _tokenProvider = tokenProvider;
     }
-    public async Task<MerchantCreateResponse> CreateAsync(MerchantCreate model, byte[] fileBytes, string fileName, string contentType)
+    public async Task<MerchantCreateResponse> CreateAsync(MerchantCreate model, List<byte[]> fileBytes, List<string> fileNames, List<string> contentTypes)
     {
         if (model == null)
             throw new ArgumentNullException(nameof(model));
 
-        if (fileBytes == null || fileBytes.Length == 0)
-            throw new ArgumentException("File bytes cannot be null or empty.", nameof(fileBytes));
-
-        if (string.IsNullOrWhiteSpace(fileName))
-            throw new ArgumentException("File name cannot be null or empty.", nameof(fileName));
         try
         {
             var token = await _tokenProvider.GetAccessTokenAsync();
@@ -37,29 +34,70 @@ public class MerchantService : IMerchantService
             using var form = new MultipartFormDataContent();
             form.Add(new StringContent(model.batchId.ToString()), "batchId");
             form.Add(new StringContent(model.paymentId.ToString()), "paymentId");
+
             form.Add(new StringContent(model.fromDate.ToString("yyyy-MM-dd")), "fromDate");
             form.Add(new StringContent(model.toDate.ToString("yyyy-MM-dd")), "toDate");
 
-            var fileContent = new ByteArrayContent(fileBytes);
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-
-            form.Add(fileContent, "File", fileName);
+            // Change "files" to "file" to match server expectation
+            for (int i = 0; i < fileBytes.Count; i++)
+            {
+                var fileContent = new ByteArrayContent(fileBytes[i]);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentTypes[i]);
+                form.Add(fileContent, "file", fileNames[i]); // Changed from "files" to "file"
+            }
 
             request.Content = form;
+
 
             var response = await _http.SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
+
+                MerchantCreateResponse? errorResponse = null;
+
+                try
+                {
+                    errorResponse = JsonSerializer.Deserialize<MerchantCreateResponse>(
+                        errorContent,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+                }
+                catch
+                {
+                    // Ignore parsing errors
+                }
+
                 return new MerchantCreateResponse
                 {
                     success = false,
-                    message = $"Server error: {response.StatusCode} - {errorContent}"
+                    message = errorResponse?.message
+                              ?? "Unable to process your request. Please try again."
                 };
             }
 
             var result = await response.Content.ReadFromJsonAsync<MerchantCreateResponse>();
+            if (result == null)
+            {
+                return new MerchantCreateResponse
+                {
+                    success = false,
+                    message = "Unable to read server response."
+                };
+            }
 
+            if (!response.IsSuccessStatusCode)
+            {
+                result.success = false;
+
+                // In case API didn't populate message
+                if (string.IsNullOrWhiteSpace(result.message))
+                {
+                    result.message = $"Request failed ({(int)response.StatusCode})";
+                }
+            }
             return result ?? new MerchantCreateResponse
             {
                 success = false,
@@ -94,9 +132,7 @@ public class MerchantService : IMerchantService
             }
 
             var result = await response.Content.ReadFromJsonAsync<MerchantUploadResponse>();
-            // Console.WriteLine("Merchant Service Hello======");
 
-            // Console.WriteLine(result.data.Count);
             return result ?? new MerchantUploadResponse
             {
                 success = false,
@@ -116,7 +152,7 @@ public class MerchantService : IMerchantService
             };
         }
     }
-    
+
     public async Task<byte[]?> DownloadMerchantFile(int id)
     {
         var token = await _tokenProvider.GetAccessTokenAsync();

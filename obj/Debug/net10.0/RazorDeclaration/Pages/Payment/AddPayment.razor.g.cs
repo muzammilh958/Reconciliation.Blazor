@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (75,8)-(133,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\AddPayment.razor"
+#line (125,8)-(183,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\AddPayment.razor"
 
     private PaymentData model = new();
     private bool isLoading = false;
@@ -154,7 +154,7 @@ using Reconciliation.Blazor.Layout.Partials
             if (isSuccess)
             {
                 await ShowMessage(
-          result.message ?? "Payment deleted successfully.",
+          result!.message ?? "Payment deleted successfully.",
           "alert-success"
       );
                 await Task.Delay(1500);
@@ -187,7 +187,7 @@ using Reconciliation.Blazor.Layout.Partials
 
     private void Cancel()
     {
-        Nav.NavigateTo("/payment");
+        Nav.NavigateTo("/payment/list");
     }
 
 #line default

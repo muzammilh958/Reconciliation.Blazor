@@ -47,7 +47,7 @@ namespace Reconciliation.Blazor.Models.Auth
         public string Email { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public List<string> Roles { get; set; } = new();
+        public List<string> Roles { get; set; } = new List<string>();
     }
 
     public class RefreshTokenRequest
@@ -73,7 +73,7 @@ namespace Reconciliation.Blazor.Models.Auth
     {
         public bool success { get; set; }
         public string? message { get; set; }
-        public Data data { get; set; }
+        public Data? data { get; set; }
         public int statusCode { get; set; }
         public object? errors { get; set; }
     }

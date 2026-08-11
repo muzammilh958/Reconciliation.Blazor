@@ -1,0 +1,176 @@
+﻿@page "/users/edit/{Id:guid}"
+@inject IUserService UserService
+@inject NavigationManager Nav
+@inject IJSRuntime JsRuntime
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Edit User</h3>
+                    <small class="text-muted">Update user details and permissions</small>
+                </div>
+            </div>
+
+            <div class="card-body">
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <div class="mt-2">Loading user...</div>
+                    </div>
+                }
+                else if (hasError)
+                {
+                    <div class="alert alert-danger">
+                        Failed to load user.
+                    </div>
+                }
+                else
+                {
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            <input class="form-control" @bind="editUser.FullName" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input class="form-control" @bind="editUser.Email" />
+                        </div>
+
+                    
+                        <div class="col-md-6">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" @bind="SelectedRole">
+                                <option value="">-- Select a role --</option>
+                                @foreach (var role in AvailableRoles)
+                                {
+                                    <option value="@role.Id">@role.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="checkbox" class="form-check-input" @bind="editUser.IsLocked" />
+                            <label class="form-check-label">Locked</label>
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-outline-secondary btn-sm" @onclick="Cancel">Cancel</button>
+                            <button class="btn btn-primary btn-sm" @onclick="SaveEdit" disabled="@isSaving">
+                                @(isSaving ? "Saving..." : "Save")
+                            </button>
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private UserDto editUser = new();
+    private List<RolesDto> AvailableRoles = new();
+    private string? SelectedRole;
+    private bool isLoading = true;
+    private bool hasError = false;
+    private bool isSaving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            hasError = false;
+
+            AvailableRoles = await UserService.GetRolesAsync();
+
+            // If you have a dedicated GetUserByIdAsync, swap it in here for efficiency.
+            var users = await UserService.GetUsersAsync();
+            var user = users.FirstOrDefault(u => u.Id == Id);
+
+            if (user == null)
+            {
+                hasError = true;
+                return;
+            }
+
+            editUser = new UserDto
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                Roles = user.Roles?.ToList(),
+                IsLocked = user.IsLocked
+            };
+
+            var roleName = editUser.Roles?.FirstOrDefault();
+            SelectedRole = AvailableRoles.FirstOrDefault(r => r.Name == roleName)?.Id;
+        }
+        catch
+        {
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SaveEdit()
+    {
+        try
+        {
+            isSaving = true;
+
+            var selectedRoleName = AvailableRoles.FirstOrDefault(r => r.Id == SelectedRole)?.Name;
+            editUser.Roles = !string.IsNullOrEmpty(selectedRoleName)
+                ? new List<string> { selectedRoleName }
+                : new List<string>();
+            editUser.RoleName = selectedRoleName!;
+
+            var parts = editUser.FullName?.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts != null && parts.Length > 0)
+            {
+                editUser.FirstName = parts[0];
+                editUser.LastName = parts.Length > 1
+                    ? string.Join(" ", parts.Skip(1))
+                    : string.Empty;
+            }
+
+            var result = await UserService.UpdateUserAsync(editUser);
+
+            if (result is bool ok && ok)
+            {
+                Nav.NavigateTo("/users/list");
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Failed to update user.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"SaveEdit error: {ex}");
+            await JsRuntime.InvokeVoidAsync("alert", $"Error: {ex.Message}");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Nav.NavigateTo("/users/list");
+    }
+}

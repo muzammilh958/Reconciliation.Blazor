@@ -2,40 +2,20 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
-            "command": "dotnet",
+            "label": "dotnet build",
             "type": "process",
+            "command": "dotnet",
             "args": [
                 "build",
-                "./${workspaceFolder}/c:/Users/muhammad.muzammil/AppData/Roaming/Code/User/workspaceStorage/1b003a8eac48d4e846dfe65e7889ac74/ms-dotnettools.csdevkit/Reconciliation.Blazor.sln",
+                "${workspaceFolder}/Reconciliation.Blazor.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "publish",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "./${workspaceFolder}/c:/Users/muhammad.muzammil/AppData/Roaming/Code/User/workspaceStorage/1b003a8eac48d4e846dfe65e7889ac74/ms-dotnettools.csdevkit/Reconciliation.Blazor.sln",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "watch",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "run",
-                "--project",
-                "./${workspaceFolder}/c:/Users/muhammad.muzammil/AppData/Roaming/Code/User/workspaceStorage/1b003a8eac48d4e846dfe65e7889ac74/ms-dotnettools.csdevkit/Reconciliation.Blazor.sln"
-            ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

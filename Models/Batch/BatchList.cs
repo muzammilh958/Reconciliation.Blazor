@@ -8,7 +8,7 @@ public class BatchDataDTO
     public int id { get; set; }
     [Required(ErrorMessage = "Batch name is required.")]
     [StringLength(100, ErrorMessage = "Batch name cannot exceed 100 characters.")]
-    public string name { get; set; }
+    public string? name { get; set; }
     [JsonPropertyName("is_Locked")]
     public bool IsLocked { get; set; }
     [Required(ErrorMessage = "From Date is required.")]
@@ -25,8 +25,8 @@ public class BatchDataDTO
 public class BatchListDTO
 {
     public bool success { get; set; }
-    public string message { get; set; }
-    public List<BatchDataDTO> data { get; set; }
+    public string? message { get; set; }
+    public List<BatchDataDTO>? data { get; set; }
     public int statusCode { get; set; }
-    public object errors { get; set; }
+    public object? errors { get; set; }
 }

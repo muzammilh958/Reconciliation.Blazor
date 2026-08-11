@@ -9,6 +9,7 @@
 @inject TokenServices TokenService
 
 @inject IAuthenticationService AuthService
+@inject ILocalStorageService _localStorage
 
 @inject NavigationManager Navigation
 @* @inject CustomAuthenticationStateProvider AuthStateProvider *@
@@ -46,7 +47,7 @@
             </div>
 
             <h1 class="login-title">
-                Welcome Back! 👋
+                Welcome Back! 
             </h1>
 
             <p class="login-subtitle">
@@ -62,22 +63,9 @@
             <!-- Email -->
 
             <div class="input-group">
-
                 <label>Email Address</label>
-
-                @* <div class="input-wrapper"> *@
-
-                     @* <i class="bi bi-envelope"></i>  *@
-
-                    <InputText class="input-field"
-                               @bind-Value="loginModel.Email"
-                               placeholder="Enter your email" />
-
-                @* </div> *@
-
-                <ValidationMessage For="@(() => loginModel.Email)"
-                                   class="field-error" />
-
+                    <InputText class="input-field" @bind-Value="loginModel.Email" placeholder="Enter your email" />
+                    <ValidationMessage For="@(() => loginModel.Email)" class="field-error" />
             </div>
 
             <!-- Password -->
@@ -90,10 +78,7 @@
 
                 
 
-                    <InputText type="password"
-                               class="input-field"
-                               @bind-Value="loginModel.Password"
-                               placeholder="Enter your password" />
+                    <InputText type="password" class="input-field" @bind-Value="loginModel.Password" placeholder="Enter your password" />
 
                     
 
@@ -175,7 +160,13 @@
     [Inject] private TokenServices TokenServices { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private HttpClient HttpClient { get; set; }
-    
+      private const string TokenKey = "authToken";
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+
     private async Task HandleLogin()
     {
         isLoading = true;
@@ -184,7 +175,7 @@
 
         try
         {
-            var response = await AuthService.LoginAsync(loginModel);
+            AuthResponse? response = await AuthService.LoginAsync(loginModel);
             switch (response.StatusCode)
             {
                 case 401:
@@ -204,20 +195,27 @@
                     break;
 
                 default:
+                    // Save token
                     await TokenServices.SaveToken(response.Data!.accessToken);
+                    await TokenServices.SaveTokenAndUserInfo(response);
+                    // Notify authentication
                     await AuthStateProvider.NotifyUserAuthentication(response.Data.accessToken);
             
                     successMessage = "Login successful!";
                     StateHasChanged();
+                    
+                    // Wait for message to show
                     await Task.Delay(800);
-                    Navigation.NavigateTo("/dashboard"); 
+                    
+                    // Force navigate to dashboard
+                    Navigation.NavigateTo("/dashboard", true); 
                     break;
             }
-            
         }
-        catch
+        catch (Exception ex)
         {
-           errorMessage = "Server error. Try again later.";
+            errorMessage = "Server error. Try again later.";
+            Console.WriteLine($"Login error: {ex.Message}");
         }
         finally
         {

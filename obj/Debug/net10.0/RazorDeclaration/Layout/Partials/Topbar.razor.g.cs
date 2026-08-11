@@ -108,6 +108,11 @@ using Reconciliation.Blazor.Layout.Partials
 
 #nullable disable
     ;
+#nullable restore
+#line (5,2)-(5,42) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+using Reconciliation.Blazor.Models.Auth;
+
+#nullable disable
     #line default
     #line hidden
     #nullable restore
@@ -120,13 +125,38 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (666,8)-(677,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+#line (133,8)-(169,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
 
     [Inject]
     public required IJSRuntime JsRuntime { get; set; }
-    protected override void OnInitialized()
+
+    private string userDisplayName = "";
+    private AuthResponse userInfo = new AuthResponse();
+
+    protected override async Task OnInitializedAsync()
     {
-     
+        try
+        {
+            // Wrap this in try-catch to prevent the error
+            userInfo = await TokenServices.GetUserInfo();
+
+            // Set display name
+            if (userInfo != null)
+            {
+                userDisplayName = $"{userInfo!.Data!.User!.FirstName} {userInfo!.Data!.User!.LastName}".Trim();
+                if (string.IsNullOrEmpty(userDisplayName))
+                    userDisplayName = userInfo!.Data!.User!.Email ?? "User";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading user info: {ex.Message}");
+            // Don't crash - just use default
+            userInfo = null;
+            userDisplayName = "User";
+        }
+
+        var token = await TokenServices.GetToken();
         AppState.OnChange += Refresh;
     }
 
@@ -139,24 +169,28 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (677,64)-(707,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+#line (169,64)-(181,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
 
         await JsRuntime.InvokeVoidAsync("toggleSidebar");
 
     }
 
-    private string GetUserDisplayName()
-    {
-        var response = AppState.GetUser();
-       
-        if (response?.Data?.User == null)
-            return "Guest";
-
-        return $"{response.Data.User.FirstName} {response.Data.User.LastName}";
-    }
+    
     private async Task Logout()
     {
-        await TokenServices.ClearToken();
+        await TokenServices.RemoveToken();
+
+        await TokenServices.ClearUserInfo();
+
+        
+
+#line default
+#line hidden
+#nullable disable
+
+#nullable restore
+#line (182,11)-(196,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+
         AppState.Clear();
         Nav.NavigateTo("/", forceLoad: true);
     }
@@ -177,7 +211,7 @@ using Reconciliation.Blazor.Layout.Partials
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (3,9)-(3,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+#line (6,9)-(6,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
 NavigationManager
 
 #line default
@@ -185,7 +219,7 @@ NavigationManager
 #nullable disable
          
 #nullable restore
-#line (3,27)-(3,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+#line (6,27)-(6,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
 Nav
 
 #line default
@@ -195,7 +229,7 @@ Nav
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (2,9)-(2,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+#line (3,9)-(3,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
 AppState
 
 #line default
@@ -203,8 +237,26 @@ AppState
 #nullable disable
          
 #nullable restore
-#line (2,18)-(2,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+#line (3,18)-(3,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
 AppState
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (2,9)-(2,36) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+AuthenticationStateProvider
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (2,37)-(2,54) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+AuthStateProvider
 
 #line default
 #line hidden

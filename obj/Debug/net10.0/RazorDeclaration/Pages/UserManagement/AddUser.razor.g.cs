@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (92,8)-(150,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\AddUser.razor"
+#line (197,8)-(255,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\AddUser.razor"
 
     private bool isLoading = false;
 

@@ -15,60 +15,110 @@
                     <small class="text-muted">Payment</small>
                 </div>
             </div>
+
             <div class="card-body">
 
                 <EditForm Model="@model" OnValidSubmit="HandleSubmit">
                     <DataAnnotationsValidator />
-                    @* <ValidationSummary /> *@
+
                     @if (!string.IsNullOrEmpty(message))
                     {
                         <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">
                             @message
                         </div>
                     }
-                    <div class="mb-3">
-                        <label class="form-label">Payment Name</label>
-                        <InputText class="form-control" @bind-Value="model.name" placeholder="Enter payment name" />
-                        <ValidationMessage For="@(() => model.name)" />
-                    </div>
 
-                    <div class="col-12">
-                        <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
-                            <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
-                                Cancel
-                            </button>
-                            <button class="btn btn-primary btn-sm" type="submit" disabled="@isLoading">
-                                @if (isLoading)
-                                {
-                                    <span>Saving...</span>
-                                }
-                                else
-                                {
-                                    <span>Save</span>
-                                }
-                            </button>
+                    <div class="row g-3">
+
+                        <!-- Payment Name -->
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Name</label>
+                            <InputText class="form-control" @bind-Value="model.name" placeholder="Enter payment name" />
+                            <ValidationMessage For="@(() => model.name)" />
                         </div>
-                    </div>
-                    @* <div class="d-flex gap-2">
-                <button class="btn btn-primary btn-sm" type="submit" disabled="@isLoading">
-                    @if (isLoading)
-                    {
-                        <span>Saving...</span>
-                    }
-                    else
-                    {
-                        <span>Save</span>
-                    }
-                </button>
 
-                <button class="btn btn-secondary" type="button" @onclick="Cancel">
-                    Cancel
-                </button>
-            </div> *@
+                        <!-- Order Id -->
+                        <div class="col-md-6">
+                            <label class="form-label">Order Id</label>
+                            <InputText class="form-control" @bind-Value="model.OrderId" placeholder="Enter order ID" />
+                            <ValidationMessage For="@(() => model.OrderId)" />
+                        </div>
+
+                        <!-- Transaction Date -->
+                        <div class="col-md-6">
+                            <label class="form-label">Transaction Date</label>
+                            <InputText class="form-control" @bind-Value="model.TransactionDate"
+                                       placeholder="Enter transaction date" />
+                            <ValidationMessage For="@(() => model.TransactionDate)" />
+                        </div>
+
+                        <!-- Tender -->
+                        <div class="col-md-6">
+                            <label class="form-label">Tender</label>
+                            <InputText class="form-control" @bind-Value="model.Tender" placeholder="Enter tender" />
+                            <ValidationMessage For="@(() => model.Tender)" />
+                        </div>
+
+                        <!-- Transaction Amount -->
+                        <div class="col-md-6">
+                            <label class="form-label">Transaction Amount</label>
+                            <InputText class="form-control" @bind-Value="model.TransactionAmount"
+                                       placeholder="Enter transaction amount" />
+                            <ValidationMessage For="@(() => model.TransactionAmount)" />
+                        </div>
+
+                        <!-- Authorization Code -->
+                        <div class="col-md-6">
+                            <label class="form-label">Authorization Code</label>
+                            <InputText class="form-control" @bind-Value="model.AuthorizationCode"
+                                       placeholder="Enter authorization code" />
+                            <ValidationMessage For="@(() => model.AuthorizationCode)" />
+                        </div>
+
+                        <!-- Merchant ID -->
+                        <div class="col-md-6">
+                            <label class="form-label">Merchant ID</label>
+                            <InputText class="form-control" @bind-Value="model.MerchantID"
+                                       placeholder="Enter merchant ID" />
+                            <ValidationMessage For="@(() => model.MerchantID)" />
+                        </div>
+
+                        <div class="col-md-6">
+                            @* <div class="d-flex align-items-center" >
+                                <div class="form-check"> *@
+                            <InputCheckbox class="form-check-input" @bind-Value="model.IsAuthEnable" />
+                            <label class="form-check-label">Auth Enable</label>
+                            @* </div>
+                            </div> *@
+                        </div>
+
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
+                            Cancel
+                        </button>
+
+                        <button class="btn btn-primary btn-sm" type="submit" disabled="@isLoading">
+
+                            @if (isLoading)
+                            {
+                                <span>Saving...</span>
+                            }
+                            else
+                            {
+                                <span>Save</span>
+                            }
+
+                        </button>
+                    </div>
 
                 </EditForm>
 
             </div>
+
+
         </div>
     </div>
 </div>
@@ -95,7 +145,7 @@
             if (isSuccess)
             {
                 await ShowMessage(
-          result.message ?? "Payment deleted successfully.",
+          result!.message ?? "Payment deleted successfully.",
           "alert-success"
       );
                 await Task.Delay(1500);
@@ -128,6 +178,6 @@
 
     private void Cancel()
     {
-        Nav.NavigateTo("/payment");
+        Nav.NavigateTo("/payment/list");
     }
 }

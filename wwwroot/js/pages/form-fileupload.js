@@ -269,3 +269,21 @@ window.getFilePondFileBase64 = async function (fileName) {
 } else {
     console.warn("FileUpload already initialized, skipping");
 }
+
+
+window.initSearchableSelects = function () {
+    var selects = document.querySelectorAll('.searchable-select');
+    selects.forEach(function (select) {
+        if (select.choices) return;
+        new Choices(select, {
+            searchEnabled: true,
+            searchFields: ['label'],
+            itemSelectText: '',
+            placeholderValue: select.getAttribute('data-placeholder') || 'Select...',
+            noResultsText: 'No results found',
+            noChoicesText: 'No choices available',
+            position: 'bottom',
+            removeItemButton: false,
+        });
+    });
+};

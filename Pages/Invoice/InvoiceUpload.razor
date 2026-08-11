@@ -1,7 +1,9 @@
 ﻿@page "/invoice/invoice-upload"
+@using System.Text.Json
 
 @inject IInvoiceTypeService InvoiceService
 
+@inject IPaymentService PaymentService
 @inject IInvoiceService InvoiceServices
 @inject IBatchesService BatchesService
 @inject IJSRuntime JsRuntime
@@ -27,26 +29,37 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <label class="form-label">Select Batch</label>
-                        <select class="form-select" @bind="SelectedBatchId">
-                            <option value="0"  selected disabled>Select Batch</option>
+                        <select id="batchSelect" class="form-control form-select select2" @bind="SelectedBatchId">
+                            <option value="0" selected disabled>Select Batch</option>
                             @foreach (var batch in batches)
                             {
                                 <option value="@batch.id">@batch.name</option>
                             }
                         </select>
                     </div>
-                    <div class="col-sm-6">
+                    @* <div class="col-sm-6">
                         <label class="form-label">Select Invoice</label>
-                        <select class="form-select" @bind="SelectedInvoiceId">
+                        <select id="invoiceSelect" class="form-control form-select select2" @bind="SelectedInvoiceId">
                             <option value="0" selected disabled>Select Invoice Type</option>
                             @foreach (var invoice in invoiceType.data)
                             {
                                 <option value="@invoice.id">@invoice.name</option>
                             }
                         </select>
+                    </div> *@
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Payment</label>
+
+                        <select id="paymentSelect" class="form-control form-select select2" @bind="SelectedPaymentId">
+                            <option value="0" disabled>Select Payment</option>
+                            @foreach (var payment in Paymentes)
+                            {
+                                <option value="@payment.id">@payment.name</option>
+                            }
+                        </select>
                     </div>
                 </div>
-                 <div class="row mt-3">
+                <div class="row mt-3">
                     <div class="col-sm-6">
                         <label class="form-label">From Date</label>
                         <input class="form-control" type="date" readonly @bind="FromDate" />
@@ -57,7 +70,7 @@
                         <input class="form-control" type="date" readonly @bind="ToDate" />
                     </div>
                 </div>
-                <div class="row mt-3">
+                @* <div class="row mt-3">
                     <div class="col-sm-6">
                         <label class="form-label">File Upload</label>
                         <div class="mb-3">
@@ -68,21 +81,21 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                 <div class="col-12">
+                </div> *@
+                <div class="col-12">
                     <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
                         <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
-                     
+
                         <button class="btn btn-primary btn-sm" type="button" @onclick="SaveAsync"
                                 disabled="@ispostLoading">
                             @if (ispostLoading)
                             {
-                                <span>Saving...</span>
+                                <span>Importing...</span>
                             }
                             else
                             {
 
-                                <span>Save</span>
+                                <span>Import</span>
                             }
                         </button>
                     </div>
@@ -97,17 +110,20 @@
     private bool showAlert = false;
     private string alertMessage = "";
     private string alertType = "success";
-    private int _selectedInvoiceId= 0;
+    private int _selectedInvoiceId = 0;
     private DateTime? FromDate { get; set; }
     private DateTime? ToDate { get; set; }
-    private int _selectedBatchId= 0;
+    private int _selectedBatchId = 0;
+
+    private List<PaymentData> Paymentes = new();
+    private int _selectedPaymentId;
     private List<Models.Batch.BatchDataDTO> batches = new();
 
     private IJSObjectReference? _module;
     private InvoiceTypeList invoiceType = new();
-     private List<byte[]> fileBytes = new();
-    private List<string> fileNames = new();
-    private List<string> contentTypes = new();
+
+    private DotNetObjectReference<InvoiceUpload>? _dotNetRef; // TODO: replace "Upload" with your actual @code class name
+    private bool _select2Initialized = false;
     private int SelectedInvoiceId
     {
         get => _selectedInvoiceId;
@@ -122,6 +138,16 @@
                 StateHasChanged();
             }
         }
+    }
+    private int SelectedPaymentId
+    {
+        get => _selectedPaymentId;
+        set => _selectedPaymentId = value;
+    }
+
+    private async Task OnInvoiceSelected(int invoiceId)
+    {
+        SelectedInvoiceId = invoiceId;
     }
 
     private int SelectedBatchId
@@ -150,6 +176,13 @@
                 await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
                 await JsRuntime.InvokeVoidAsync("loadConfig");
                 await JsRuntime.InvokeVoidAsync("loadApps");
+
+                if (!_select2Initialized && !isLoading && batches.Any())
+                {
+                    _dotNetRef = DotNetObjectReference.Create(this);
+                    await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetRef);
+                    _select2Initialized = true;
+                }
             }
             catch (Exception ex)
             {
@@ -164,6 +197,7 @@
         {
             batches = await BatchesService.GetAllAsync();
             invoiceType = await InvoiceService.GetAllAsync();
+            Paymentes = await PaymentService.GetAllAsync();
         }
         catch (Exception ex)
         {
@@ -185,20 +219,16 @@
     }
 
     private async Task SaveAsync()
-    { 
+    {
         ispostLoading = true;
 
         try
         {
-            await LoadFileDataAsync(); // Ensure data is fresh
 
-            if (fileBytes.Count == 0)
-            {
-                ShowAlert("Please select a valid file", "danger");
-                return;
-            }
 
-            if (SelectedBatchId <= 0 || SelectedInvoiceId <= 0 || !FromDate.HasValue || !ToDate.HasValue)
+            Console.WriteLine($"SelectedBatchId: {SelectedBatchId}, SelectedPaymentId: {SelectedPaymentId}, FromDate: {FromDate}, ToDate: {ToDate}");
+
+            if (SelectedBatchId <= 0 || SelectedPaymentId <= 0 || !FromDate.HasValue || !ToDate.HasValue)
             {
                 ShowAlert("Please fill all required fields", "danger");
                 return;
@@ -207,23 +237,35 @@
             var model = new InvoiceUploadRequest
             {
                 batchId = SelectedBatchId,
-                invoiceId = SelectedInvoiceId,
+                PaymentId = SelectedPaymentId,
                 fromDate = FromDate.Value,
                 toDate = ToDate.Value
             };
 
             InvoiceUploadResponse? result = await InvoiceServices.CreateAsync(
-                model,
-                fileBytes[0],
-                fileNames[0],
-                contentTypes[0]); 
+                model);
 
-          ShowAlert(result.message,
-                      result.success ? "success" : "danger");
+            if (result != null)
+            {
+                // Directly use the message from the response
+                if (!result.success)
+                {
+                    ShowAlert(result.message ?? "Failed to save", "danger");
+                }
+                else
+                {
+                    ShowAlert(result.message ?? "Saved successfully", "success");
+                }
+            }
+            else
+            {
+                ShowAlert("No response from server", "danger");
+            }
         }
         catch (Exception ex)
         {
-            ShowAlert(ex.Message ?? "Failed to save", "danger");
+            
+            ShowAlert(ExtractFriendlyMessage(ex), "danger");
             Console.WriteLine(ex); // full stack trace
         }
         finally
@@ -232,58 +274,21 @@
         }
     }
 
-    private async Task LoadFileDataAsync()
+    private static string ExtractFriendlyMessage(Exception ex)
     {
-        fileBytes.Clear();
-        fileNames.Clear();
-        contentTypes.Clear();
-
-        try
+        var start = ex.Message.IndexOf('{');
+        if (start >= 0)
         {
-            var jsFiles = await JsRuntime.InvokeAsync<List<FileData>>("getFilePondFiles");
-
-            if (jsFiles == null || jsFiles.Count == 0)
+            try
             {
-                ShowAlert("No files found from FilePond", "danger");
-                return;
+                var resp = JsonSerializer.Deserialize<InvoiceUploadResponse>(ex.Message[start..]);
+                if (resp != null && !string.IsNullOrWhiteSpace(resp.message))
+                    return resp.message;
             }
-
-            foreach (var file in jsFiles)
-            {
-                if (string.IsNullOrWhiteSpace(file?.name))
-                    continue;
-
-                // Critical: Read bytes via JS interop
-                var base64 = await JsRuntime.InvokeAsync<string>("getFilePondFileBase64", file.name);
-                if (string.IsNullOrWhiteSpace(base64))
-                {
-                    Console.WriteLine($"Failed to read file: {file.name}");
-                    continue;
-                }
-
-                var bytes = Convert.FromBase64String(base64);
-
-                if (bytes.Length == 0)
-                    continue;
-
-                fileBytes.Add(bytes);
-                fileNames.Add(file.name);
-                contentTypes.Add(file.contentType ?? "application/octet-stream");
-            }
-            if (fileBytes.Count == 0)
-            {
-                ShowAlert("Failed to load any file data", "danger");
-            }
+            catch { }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"File load error: {ex}");
-        }
+        return "Something went wrong. Please try again.";
     }
-    public class FileData
-    {
-        public string name { get; set; } = "";
-        public string contentType { get; set; } = "";
-        public List<int> bytes { get; set; } = new(); // probably not used
-    }
+
+    
 }

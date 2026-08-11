@@ -14501,6 +14501,52 @@ html[data-skin=flat][data-bs-theme=dark][data-topbar-color=dark], html[data-skin
   display: block;
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+    width: 100%;
+}
+
+.logo-light {
+    background-color: #2c3e50; /* or your background color */
+    padding: 15px 20px;
+    border-radius: 4px;
+}
+
+.logo-lg {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.logo-sm {
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: none; /* Hide small logo on larger screens */
+}
+
+/* Show small logo on smaller screens */
+@media (max-width: 768px) {
+    .logo-lg {
+        display: none;
+    }
+    .logo-sm {
+        display: block;
+        font-size: 12px;
+    }
+}
+
 html[data-topbar-color=dark] .logo-topbar .logo-light,
 html[data-bs-theme=dark] .logo-topbar .logo-light {
   display: block;

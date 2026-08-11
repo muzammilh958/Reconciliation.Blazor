@@ -80,6 +80,7 @@
     private async Task OnLogout()
     {
         await AuthStateProvider.NotifyUserLogout();
+        
         Navigation.NavigateTo("/");
     }
 }

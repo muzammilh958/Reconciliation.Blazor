@@ -1,7 +1,7 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Reconciliation.Blazor.Core.Endpoints;
 using Reconciliation.Blazor.Services;
-using System.Net.Http.Headers;
 namespace Reconciliation.Blazor;
 
 public class InvoiceTypeService : IInvoiceTypeService
@@ -108,21 +108,25 @@ public class InvoiceTypeService : IInvoiceTypeService
         }
     }
 
-    public async Task<InvoiceType?> GetByIdAsync(int id)
+    public async Task<SingleInvoiceTypeResponse?> GetByIdAsync(int id)
     {
         try
         {
             var token = await _tokenProvider.GetAccessTokenAsync();
 
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiEndpoints.InvoiceType.GetById}/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiEndpoints.InvoiceType.GetById}{id}");
             request.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await _http.SendAsync(request);
+            Console.WriteLine($"Response: {response.StatusCode}");
+            Console.WriteLine($"Response Content: {await response.Content.ReadAsStringAsync()}");
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException("Failed to retrieve InvoiceType");
             }
-            var responseBody = await response.Content.ReadFromJsonAsync<InvoiceType>();
+            var responseBody = await response.Content.ReadFromJsonAsync<SingleInvoiceTypeResponse>();
+            Console.WriteLine($"Response Body: {responseBody.data.id}, {responseBody.data.name}");
+
             return responseBody;
         }
         catch (Exception e)

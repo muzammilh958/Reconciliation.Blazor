@@ -22,7 +22,7 @@ public class AppState
         Console.WriteLine($"User    : {session?.Data?.User != null}");
         Console.WriteLine($"Email   : {session?.Data?.User?.Email}");
         Console.WriteLine("SetUser()");
-        Console.WriteLine(session.Data?.User?.Email);
+        Console.WriteLine(session!.Data?.User?.Email);
 
         CurrentUser = session;
         Console.WriteLine(CurrentUser.Data?.User?.Email);

@@ -5,7 +5,7 @@ namespace Reconciliation.Blazor;
 public interface IStoreService
 {
     Task<List<StoreDTO>> GetAllAsync();
-    Task<StoreDTO?> GetByIdAsync(int id);
+    Task<StoreEditDTO?> GetByIdAsync(int id);
 
     Task<StoreCreateResponse> CreateAsync(StoreDTO model);
 

@@ -157,7 +157,7 @@ BlankLayout
         }
         #pragma warning restore 1998
 #nullable restore
-#line (166,8)-(246,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (151,8)-(244,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 
     private LoginRequest loginModel = new();
     private string? successMessage;
@@ -170,7 +170,13 @@ BlankLayout
     [Inject] private TokenServices TokenServices { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private HttpClient HttpClient { get; set; }
-    
+      private const string TokenKey = "authToken";
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+
     private async Task HandleLogin()
     {
         isLoading = true;
@@ -179,7 +185,7 @@ BlankLayout
 
         try
         {
-            var response = await AuthService.LoginAsync(loginModel);
+            AuthResponse? response = await AuthService.LoginAsync(loginModel);
             switch (response.StatusCode)
             {
                 case 401:
@@ -199,20 +205,27 @@ BlankLayout
                     break;
 
                 default:
+                    // Save token
                     await TokenServices.SaveToken(response.Data!.accessToken);
+                    await TokenServices.SaveTokenAndUserInfo(response);
+                    // Notify authentication
                     await AuthStateProvider.NotifyUserAuthentication(response.Data.accessToken);
             
                     successMessage = "Login successful!";
                     StateHasChanged();
+                    
+                    // Wait for message to show
                     await Task.Delay(800);
-                    Navigation.NavigateTo("/dashboard"); 
+                    
+                    // Force navigate to dashboard
+                    Navigation.NavigateTo("/dashboard", true); 
                     break;
             }
-            
         }
-        catch
+        catch (Exception ex)
         {
-           errorMessage = "Server error. Try again later.";
+            errorMessage = "Server error. Try again later.";
+            Console.WriteLine($"Login error: {ex.Message}");
         }
         finally
         {
@@ -245,7 +258,7 @@ BlankLayout
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (15,9)-(15,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (16,9)-(16,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 JwtAuthStateProvider
 
 #line default
@@ -253,7 +266,7 @@ JwtAuthStateProvider
 #nullable disable
          
 #nullable restore
-#line (15,30)-(15,47) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (16,30)-(16,47) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 AuthStateProvider
 
 #line default
@@ -263,7 +276,7 @@ AuthStateProvider
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (13,9)-(13,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (14,9)-(14,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 NavigationManager
 
 #line default
@@ -271,8 +284,26 @@ NavigationManager
 #nullable disable
          
 #nullable restore
-#line (13,27)-(13,37) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (14,27)-(14,37) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 Navigation
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (12,9)-(12,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+ILocalStorageService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (12,30)-(12,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+_localStorage
 
 #line default
 #line hidden

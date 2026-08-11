@@ -130,17 +130,18 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (105,8)-(189,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
+#line (107,8)-(218,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
 
     private bool showAlert = false;
     private string alertMessage = "";
     private string alertType = "success";
     private int SelectedBatchId { get; set; } = 0;
     private bool isLoading = true;
+    private bool dataReady = true;
     private bool isLoadingExceptions = false;
     private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
     private ExceptionlistDTO exceptionlistDTO = new();
-
+    private IJSObjectReference? _module;
     protected override async Task OnInitializedAsync()
     {
         try
@@ -157,6 +158,30 @@ using Reconciliation.Blazor.Layout.Partials
         finally
         {
             isLoading = false;
+        }
+    } 
+    private async Task InitDataTableAsync()
+    {
+        if (_module != null)
+        {
+            await _module.InvokeVoidAsync("loadDataTableAjax");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/css/datatables/datatables-ajax.js"
+            );
+        }
+        if (dataReady && !isLoading && _module != null)
+        {
+            dataReady = false; // prevent re-run
+
+            await _module.InvokeVoidAsync("initDataTable");
         }
     }
 
@@ -184,6 +209,8 @@ using Reconciliation.Blazor.Layout.Partials
         try
         {
             exceptionlistDTO = await ExceptionService.GetExceptionlist(SelectedBatchId.ToString());
+            
+            dataReady = true;
         }
         catch (Exception ex)
         {
@@ -202,9 +229,9 @@ using Reconciliation.Blazor.Layout.Partials
     {
         return exceptionType switch
         {
-            "Duplicate" => "bg-warning text-dark",
-            "No Match Found" => "bg-danger",
-            _ => "bg-secondary"
+            "Duplicate" => "badge-soft-warning text-dark",
+            "No Match Found" => "badge-soft-danger",
+            _ => "badge-soft-secondary"
         };
     }
 
@@ -220,6 +247,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (7,9)-(7,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
+IJSRuntime
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (7,20)-(7,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
+JsRuntime
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (5,9)-(5,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"

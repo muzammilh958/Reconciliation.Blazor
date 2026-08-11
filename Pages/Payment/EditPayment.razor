@@ -1,0 +1,229 @@
+﻿@page "/payment/edit/{Id:int}"
+
+@inject IPaymentService PaymentService
+@inject NavigationManager Nav
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Edit Payment</h3>
+                    <small class="text-muted">Payment</small>
+                </div>
+            </div>
+
+            <div class="card-body">
+
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <div class="mt-2">Loading Payment...</div>
+                    </div>
+                }
+                else if (hasError)
+                {
+                    <div class="alert alert-danger">
+                        Failed to load Payment.
+                    </div>
+                }
+                else
+                {
+                    <EditForm Model="@model" OnValidSubmit="HandleSubmit">
+                        <DataAnnotationsValidator />
+
+                        @if (!string.IsNullOrEmpty(message))
+                        {
+                            <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">
+                                @message
+                            </div>
+                        }
+
+                        <div class="row g-3">
+
+                            <!-- Payment Name -->
+                            <div class="col-md-6">
+                                <label class="form-label">Payment Name</label>
+                                <InputText class="form-control" @bind-Value="model.name" placeholder="Enter payment name" />
+                                <ValidationMessage For="@(() => model.name)" />
+                            </div>
+
+                            <!-- Order Id -->
+                            <div class="col-md-6">
+                                <label class="form-label">Order Id</label>
+                                <InputText class="form-control" @bind-Value="model.OrderId" placeholder="Enter order ID" />
+                                <ValidationMessage For="@(() => model.OrderId)" />
+                            </div>
+
+                            <!-- Transaction Date -->
+                            <div class="col-md-6">
+                                <label class="form-label">Transaction Date</label>
+                                <InputText class="form-control" @bind-Value="model.TransactionDate"
+                                           placeholder="Enter transaction date" />
+                                <ValidationMessage For="@(() => model.TransactionDate)" />
+                            </div>
+
+                            <!-- Tender -->
+                            <div class="col-md-6">
+                                <label class="form-label">Tender</label>
+                                <InputText class="form-control" @bind-Value="model.Tender" placeholder="Enter tender" />
+                                <ValidationMessage For="@(() => model.Tender)" />
+                            </div>
+
+                            <!-- Transaction Amount -->
+                            <div class="col-md-6">
+                                <label class="form-label">Transaction Amount</label>
+                                <InputText class="form-control" @bind-Value="model.TransactionAmount"
+                                           placeholder="Enter transaction amount" />
+                                <ValidationMessage For="@(() => model.TransactionAmount)" />
+                            </div>
+
+                            <!-- Authorization Code -->
+                            <div class="col-md-6">
+                                <label class="form-label">Authorization Code</label>
+                                <InputText class="form-control" @bind-Value="model.AuthorizationCode"
+                                           placeholder="Enter authorization code" />
+                                <ValidationMessage For="@(() => model.AuthorizationCode)" />
+                            </div>
+
+                            <!-- Merchant ID -->
+                            <div class="col-md-6">
+                                <label class="form-label">Merchant ID</label>
+                                <InputText class="form-control" @bind-Value="model.MerchantID"
+                                           placeholder="Enter merchant ID" />
+                                <ValidationMessage For="@(() => model.MerchantID)" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="checkbox" class="form-check-input" @bind="model.IsAuthEnable" />
+                                <label class="form-check-label">Auth Enable</label>
+                            </div>
+
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
+                                Cancel
+                            </button>
+
+                            <button class="btn btn-primary btn-sm" type="submit" disabled="@isSaving">
+
+                                @if (isSaving)
+                                {
+                                    <span>Saving...</span>
+                                }
+                                else
+                                {
+                                    <span>Update</span>
+                                }
+
+                            </button>
+                        </div>
+
+                    </EditForm>
+                }
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private PaymentData model = new();
+    private bool isLoading = true;
+    private bool hasError = false;
+    private bool isSaving = false;
+    private string? message;
+    private bool isSuccess;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            hasError = false;
+
+            // NOTE: assumes IPaymentService has a GetByIdAsync(int id) method.
+            // Update this call if your service uses a different method name.
+            var existing = await PaymentService.GetByIdAsync(Id);
+
+            if (existing is null)
+            {
+                hasError = true;
+            }
+            else
+            {
+                model = new PaymentData
+                {
+                    id = existing.id,
+                    name = existing.name,
+                    AuthorizationCode = existing.AuthorizationCode,
+                    MerchantID = existing.MerchantID,
+                    OrderId = existing.OrderId,
+                    Tender = existing.Tender,
+                    TransactionAmount = existing.TransactionAmount,
+                    TransactionDate = existing.TransactionDate,
+                    IsAuthEnable = existing.IsAuthEnable
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    private async Task HandleSubmit()
+    {
+        isSaving = true;
+        model.name = model.name?.Trim() ?? "";
+
+        if (string.IsNullOrWhiteSpace(model.name))
+        {
+            message = "Payment name is required.";
+            isSuccess = false;
+            isSaving = false;
+            return;
+        }
+
+        try
+        {
+            var result = await PaymentService.UpdateAsync(model.id, model);
+
+            isSuccess = result?.success ?? false;
+            message = result?.message ?? "No response received";
+
+            if (isSuccess)
+            {
+                await Task.Delay(1000);
+                Nav.NavigateTo("/payment/list");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            isSuccess = false;
+            message = "Failed to update Payment.";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+    private void Cancel()
+    {
+        Nav.NavigateTo("/payment/list");
+    }
+}
