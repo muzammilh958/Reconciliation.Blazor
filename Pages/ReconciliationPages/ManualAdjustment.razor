@@ -1,0 +1,670 @@
+﻿@page "/manual/adjustment"
+@inject IBatchesService BatchesService
+@inject IPaymentService PaymentService
+@inject IManualAdjustment ManualAdjustmentService
+@inject TokenServices TokenServices
+@inject IJSRuntime JsRuntime;
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Manual Adjustment</h3>
+                    <small class="text-muted">Manage Manual Reconciliation</small>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (showAlert)
+                {
+                    <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                        @alertMessage
+                        <button type="button" class="btn-close" @onclick="() => showAlert = false"></button>
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Batch</label>
+                        <select class="form-control form-select select2" id="batchSelect" @bind="SelectedBatchId">
+                            <option value="0" selected disabled>Select Batch</option>
+                            @foreach (var batch in batchDataDTOs)
+                            {
+                                <option value="@batch.id">@batch.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Payment</label>
+                        <select class="form-control form-select select2" id="paymentSelect">
+                            <option value="0" selected disabled>Select Payment</option>
+                            <option value="-1">All Payments (Reconcile All)</option>
+                            @foreach (var payment in Paymentes)
+                            {
+                                <option value="@payment.id">@payment.name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                
+                <div class="row mt-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">Business Day</label>
+                        <div class="input-group">
+                            <input type="date" class="form-control" readonly disabled @bind="FromDate" />
+                            <span class="input-group-text">to</span>
+                            <input type="date" class="form-control" readonly disabled @bind="ToDate" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                            <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
+                            <button class="btn btn-primary btn-sm" type="button"
+                                    @onclick="GetManualReconciliationRecords" disabled="@isReconciling">
+                                @if (isReconciling)
+                                {
+                                    <span>Fetching Data...</span>
+                                }
+                                else
+                                {
+                                    <span>Fetch Data</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            
+                @if (showResults && manualAdjustmentDTO?.Data.InvoiceLines != null)
+                {
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5 class="mb-3">Reconciliation Results</h5>
+
+                           
+                            @if (showResults && manualAdjustmentDTO?.Data.MerchantLines != null)
+                            {
+                                <h6 class="mt-4">Payment Transactions</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-striped dt-responsive align-middle mb-0" id="merchantTable"
+                                           data-tables="basic">
+                                        <thead>
+                                            <tr>
+                                                <th><input type="checkbox" id="selectAllMerchant" /></th>
+                                                
+                                                <th>Batch Name</th>
+                                                <th>Order ID</th>
+                                                <th>Store ID</th>
+                                                <th>Amount</th>
+                                                <th>Tender Type</th>
+                                                <th>Auth Code</th>
+                                                <th>Transaction Date</th>
+                                                <th>Business Day</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @foreach (var merchant in manualAdjustmentDTO.Data.MerchantLines)
+                                            {
+                                                <tr>
+                                                    <td><input type="checkbox" class="row-checkbox merchant-checkbox"
+                                                                   name="selectedMerchantIds" value="@merchant.id"
+                                                                  /></td>
+                                                        <td>@manualAdjustmentDTO.Data.batch.name</td>
+                                                        <td>@merchant.orderId</td>
+                                                        <td>@merchant.storeId</td>
+                                                        <td>@merchant.amount.ToString("F2")</td>
+                                                        <td>@merchant.tenderType</td>
+                                                        <td>@merchant.authCode</td>
+                                                        <td>@merchant.transactionDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                                        <td>@merchant.BusinessDay.ToString("yyyy-MM-dd")</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                @if (showResults && manualAdjustmentDTO?.Data.InvoiceLines != null)
+                                {
+                                    <h6 class="mt-3">Invoice Transactions</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped dt-responsive align-middle mb-0" id="invoiceTable"
+                                               data-tables="basic">
+                                            <thead>
+                                                <tr>
+                                                    <th><input type="checkbox" id="selectAllInvoice" /></th>
+                                                    <th>Batch Name</th>
+                                                    <th>Order ID</th>
+                                                    <th>Store ID</th>
+                                                    <th>Amount</th>
+                                                    <th>Tender Type</th>
+                                                    <th>Auth Code</th>
+                                                    <th>Transaction Date</th>
+                                                    <th>Business Day</th>
+                                                    <th>Variance</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var invoice in manualAdjustmentDTO.Data.InvoiceLines)
+                                                {
+                                                    <tr>
+                                                        <td><input type="checkbox" class="row-checkbox invoice-checkbox"
+                                                                       name="selectedInvoiceIds" value="@invoice.id" /></td>
+                                                            <td>@manualAdjustmentDTO.Data.batch.name</td>
+                                                            <td>@invoice.orderId</td>
+                                                            <td>@invoice.storeId</td>
+                                                            <td>@invoice.amount.ToString("F2")</td>
+                                                            <td>@invoice.tenderType</td>
+                                                            <td>@invoice.authCode</td>
+                                                            <td>@invoice.transactionDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                                            <td>@invoice.businessDay.ToString("yyyy-MM-dd")</td>
+                                                            <td>@(invoice.varianceAmount?.ToString("F2") ?? "")</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-3">
+                                <button class="btn btn-primary" type="button" @onclick="ManualReconcile"
+                                        disabled="@isManualReconciling">
+
+                                    @if (isManualReconciling)
+                                    {
+                                        <span>Reconciling...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Manual Reconcile</span>
+                                    }
+
+                                </button>
+                            </div>
+
+                        }
+
+               
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+@code {
+
+    private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
+    private ManualReconciliationRequest manualReconciliationRequest = new();
+    private HashSet<int> selectedMerchantIds = new();
+    private HashSet<int> selectedInvoiceIds = new();
+    private bool isManualReconciling = false;
+
+    private List<PaymentData> Paymentes = new();
+    private bool isLoading = true;
+    private int _selectedBatchId = 0;
+    private string _selectedBatchName = "";
+
+    private int _selectedPaymentId = 0;
+    private DateTime FromDate = DateTime.Now;
+    private DateTime ToDate = DateTime.Now + TimeSpan.FromDays(7);
+    private string alertMessage = "";
+    private string alertType = "success";
+    private bool showAlert = false;
+
+    private bool showResults = false;
+    private bool hasError = false;
+    private IJSObjectReference? _dataTableModule;
+    private IJSObjectReference? _formFileUploadModule;
+    private bool dataReady = false;
+    private bool isReconciling = false;
+    private DotNetObjectReference<ManualAdjustment>? _dotNetHelper;
+    private ManualAdjustmentDTO manualAdjustmentDTO = new ManualAdjustmentDTO();
+
+    [JSInvokable]
+    public void OnMerchantSelectionChanged(int merchantId, bool isChecked)
+    {
+        if (isChecked)
+            selectedMerchantIds.Add(merchantId);
+        else
+            selectedMerchantIds.Remove(merchantId);
+
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnInvoiceSelectionChanged(int invoiceId, bool isChecked)
+    {
+        if (isChecked)
+            selectedInvoiceIds.Add(invoiceId);
+        else
+            selectedInvoiceIds.Remove(invoiceId);
+
+        StateHasChanged();
+    }
+    private int SelectedBatchId
+    {
+        get => _selectedBatchId;
+        set
+        {
+            _selectedBatchId = value;
+            _selectedBatchName = batchDataDTOs?
+            .FirstOrDefault(m => m.id == value)?
+            .name ?? string.Empty;
+
+        }
+    }
+
+    private int SelectedPaymentId
+    {
+        get => _selectedPaymentId;
+        set
+        {
+            _selectedPaymentId = value;
+        }
+    }
+
+    [JSInvokable]
+    public void OnPaymentSelected(int paymentId)
+    {
+       
+        _selectedPaymentId = paymentId;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
+    {
+        
+        _selectedBatchId = batchId;
+        _selectedBatchName = batchDataDTOs.Where(m => m.id == batchId).Select(b => b.name).FirstOrDefault() ?? "";
+
+        FromDate = batchDataDTOs.Where(b => b.id == batchId).Select(b => b.FromDate).FirstOrDefault() ?? DateTime.Now;
+        ToDate = batchDataDTOs.Where(b => b.id == batchId).Select(b => b.ToDate).FirstOrDefault() ?? DateTime.Now;
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            batchDataDTOs = await BatchesService.GetAllAsync();
+            Paymentes = await PaymentService.GetAllAsync();
+            dataReady = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load data", "danger");
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task InitDataTableAsync()
+    {
+        @* if (_module != null)
+        {
+            await _module.InvokeVoidAsync("loadDataTableAjax");
+        } *@
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            _dataTableModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+             "import",
+             "/css/datatables/datatables-ajax.js"
+         );
+            try
+            {
+
+                _dotNetHelper = DotNetObjectReference.Create(this);
+                _formFileUploadModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+                await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
+
+                await JsRuntime.InvokeVoidAsync("loadConfig");
+                await JsRuntime.InvokeVoidAsync("loadApps");
+
+                await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+        }
+
+        if (dataReady && !isLoading)
+        {
+            dataReady = false;
+            try
+            {
+                if (_dataTableModule != null)
+                {
+                    // await _dataTableModule.InvokeVoidAsync("initManualAdjustmentTables");
+                    await _dataTableModule.InvokeVoidAsync("initializeSelectAll");
+                    await _dataTableModule.InvokeVoidAsync("setupIndividualCheckboxes");
+                    await _dataTableModule.InvokeVoidAsync("initManualAdjustmentServerTables", _dotNetHelper, _selectedBatchName);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"DataTable initialization error: {ex}"
+                );
+            }
+        }
+    }
+    private void ShowAlert(string message, string type = "success")
+    {
+        alertMessage = message;
+        alertType = type;
+        showAlert = true;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public async Task<object> GetManualAdjustmentPage(string tableType, int pageNumber, int pageSize, int draw, string searchValue = null)
+    {
+       
+        var result = await ManualAdjustmentService.GetManualAdjustmentRecords(
+            FromDate,
+            ToDate,
+            SelectedBatchId,
+            SelectedPaymentId,
+            pageNumber,
+            pageSize,
+            searchValue
+        );
+
+        if (tableType == "merchant")
+        {
+            MergeLines(manualAdjustmentDTO.Data.MerchantLines, result.Data.MerchantLines, x => x.id);
+       
+            manualAdjustmentDTO.Data.MerchantLines = result.Data.MerchantLines;
+            manualAdjustmentDTO.Data.merchantTotalCount = result.Data.merchantTotalCount;
+
+            return new
+            {
+                draw = draw,
+                recordsTotal = result.Data.merchantTotalCount,
+                recordsFiltered = result.Data.merchantTotalCount,
+                data = result.Data.MerchantLines
+            };
+        }
+           
+        MergeLines(manualAdjustmentDTO.Data.InvoiceLines, result.Data.InvoiceLines, x => x.id);
+        manualAdjustmentDTO.Data.invoiceTotalCount = result.Data.invoiceTotalCount;
+
+
+        return new
+        {
+            draw = 1,
+            recordsTotal = result.Data.invoiceTotalCount,
+            recordsFiltered = result.Data.invoiceTotalCount,
+            data = result.Data.InvoiceLines
+        };
+    }
+    private void MergeLines<T>(List<T> target, List<T> incoming, Func<T, int> keySelector)
+    {
+        foreach (var item in incoming)
+        {
+            var idx = target.FindIndex(x => keySelector(x) == keySelector(item));
+            if (idx >= 0)
+                target[idx] = item;
+            else
+                target.Add(item);
+        }
+    }
+    private async Task GetManualReconciliationRecords()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+
+        if(SelectedPaymentId == 0)
+        {
+            ShowAlert("Please select a payment first.", "warning");
+            return;
+        }
+
+       
+        isReconciling = true;
+        showResults = false;
+        dataReady = false;
+
+        selectedMerchantIds.Clear();
+        selectedInvoiceIds.Clear();
+
+        try
+        {
+            if (_dataTableModule != null)
+            {
+                try
+                {
+                    await _dataTableModule.InvokeVoidAsync(
+                        "destroyDataTables"
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(
+                        $"DataTable destroy error: {ex.Message}"
+                    );
+                }
+            }
+            manualAdjustmentDTO = await ManualAdjustmentService.GetManualAdjustmentRecords(FromDate, ToDate, SelectedBatchId,
+SelectedPaymentId, 1, 40);
+
+        
+            if (manualAdjustmentDTO == null)
+            {
+                ShowAlert("No response from server.", "danger");
+                return;
+            }
+
+            switch (manualAdjustmentDTO.StatusCode)
+            {
+                case 200:
+                    showResults = true;
+                    dataReady = true;
+                    ShowAlert("Fetch Data Success!", "success");
+
+                    break;
+
+                case 400:
+                case 404:
+                case 500:
+                    ShowAlert(manualAdjustmentDTO.Message!, "danger");
+                    break;
+
+                default:
+                    ShowAlert(manualAdjustmentDTO.Message ?? "Unknown error.", "danger");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error: {ex.Message}", "danger");
+            showResults = false;
+            dataReady = false;
+            StateHasChanged();
+        }
+        finally
+        {
+            isReconciling = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ManualReconcile()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+        if (SelectedPaymentId < -1)
+        {
+            ShowAlert("Please select a payment first.", "warning");
+            return;
+        }
+
+       
+        if (selectedMerchantIds.Count == 0)
+        {
+            ShowAlert("Please select at least one merchant transaction.", "warning");
+            return;
+        }
+
+        if (selectedInvoiceIds.Count == 0)
+        {
+            ShowAlert("Please select at least one invoice transaction.", "warning");
+            return;
+        }
+
+        if (selectedMerchantIds.Count > 1)
+        {
+            ShowAlert(
+                "Please select only one payment transaction for a manual adjustment. " +
+                "Multiple invoices can be mapped to one payment.",
+                "warning");
+
+            return;
+        }
+
+        if (!ValidateAmounts())
+        {
+            return;
+        }
+
+        isManualReconciling = true;
+
+        try
+        {
+            var userInfo = await TokenServices.GetUserInfo();
+
+            var request = new ManualReconciliationRequest
+            {
+                BatchId = SelectedBatchId,
+                PaymentId = SelectedPaymentId,
+                userId = userInfo?.Data?.User?.Id ?? "",
+                Groups = new List<ManualReconciliationGroup>
+                {
+                    new ManualReconciliationGroup
+                    {
+                        MerchantTransactionIds = selectedMerchantIds.ToList(),
+                        InvoiceTransactionIds = selectedInvoiceIds.ToList()
+                    }
+                }
+            };
+
+            Console.WriteLine(
+                $"Manual reconciliation: Batch={request.BatchId}, " +
+                $"Payment={request.PaymentId}, " +
+                $"Merchants={string.Join(",", request.Groups[0].MerchantTransactionIds)}, " +
+                $"Invoices={string.Join(",", request.Groups[0].InvoiceTransactionIds)}"
+            );
+
+            var response = await ManualAdjustmentService
+                .ManualReconcileAsync(request);
+
+            if (response == null)
+            {
+                ShowAlert("No response received from server.", "danger");
+                return;
+            }
+
+            if (response.StatusCode >= 200 && response.StatusCode < 300)
+            {
+                ShowAlert(
+                    "Manual reconciliation completed successfully.",
+                    "success"
+                );
+
+                await GetManualReconciliationRecords();
+            }
+            else
+            {
+                ShowAlert(
+                    response.Message ?? "Manual reconciliation failed.",
+                    "danger"
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+
+            ShowAlert(
+                $"Manual reconciliation failed: {ex.Message}",
+                "danger"
+            );
+        }
+        finally
+        {
+            isManualReconciling = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private bool ValidateAmounts()
+    {
+        var selectedMerchantLines =
+            manualAdjustmentDTO.Data.MerchantLines
+                .Where(x => selectedMerchantIds.Contains(x.id))
+                .ToList();
+
+        var selectedInvoiceLines =
+            manualAdjustmentDTO.Data.InvoiceLines
+                .Where(x => selectedInvoiceIds.Contains(x.id))
+                .ToList();
+
+        if (selectedMerchantLines.Count != 1)
+        {
+            ShowAlert(
+                "Exactly one payment transaction must be selected.",
+                "warning");
+
+            return false;
+        }
+
+        var paymentAmount = selectedMerchantLines.Sum(x => x.amount);
+
+        var invoiceAmount = selectedInvoiceLines.Sum(x => x.amount);
+        
+        double payment = Math.Round(paymentAmount, 2);
+        double invoice = Math.Round(invoiceAmount, 2);
+
+        if (payment != invoice)
+        {
+            Console.WriteLine($"Amount mismatch: Payment={paymentAmount}, Invoice={invoiceAmount}");
+            ShowAlert(
+                $"Amount mismatch. Payment amount: {paymentAmount:F2}, " +
+                $"Invoice amount: {invoiceAmount:F2}.",
+                "warning");
+
+            return false;
+        }
+
+        return true;
+    }
+
+}

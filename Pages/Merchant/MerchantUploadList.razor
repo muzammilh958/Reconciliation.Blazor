@@ -58,14 +58,25 @@
                                     <tr>
                                         <td>@merchantUpload.batch.name</td>
                                         <td>@merchantUpload.payment.name</td>
-                                        <td>@merchantUpload.fromDate.ToString("dd/MM/yyyy")</td>
-                                        <td>@merchantUpload.toDate.ToString("dd/MM/yyyy")</td>
+                                       <td>@merchantUpload.fromDate.ToString("dd-MM-yyyy")</td>
+                                        <td>@merchantUpload.toDate.ToString("dd-MM-yyyy") </td>
                                         <td>@merchantUpload.rowCount</td>
                                        
                                         <td class="text-end">
-                                            <button class="btn btn-sm btn-success" title="Download Original File"
+                                            <button 
+                                            class="btn btn-sm btn-success"
+                                             title="Download Original File"
+                                                disabled="@isDownloading"
                                                     @onclick="() => DownloadFile(merchantUpload)">
-                                                <i class="ti ti-download me-1"></i>
+                                                @if (isDownloading && downloadingInvoiceId == merchantUpload.id)
+                                                {
+                                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+
+                                                }
+                                                else
+                                                {
+                                                    <i class="ti ti-download me-1"></i>                    
+                                                }
                                             </button>
                                             
                                         </td>
@@ -103,6 +114,9 @@
     private string searchTerm = "";
     private int pageSize = 25;
     private int currentPage = 1;
+    private bool isDownloading = false;
+    
+    private int? downloadingInvoiceId = null;
     private IJSObjectReference? _module;
 
     // ======================== LIFECYCLE ========================
@@ -305,9 +319,14 @@
     // ======================== ACTION HANDLERS ========================
     private async Task DownloadFile(UploadedData merchant)
     {
+        if (isDownloading) return;
+
         try
         {
-
+            isDownloading = true;
+            downloadingInvoiceId = merchant.id;
+            StateHasChanged(); 
+          
             var fileBytes = await merchantService.DownloadMerchantFile(merchant.id);
             if (fileBytes == null)
                 return;
@@ -326,11 +345,16 @@
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-
+            isDownloading = false;
+            downloadingInvoiceId = null;
+            StateHasChanged();
         }
         finally
-        {
+        {   
             isLoading = false;
+            isDownloading = false;
+            downloadingInvoiceId = null;
+            StateHasChanged();
         }
     }
 

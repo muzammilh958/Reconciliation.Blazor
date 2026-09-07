@@ -29,7 +29,7 @@ namespace Reconciliation.Blazor.Models.Auth
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
         // public UserDto? User { get; set; }
-         public AuthData? Data { get; set; }
+        public AuthData? Data { get; set; }
 
         public int StatusCode { get; set; }
         public string? AccessToken { get; set; }
@@ -63,7 +63,7 @@ namespace Reconciliation.Blazor.Models.Auth
     }
 
 
-      public class Data
+    public class Data
     {
         public string accessToken { get; set; } = string.Empty;
         public User? user { get; set; }
@@ -99,4 +99,14 @@ namespace Reconciliation.Blazor.Models.Auth
         public int accessFailedCount { get; set; }
     }
 
+    public class ValidateTokenResponse
+    {
+        public bool valid { get; set; }
+        public string? userId { get; set; }
+        public string? email { get; set; }
+        public DateTime? expiresAt { get; set; }
+        public bool? shouldRefresh { get; set; }
+        public string? message { get; set; }
+        public bool? expired { get; set; }
+    }
 }

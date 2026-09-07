@@ -17,13 +17,16 @@
 
                 <EditForm Model="@model" OnValidSubmit="HandleSubmit">
                     <DataAnnotationsValidator />
-                    @* <ValidationSummary /> *@
+                    
                     @if (!string.IsNullOrEmpty(message))
                     {
                         <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">
                             @message
                         </div>
                     }
+
+
+
                     <div class="mb-3">
                         <label class="form-label">Batch Name</label>
                         <InputText class="form-control" @bind-Value="model.name" placeholder="Enter batch name" />

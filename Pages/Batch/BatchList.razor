@@ -1,20 +1,12 @@
 ﻿@page "/batch/list"
-@using Reconciliation.Blazor.Models.Batch
+@using global::Reconciliation.Blazor.Models.Batch
 
 @inject IBatchesService BatchesService
 @inject NavigationManager Nav
 @inject IJSRuntime JsRuntime;
 
 
-@if (showMessage)
-{
-    <div class="alert @messageClass alert-dismissible fade show shadow-sm mb-3" role="alert">
-        @messageText
 
-        <button type="button" class="btn-close" @onclick="CloseMessage">
-        </button>
-    </div>
-}
 
 <div class="row">
     <div class="col-12">
@@ -32,6 +24,15 @@
             </div>
 
             <div class="card-body">
+                @if (showMessage)
+                {
+                    <div class="alert @messageClass alert-dismissible fade show shadow-sm mb-3" role="alert">
+                        @messageText
+
+                        <button type="button" class="btn-close" @onclick="CloseMessage">
+                        </button>
+                    </div>
+                }
                 @if (isLoading)
                 {
                     <div class="text-center py-5">
@@ -69,8 +70,8 @@
                             {
                                 <tr>
                                     <td>@batch.name</td>
-                                    <td>@(batch.FromDate.HasValue ? batch.FromDate.Value.ToString("yyyy-MM-dd") : "")</td>
-                                    <td>@(batch.ToDate.HasValue ? batch.ToDate.Value.ToString("yyyy-MM-dd") : "")</td>
+                                    <td>@(batch.FromDate.HasValue ? batch.FromDate.Value.ToString("dd-MM-yyyy") : "")</td>
+                                    <td>@(batch.ToDate.HasValue ? batch.ToDate.Value.ToString("dd-MM-yyyy") : "")</td>
 
                                     <td>
                                         @if (batch.IsLocked)
@@ -153,7 +154,7 @@
     private void OpenEdit(BatchDataDTO batch)
     {
         Nav.NavigateTo($"/batch/edit/{batch.id}");
-       
+
     }
 
    
@@ -196,9 +197,8 @@
         }
         else
         {
-            await ShowMessage(
-                result?.message ?? "Delete failed.",
-                "alert-danger"
+            showDeleteDialog = false;
+            await ShowMessage(result?.message ?? "Delete failed.", "alert-danger"
             );
         }
     }

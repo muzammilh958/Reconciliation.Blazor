@@ -1,12 +1,23 @@
 ﻿@using Reconciliation.Blazor.Pages.Dashboard
+@inject JwtAuthStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
 
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    <RedirectToLogin />
+                     @{
+                        // 🔥 FIX: Redirect to login
+                        NavigationManager.NavigateTo("/", true);
+                    }
                 </NotAuthorized>
+                 <Authorizing>
+                    <div style="text-align:center; padding:50px;">
+                        <h3>Checking authentication...</h3>
+                        <p>Please wait</p>
+                    </div>
+                </Authorizing>
             </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
@@ -18,3 +29,11 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // 🔥 App start pe authentication check karein
+        await AuthStateProvider.GetAuthenticationStateAsync();
+    }
+}

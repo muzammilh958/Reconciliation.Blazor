@@ -1,0 +1,4 @@
+E:\Project\ReconciliationSystem\Reconciliation.Blazor\obj\Release\net10.0\browser-wasm\PubTmp\Out\wwwroot\index.html
+E:\Project\ReconciliationSystem\Reconciliation.Blazor\obj\Release\net10.0\browser-wasm\PubTmp\Out\Reconciliation.Blazor.runtimeconfig.json
+E:\Project\ReconciliationSystem\Reconciliation.Blazor\obj\Release\net10.0\browser-wasm\PubTmp\Out\dotnet.js
+E:\Project\ReconciliationSystem\Reconciliation.Blazor\obj\Release\net10.0\browser-wasm\PubTmp\Out\web.config

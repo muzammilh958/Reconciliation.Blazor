@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (99,8)-(235,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\StoreList.razor"
+#line (100,8)-(236,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\StoreList.razor"
 
     private List<StoreDTO> stores = new();
     private bool showDeleteDialog = false;

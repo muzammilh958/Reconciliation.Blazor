@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (103,8)-(238,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
+#line (104,8)-(239,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
 
     private InvoiceTypeList InvoiceTypes = new();
     private bool showDeleteDialog = false;

@@ -34,9 +34,7 @@ public class TokenServices
                 return null;
             }
 
-            // Log the raw JSON for debugging
-            Console.WriteLine($"Raw userInfo JSON: {userInfoString}");
-
+      
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -91,7 +89,7 @@ public class TokenServices
         if (authResponse.Data.User != null)
         {
             var userJson = JsonSerializer.Serialize(authResponse);
-            Console.WriteLine($"Saving user info: {userJson}");
+           
             await _localStorage.SetItemAsync(UserInfoKey, userJson);
         }
     }

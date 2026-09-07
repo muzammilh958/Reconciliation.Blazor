@@ -8,6 +8,11 @@ using static Reconciliation.Blazor.UserAdminService;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]
+                  ?? throw new InvalidOperationException("ApiSettings:BaseUrl is not configured.");
+
+ApiEndpoints.Initialize(apiBaseUrl);
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
@@ -35,18 +40,15 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IInvoiceTypeService, InvoiceTypeService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IExceptionService, ExceptionService>();
-
+builder.Services.AddScoped<IManualAdjustment, ManualAdjustmentService>();
+builder.Services.AddScoped<IPendingReviewsServices, PendingReviews>();
+builder.Services.AddScoped<IExceptions, ExceptionsServices>();
 
 builder.Services.AddScoped<AppState>();
-// Add Authorized HTTP Client (JWT interceptor)
-builder.Services.AddScoped<AuthorizedHttpClient>();
 
-// Add Authorization
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<TokenServices>();
 
-
-    
 builder.Services.AddTransient<ApiAuthHandler>();
 
 builder.Services.AddHttpClient("Api", client =>
@@ -54,6 +56,7 @@ builder.Services.AddHttpClient("Api", client =>
     client.BaseAddress = new Uri(ApiEndpoints.Base);
 })
 .AddHttpMessageHandler<ApiAuthHandler>();
+
 builder.Services.AddScoped(sp => new HttpClient
 {
     BaseAddress = new Uri("http://localhost:5186") // Your API URL

@@ -17,6 +17,12 @@ public class PaymentData
     [StringLength(100, ErrorMessage = "Transaction Date column name cannot exceed 100 characters.")]
     public string TransactionDate { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "Store ID column name is required.")]
+    [StringLength(100, ErrorMessage = "Store ID column name cannot exceed 100 characters.")]
+    public string StoreId { get; set; } = string.Empty;
+
+    
+
     [Required(ErrorMessage = "Tender column name is required.")]
     [StringLength(100, ErrorMessage = "Tender column name cannot exceed 100 characters.")]
     public string Tender { get; set; } = string.Empty;

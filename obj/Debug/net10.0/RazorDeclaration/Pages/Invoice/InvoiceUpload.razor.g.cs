@@ -136,7 +136,7 @@ using System.Text.Json
         }
         #pragma warning restore 1998
 #nullable restore
-#line (107,8)-(136,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (87,8)-(116,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 
     private bool isLoading = true;
     private bool ispostLoading = false;
@@ -173,7 +173,7 @@ using System.Text.Json
 #nullable disable
 
 #nullable restore
-#line (137,64)-(294,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (117,64)-(291,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 
                 StateHasChanged();
             }
@@ -185,9 +185,23 @@ using System.Text.Json
         set => _selectedPaymentId = value;
     }
 
-    private async Task OnInvoiceSelected(int invoiceId)
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
     {
-        SelectedInvoiceId = invoiceId;
+        SelectedBatchId = batchId; // reuses your existing setter logic (FromDate/ToDate + StateHasChanged)
+    }
+
+    [JSInvokable]
+    public void OnPaymentSelected(int paymentId)
+    {
+        SelectedPaymentId = paymentId;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnInvoiceSelected(int invoiceId)
+    {
+        SelectedInvoiceId = invoiceId; // your existing property already does the lookup + StateHasChanged
     }
 
     private int SelectedBatchId
@@ -217,17 +231,20 @@ using System.Text.Json
                 await JsRuntime.InvokeVoidAsync("loadConfig");
                 await JsRuntime.InvokeVoidAsync("loadApps");
 
-                if (!_select2Initialized && !isLoading && batches.Any())
-                {
-                    _dotNetRef = DotNetObjectReference.Create(this);
-                    await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetRef);
-                    _select2Initialized = true;
-                }
+             
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"JS load error: {ex.Message}");
             }
+
+            
+        }
+        if (!_select2Initialized && !isLoading && batches.Any())
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetRef);
+            _select2Initialized = true;
         }
     }
     protected override async Task OnInitializedAsync()
@@ -304,7 +321,7 @@ using System.Text.Json
         }
         catch (Exception ex)
         {
-            
+
             ShowAlert(ExtractFriendlyMessage(ex), "danger");
             Console.WriteLine(ex); // full stack trace
         }

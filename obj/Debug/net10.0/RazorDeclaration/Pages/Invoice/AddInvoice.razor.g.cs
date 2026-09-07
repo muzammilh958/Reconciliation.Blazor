@@ -159,7 +159,7 @@ using Reconciliation.Blazor.Layout.Partials
       );
                 await Task.Delay(1500);
                 // optional redirect
-                Nav.NavigateTo("/invoice-type/list");
+                Nav.NavigateTo("/invoice/view-invoice-types");
             }
         }
         catch (Exception ex)

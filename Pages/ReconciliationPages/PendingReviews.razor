@@ -1,0 +1,519 @@
+﻿@page "/review-reconciliation/queue"
+
+@inject IBatchesService BatchesService
+@inject IPaymentService PaymentService
+@inject IPendingReviewsServices PendingReviewsServices
+@inject IJSRuntime JsRuntime;
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Pending Review</h3>
+                    <small class="text-muted">Manage Manual Reconciliation Pending Requests</small>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (showAlert)
+                {
+                    <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                        @alertMessage
+                        <button type="button" class="btn-close" @onclick="() => showAlert = false"></button>
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Batch</label>
+                        <select class="form-control form-select select2" id="batchSelect">
+                            <option value="0" selected disabled>Select Batch</option>
+                            @foreach (var batch in batchDataDTOs)
+                            {
+                                <option value="@batch.id">@batch.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Payment</label>
+                        <select class="form-control form-select select2" id="paymentSelect">
+                            <option value="0" selected disabled>Select Payment</option>
+                            <option value="-1">All Payments (Reconcile All)</option>
+                            @foreach (var payment in Paymentes)
+                            {
+                                <option value="@payment.id">@payment.name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                            <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
+                            <button class="btn btn-primary btn-sm" type="button"
+                                    @onclick="GetPendingReconciliationRecords" disabled="@isReconciling">
+                                @if (isReconciling)
+                                {
+                                    <span>Fetching Data...</span>
+                                }
+                                else
+                                {
+                                    <span>Fetch Data</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                @if (pendingReviewsDTO != null && pendingReviewsDTO.data != null && pendingReviewsDTO.data.Any())
+                {
+                    <div class="row mt-3">
+                        <div class="table-responsive">
+                            <table class="table table-striped dt-responsive align-middle mb-0" id="invoiceTable"
+                                   data-tables="basic">
+                                <thead>
+                                    <th>Batch Name</th>
+                                    <th>Invoice Amount</th>
+                                    <th>Auth Code</th>
+                                    <th>Tender</th>
+                                    <th>Store Id</th>
+                                    <th>Action</th>
+                                </thead>
+                                <tbody>
+
+                                    @foreach (var item in pendingReviewsDTO.data)
+                                    {
+                                        <tr>
+
+                                            <td>@GetBatchName(item.invoiceTransaction.batchId)</td>
+                                            <td>@item.invoiceTransaction.amount</td>
+                                            <td>@item.invoiceTransaction.authCode</td>
+                                            <td>@item.invoiceTransaction.tenderType</td>
+                                            <td>@item.invoiceTransaction.storeId</td>
+                                            <td>
+                                                <div class="d-flex gap-2" role="group" aria-label="Action buttons">
+                                                    <button type="button" class="btn btn-success btn-sm view-invoice"
+                                                            @onclick="() => Approval(item.id, true)">Approve</button>
+                                                    <button type="button" class="btn btn-danger btn-sm view-invoice"
+                                                            @onclick="() => Approval(item.id, false)">Reject</button>
+                                                    @* <button type="button" class="btn btn-primary btn-sm view-invoice "
+                                                            data-batchid="@GetBatchName(item.invoiceTransaction.batchId)"
+                                                            data-amount="@item.invoiceTransaction.amount"
+                                                            data-authcode="@item.invoiceTransaction.authCode"
+                                                            data-tender="@item.invoiceTransaction.tenderType"
+                                                            data-storeid="@item.invoiceTransaction.storeId"
+                                                            data-invoiceid="@item.invoiceTransaction.id"
+                                                            @onclick="() => OpenInvoiceModal(item)">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </button> *@
+                                                </div>
+                                            </td>
+                                            
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="invoiceModal" tabindex="-1" role="dialog" aria-labelledby="invoiceModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-light border-bottom">
+                <div>
+                    <h5 class="modal-title fw-bold mb-1" id="invoiceModalLabel">
+                        Invoice Details
+                    </h5>
+                    <small class="text-muted">
+                        Review invoice information before processing
+                    </small>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row">
+                    <div class="col-md-6">
+                          <div class="invoice-detail">
+                            <label>Batch Name</label>
+                            <div id="modalBatchId" class="detail-value">
+                                -
+                            </div>
+                        </div>
+
+                        <div class="invoice-detail">
+                            <label>Amount</label>
+                            <div id="modalAmount" class="detail-value">
+                                -
+                            </div>
+                        </div>
+
+                        <div class="invoice-detail">
+                            <label>Auth Code</label>
+                            <div id="modalAuthCode" class="detail-value">
+                                -
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                         <div class="invoice-detail">
+                            <label>Tender Type</label>
+                            <div id="modalTender" class="detail-value">
+                                -
+                            </div>
+                        </div>
+
+                        <div class="invoice-detail">
+                            <label>Store ID</label>
+                            <div id="modalStoreId" class="detail-value">
+                                -
+                            </div>
+                        </div>
+
+                        <div class="invoice-detail">
+                            <label>Invoice ID</label>
+                            <div id="modalInvoiceId" class="detail-value">
+                                -
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Add more details as needed -->
+            </div>
+             <div class="modal-footer bg-light">
+
+                <button type="button"
+                        class="btn btn-outline-secondary px-4"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary px-4">
+                    <i class="ri-check-line me-1"></i>
+                    Process
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private bool showAlert = false;
+    private bool isLoading = false;
+    private bool dataReady = false;
+    private bool isReconciling = false;
+    private bool hasError = false;
+    private string alertMessage = "";
+    private string alertType = "success";
+
+    private int _selectedBatchId = 0;
+    private int _selectedPaymentId = 0;
+
+    private List<PaymentData> Paymentes = new();
+    private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
+
+    private PendingReviewsDTO pendingReviewsDTO = new PendingReviewsDTO();
+
+    private UpdatePendingReviewsDTO updatePendingReviewsDTO = new UpdatePendingReviewsDTO();
+
+    private IJSObjectReference? _dataTableModule;
+
+    private IJSObjectReference? _module;
+
+    private DotNetObjectReference<PendingReviews>? _dotNetHelper;
+    private string GetBatchName(int batchId)
+    {
+        var batch = batchDataDTOs.FirstOrDefault(b => b.id == batchId);
+        return batch?.name ?? batchId.ToString(); // Fallback to ID if name not found
+    }
+    private void OpenInvoiceModal(PendingReviewsData item)
+    {
+        Console.Write("Hello Open Invoice Mode");
+        // Populate modal data
+        JsRuntime.InvokeVoidAsync("openInvoiceModal", new
+        {
+            batchId = item.invoiceTransaction.batchId,
+            amount = item.invoiceTransaction.amount,
+            authCode = item.invoiceTransaction.authCode,
+            tender = item.invoiceTransaction.tenderType,
+            storeId = item.invoiceTransaction.storeId,
+            invoiceId = item.invoiceTransaction.id
+        });
+    }
+    private async Task InitDataTableAsync()
+    {
+        if (_module != null)
+        {
+            await _module.InvokeVoidAsync("loadDataTableAjax");
+        }
+    }
+    private int SelectedBatchId
+    {
+        get => _selectedBatchId;
+        set
+        {
+            _selectedBatchId = value;
+        }
+    }
+
+    private int SelectedPaymentId
+    {
+        get => _selectedPaymentId;
+        set
+        {
+            _selectedPaymentId = value;
+        }
+    }
+    [JSInvokable]
+    public void OnPaymentSelected(int paymentId)
+    {
+        Console.WriteLine($"Payment selected: {paymentId}");
+        _selectedPaymentId = paymentId;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
+    {
+        Console.WriteLine($"Batch selected: {batchId}");
+        _selectedBatchId = batchId;
+
+        StateHasChanged();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            batchDataDTOs = await BatchesService.GetAllAsync();
+            Paymentes = await PaymentService.GetAllAsync();
+            dataReady = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load data", "danger");
+            hasError = true;
+            dataReady = false;
+        }
+        finally
+        {
+            isLoading = false;
+            dataReady = false;
+        }
+    }
+
+    private void ShowAlert(string message, string type = "success")
+    {
+        alertMessage = message;
+        alertType = type;
+        showAlert = true;
+        StateHasChanged();
+    }
+
+    private async Task GetPendingReconciliationRecords()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+
+        if (SelectedPaymentId < -1)
+        {
+            ShowAlert("Please select a valid Payment first.", "warning");
+            return;
+        }
+
+
+        pendingReviewsDTO = null;
+        dataReady = false;
+        isReconciling = true;
+        StateHasChanged();
+
+        try
+        {
+            var request = new PendingReviewRequest
+            {
+                PaymentId = _selectedPaymentId,
+                BatchId = _selectedBatchId
+            };
+
+            pendingReviewsDTO = await PendingReviewsServices.GetPendingReviewsDTOAsync(request);
+
+
+            if (pendingReviewsDTO == null)
+            {
+                ShowAlert("No response from server.", "danger");
+                return;
+            }
+
+            switch (pendingReviewsDTO.statusCode)
+            {
+                case 200:
+                    isReconciling = false;
+                    dataReady = true;
+                    ShowAlert(pendingReviewsDTO.message, "success");
+
+                    break;
+
+                case 400:
+                case 404:
+                case 500:
+                    ShowAlert(pendingReviewsDTO.message!, "danger");
+                    break;
+
+                default:
+                    ShowAlert(pendingReviewsDTO.message ?? "Unknown error.", "danger");
+                    break;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error: {ex.Message}", "danger");
+            isReconciling = false;
+            dataReady = false;
+            StateHasChanged();
+        }
+        finally
+        {
+            isReconciling = false;
+            StateHasChanged();
+        }
+
+    }
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            _dataTableModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+             "import",
+             "/css/datatables/datatables-ajax.js"
+         );
+            if (dataReady && !isLoading && _module != null)
+            {
+                dataReady = false; // prevent re-run
+                await _module.InvokeVoidAsync("initDataTable");
+            }
+            try
+            {
+
+                _dotNetHelper = DotNetObjectReference.Create(this);
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+                await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
+
+                await JsRuntime.InvokeVoidAsync("loadConfig");
+                await JsRuntime.InvokeVoidAsync("loadApps");
+
+                await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+        }
+
+        if (dataReady && !isLoading)
+        {
+            dataReady = false;
+            try
+            {
+                if (_dataTableModule != null)
+                {
+                    await _dataTableModule.InvokeVoidAsync(
+                        "initManualAdjustmentTables"
+                    );
+
+                    await _dataTableModule.InvokeVoidAsync(
+                        "initializeSelectAll"
+                    );
+
+                    await _dataTableModule.InvokeVoidAsync(
+                        "setupIndividualCheckboxes"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"DataTable initialization error: {ex}"
+                );
+            }
+        }
+    }
+
+    private async Task Approval(int Id, bool approvalStatus)
+    {
+        try
+        {
+            var request = new ManualReconciliationApprovalRequests
+            {
+                Id = Id,
+                ApprovalStatus = approvalStatus
+            };
+
+            updatePendingReviewsDTO = await PendingReviewsServices.SetPendingReviewsDTOAsync(request);
+
+
+            if (updatePendingReviewsDTO == null)
+            {
+                ShowAlert("No response from server.", "danger");
+                return;
+            }
+
+            switch (updatePendingReviewsDTO.statusCode)
+            {
+                case 200:
+                    isReconciling = false;
+                    dataReady = true;
+                    ShowAlert(updatePendingReviewsDTO.message!, "success");
+                    await GetPendingReconciliationRecords();
+                    break;
+
+                case 400:
+                case 404:
+                case 500:
+                    ShowAlert(updatePendingReviewsDTO.message!, "danger");
+                    await GetPendingReconciliationRecords();
+                    break;
+
+                default:
+                    ShowAlert(updatePendingReviewsDTO.message ?? "Unknown error.", "danger");
+                    await GetPendingReconciliationRecords();
+                    break;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error: {ex.Message}", "danger");
+            @* isReconciling = false;
+            dataReady = false; *@
+            StateHasChanged();
+        }
+        finally
+        {
+            @* isReconciling = false; *@
+            StateHasChanged();
+        }
+
+    }
+}

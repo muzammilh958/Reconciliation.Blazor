@@ -44,11 +44,12 @@
                         <table class="table table-hover align-middle" data-tables="basic">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Batch ID</th>
+                                  
                                     <th>Batch Name</th>
                                     <th>Payment Type</th>
                                     <th>From Date</th>
                                     <th>To Date</th>
+                                    <th>Row Count</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -57,14 +58,30 @@
                                 @foreach (var invoice in invoiceUploadedList.data)
                                 {
                                     <tr>
-                                        <td>@invoice.batchId</td>
                                         <td>@invoice.batchName</td>
                                         <td>@invoice.invoiceType</td>
-                                        <td>@invoice.fromDate.ToString("yyyy-MM-dd")</td>
-                                        <td>@invoice.toDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@invoice.fromDate.ToString("dd-MM-yyyy")</td>
+                                        <td>@invoice.toDate.ToString("dd-MM-yyyy")</td>
+                                        <td>@invoice.rowCount</td>
                                         <td>
-                                            <button class="btn btn-sm btn-success" title="Download Original File" @onclick="()=>DownloadInvoiceDetails(invoice)">
-                                                 <i class="ti ti-download me-1"></i>
+                                            <button 
+                                                class="btn btn-sm btn-success"
+                                                title="Download Original File"
+                                                @onclick="()=>DownloadInvoiceDetails(invoice)"
+                                                disabled="@isDownloading"
+                                                >
+                                                 @if (isDownloading && downloadingInvoiceId == invoice.id)
+                                                 {
+                                                     <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                                       
+                                                 }
+                                                 else
+                                                 {
+                                                     <i class="ti ti-download me-1"></i>
+                                                     
+                                                 }
+                                               
+
                                             </button>
                                         </td>
                                             @* <td>@invoice.uploadedFilePath</td> *@
@@ -86,6 +103,8 @@
     private bool isLoading = true;
     private bool hasError = false;
     private bool dataReady = false;
+    private bool isDownloading = false;
+    private int? downloadingInvoiceId = null;
 
     private IJSObjectReference? _module;
 
@@ -135,9 +154,13 @@
     }
     private async Task DownloadInvoiceDetails(InvoiceUploaded merchant)
     {
+        if (isDownloading) return; // Prevent multiple downloads
+
         try
         {
-
+            isDownloading = true;
+            downloadingInvoiceId = merchant.id;
+            StateHasChanged(); 
             var fileBytes = await invoiceServices.DownloadInvoiceFile(merchant.id);
             if (fileBytes == null)
                 return;
@@ -156,11 +179,16 @@
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-
+            isDownloading = false;
+            downloadingInvoiceId = null;
+            StateHasChanged();
         }
         finally
         {
             isLoading = false;
+            isDownloading = false;
+            downloadingInvoiceId = null;
+            StateHasChanged();
         }
     }
 }

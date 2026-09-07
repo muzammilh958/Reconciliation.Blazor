@@ -120,12 +120,6 @@ using Reconciliation.Blazor.Services
 
 #nullable disable
     ;
-#nullable restore
-#line (8,2)-(8,41) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
-using Reconciliation.Blazor.Models.Auth
-
-#nullable disable
-    ;
     #line default
     #line hidden
     [global::Microsoft.AspNetCore.Components.LayoutAttribute(typeof(
@@ -157,7 +151,7 @@ BlankLayout
         }
         #pragma warning restore 1998
 #nullable restore
-#line (58,8)-(100,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
+#line (59,8)-(101,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
 
     public class ForgotPasswordModel
     {
@@ -207,7 +201,7 @@ BlankLayout
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (11,9)-(11,31) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
+#line (12,9)-(12,31) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
 IAuthenticationService
 
 #line default
@@ -215,7 +209,7 @@ IAuthenticationService
 #nullable disable
          
 #nullable restore
-#line (11,32)-(11,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
+#line (12,32)-(12,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
 AuthService
 
 #line default
@@ -225,7 +219,7 @@ AuthService
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (10,9)-(10,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
+#line (11,9)-(11,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
 NavigationManager
 
 #line default
@@ -233,7 +227,7 @@ NavigationManager
 #nullable disable
          
 #nullable restore
-#line (10,27)-(10,37) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
+#line (11,27)-(11,37) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\ForgetPassword.razor"
 Navigation
 
 #line default

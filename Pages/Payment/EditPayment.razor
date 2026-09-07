@@ -73,6 +73,12 @@
                                 <ValidationMessage For="@(() => model.Tender)" />
                             </div>
 
+                             <div class="col-md-6">
+                                <label class="form-label">Store Id</label>
+                                <InputText class="form-control" @bind-Value="model.StoreId" placeholder="Enter store ID" />
+                                <ValidationMessage For="@(() => model.StoreId)" />
+                            </div>
+
                             <!-- Transaction Amount -->
                             <div class="col-md-6">
                                 <label class="form-label">Transaction Amount</label>

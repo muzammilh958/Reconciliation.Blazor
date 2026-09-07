@@ -160,7 +160,7 @@ MainLayout
         }
         #pragma warning restore 1998
 #nullable restore
-#line (160,8)-(187,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (160,8)-(186,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 
     
     private bool isLoading = true;
@@ -170,8 +170,7 @@ MainLayout
 
     protected override async Task OnInitializedAsync()
     {
-         Console.WriteLine($"Dashboard AppState: {AppState.GetHashCode()}");
-
+       
         try
         {
             isLoading = true;

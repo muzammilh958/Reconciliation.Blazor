@@ -130,12 +130,14 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (84,8)-(166,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUploadList.razor"
+#line (101,8)-(194,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUploadList.razor"
 
     InvoiceUploadedList invoiceUploadedList = new InvoiceUploadedList();
     private bool isLoading = true;
     private bool hasError = false;
     private bool dataReady = false;
+    private bool isDownloading = false;
+    private int? downloadingInvoiceId = null;
 
     private IJSObjectReference? _module;
 
@@ -185,9 +187,13 @@ using Reconciliation.Blazor.Layout.Partials
     }
     private async Task DownloadInvoiceDetails(InvoiceUploaded merchant)
     {
+        if (isDownloading) return; // Prevent multiple downloads
+
         try
         {
-
+            isDownloading = true;
+            downloadingInvoiceId = merchant.id;
+            StateHasChanged(); 
             var fileBytes = await invoiceServices.DownloadInvoiceFile(merchant.id);
             if (fileBytes == null)
                 return;
@@ -206,11 +212,16 @@ using Reconciliation.Blazor.Layout.Partials
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-
+            isDownloading = false;
+            downloadingInvoiceId = null;
+            StateHasChanged();
         }
         finally
         {
             isLoading = false;
+            isDownloading = false;
+            downloadingInvoiceId = null;
+            StateHasChanged();
         }
     }
 

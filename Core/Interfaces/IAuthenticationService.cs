@@ -7,7 +7,7 @@ namespace Reconciliation.Blazor.Core.Interfaces
         Task<AuthResponse> LoginAsync(LoginRequest request);
         Task<AuthResponse> SignUpAsync(SignUpRequest request);
         Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request);
-        Task<bool> ForgotPasswordAsync(string email);
+        Task<bool> ForgetPasswordAsync(string email);
         Task LogoutAsync();
     }
 }

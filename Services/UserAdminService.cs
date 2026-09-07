@@ -44,6 +44,7 @@ public class UserAdminService : IUserService
             if (!response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error creating user: {json}");
 
                 var messages = new List<string>();
 
@@ -51,6 +52,15 @@ public class UserAdminService : IUserService
                 {
                     using var doc = JsonDocument.Parse(json);
 
+                      if (doc.RootElement.TryGetProperty("message", out var messageElement))
+                        {
+                            // Get the message directly
+                            var errorMessage = messageElement.GetString();
+                            if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                messages.Add(errorMessage);
+                            }
+                        }
                     if (doc.RootElement.TryGetProperty("errors", out var errors))
                     {
                         foreach (var field in errors.EnumerateObject())

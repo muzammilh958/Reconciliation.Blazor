@@ -115,14 +115,20 @@ using Microsoft.AspNetCore.Components.Forms
 #nullable disable
     ;
 #nullable restore
-#line (7,2)-(7,38) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
-using Reconciliation.Blazor.Services
+#line (7,2)-(7,44) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+using Reconciliation.Blazor.Core.Endpoints
 
 #nullable disable
     ;
 #nullable restore
-#line (8,2)-(8,41) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
-using Reconciliation.Blazor.Models.Auth
+#line (8,2)-(8,49) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+using global::Reconciliation.Blazor.Models.Auth
+
+#nullable disable
+    ;
+#nullable restore
+#line (9,2)-(9,46) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+using global::Reconciliation.Blazor.Services
 
 #nullable disable
     ;
@@ -157,7 +163,7 @@ BlankLayout
         }
         #pragma warning restore 1998
 #nullable restore
-#line (151,8)-(244,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (152,8)-(277,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 
     private LoginRequest loginModel = new();
     private string? successMessage;
@@ -170,11 +176,43 @@ BlankLayout
     [Inject] private TokenServices TokenServices { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private HttpClient HttpClient { get; set; }
+    
+    [Inject] private JwtAuthStateProvider AuthStateProviders { get; set; }
       private const string TokenKey = "authToken";
 
     protected override async Task OnInitializedAsync()
     {
-        
+        var token = await TokenServices.GetToken();
+        if (!string.IsNullOrEmpty(token))
+        {
+            var isValid = await ValidateTokenWithApi(token);
+            if (isValid)
+            {
+                NavigationManager.NavigateTo("/dashboard", true);
+                return;
+            }
+            else
+            {
+                await TokenServices.RemoveToken();
+                await _localStorage.RemoveItemAsync("userInfo");
+                await AuthStateProvider.NotifyUserLogout();
+            }
+        }
+    }
+     private async Task<bool> ValidateTokenWithApi(string token)
+    {
+        try
+        {
+            HttpClient.DefaultRequestHeaders.Authorization = 
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await HttpClient.GetAsync(ApiEndpoints.Auth.ValidateToken);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private async Task HandleLogin()
@@ -258,7 +296,7 @@ BlankLayout
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (16,9)-(16,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (17,9)-(17,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 JwtAuthStateProvider
 
 #line default
@@ -266,7 +304,7 @@ JwtAuthStateProvider
 #nullable disable
          
 #nullable restore
-#line (16,30)-(16,47) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (17,30)-(17,47) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 AuthStateProvider
 
 #line default
@@ -276,7 +314,7 @@ AuthStateProvider
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (14,9)-(14,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (15,9)-(15,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 NavigationManager
 
 #line default
@@ -284,7 +322,7 @@ NavigationManager
 #nullable disable
          
 #nullable restore
-#line (14,27)-(14,37) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (15,27)-(15,37) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 Navigation
 
 #line default
@@ -294,7 +332,7 @@ Navigation
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (12,9)-(12,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (13,9)-(13,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 ILocalStorageService
 
 #line default
@@ -302,7 +340,7 @@ ILocalStorageService
 #nullable disable
          
 #nullable restore
-#line (12,30)-(12,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (13,30)-(13,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 _localStorage
 
 #line default
@@ -312,7 +350,7 @@ _localStorage
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (11,9)-(11,31) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (12,9)-(12,31) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 IAuthenticationService
 
 #line default
@@ -320,7 +358,7 @@ IAuthenticationService
 #nullable disable
          
 #nullable restore
-#line (11,32)-(11,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (12,32)-(12,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 AuthService
 
 #line default
@@ -330,7 +368,7 @@ AuthService
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (9,9)-(9,22) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (10,9)-(10,22) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 TokenServices
 
 #line default
@@ -338,7 +376,7 @@ TokenServices
 #nullable disable
          
 #nullable restore
-#line (9,23)-(9,35) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
+#line (10,23)-(10,35) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Auth\Login.razor"
 TokenService
 
 #line default

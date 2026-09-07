@@ -1,0 +1,637 @@
+﻿@page "/transaction/reconciliation"
+
+@inject IBatchesService BatchesService
+
+@inject IPaymentService PaymentService
+
+@inject NavigationManager NavigationManager
+
+@inject IJSRuntime JsRuntime;
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Reconciliation Wizard</h3>
+                    <small class="text-muted">Manage and reconcile batches</small>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (showAlert)
+                {
+                    <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                        @alertMessage
+                        <button type="button" class="btn-close" @onclick="() => showAlert = false"></button>
+                    </div>
+                }
+
+                <!-- Batch selection row (correct) -->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Batch</label>
+                        <select class="form-control form-select select2" id="batchSelect">
+                            <option value="0" selected disabled>Select Batch</option>
+                            @foreach (var batch in batchDataDTOs)
+                            {
+                                <option value="@batch.id">@batch.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Select Payment</label>
+                        <select class="form-control form-select select2" id="paymentSelect">
+                            <option value="0" selected disabled>Select Payment</option>
+                            <option value="-1">All Payments (Reconcile All)</option>
+                            @foreach (var payment in Paymentes)
+                            {
+                                <option value="@payment.id">@payment.name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">Business Days</label>
+                        <div class="input-group">
+                            <input type="date" class="form-control" @bind="FromDate" disabled readonly />
+                            <span class="input-group-text">to</span>
+                            <input type="date" class="form-control" @bind="ToDate" disabled readonly />
+                        </div>
+                    </div>
+                </div>
+
+                @if (isReconciling)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Reconciliation...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Reconcil batches...</p>
+                    </div>
+                }
+
+                @if (showResults && reconciliationResult?.Data != null)
+                {
+                    <div class="mt-4">
+                        <h5 class="fw-semibold">Reconciliation Results</h5>
+
+                        @* <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white shadow">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Matched</h6>
+                                        <h4 class="mb-0">@reconciliationResult.data.Count(d => d.reconStatus == "Matched")</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-danger text-white shadow"  style="cursor: pointer;"  @onclick="GoToException">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Exceptions</h6>
+                                        <h4 class="mb-0">@reconciliationResult.data.Count(d => d.reconStatus == "Exception")</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-dark shadow">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Variance</h6>
+                                        <h4 class="mb-0 text-white">
+                                          @reconciliationResult.data.Where(d => d.varianceAmount.HasValue &&
+                                                                                    d.varianceAmount != 0).Sum(d => d.varianceAmount.Value).ToString("C")
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                          
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white shadow">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Refund Matched</h6>
+                                        <h4 class="mb-0">@reconciliationResult.data.Count(d => d.reconStatus == "Refund Matched")</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-secondary text-white shadow">
+                                    <div class="card-body py-2 px-3">
+                                        <h6 class="text-white mb-1">Duplicate</h6>
+                                        <h4 class="mb-0">@reconciliationResult.data.Count(d => d.exceptionType == "Duplicate")</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  *@
+
+                        
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered table-hover" id="reconTable"
+                                           data-tables="basic">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>S.no</th>
+                                                <th>Batch Name</th>
+                                                <th>Payment Type</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>@(string.IsNullOrEmpty(reconciliationResult.Data.batch.name) ? "N/A" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    reconciliationResult.Data.batch.name)</td>
+                                                    <td>@(string.IsNullOrEmpty(reconciliationResult.Data.payment.name) ? "N/A" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        reconciliationResult.Data.payment.name)</td>
+                                                        <td><span
+                                                            class="badge badge-soft-success">@reconciliationResult.Data.Status</span>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex flex-wrap gap-2">
+
+                                                                <button class="btn btn-success btn-sm" type="button"
+                                                                        @onclick="() => Download(reconciliationResult.Data.matchedCount.headerId)"><i
+                                                                    class="fas fa-download"></i>Download</button>
+
+
+                                                                    @if (!isLocked)
+                                                                    {
+                                                                        <button class="btn btn-info btn-sm" type="button"
+                                                                                @onclick="() => ConfirmDelete(reconciliationResult.Data.batch.id, reconciliationResult.Data.batch.name!,reconciliationResult.Data.matchedCount.headerId)"><i
+                                                                            class="fas fa-ban"></i> Void</button>
+
+                                                                            <button class="btn btn-danger btn-sm" type="button"
+                                                                                    @onclick="() => showLockDialog = true" disabled="@isLocking">
+                                                                                @if (isLocking)
+                                                                                {
+                                                                                    <span><i class="fas fa-spinner fa-spin"></i> Locking...</span>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <span><i class="fas fa-lock"></i> Lock</span>
+                                                                                }
+                                                                            </button>
+
+                                                                        }
+
+                                                                 
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    Total records: @reconciliationResult.Data.matchedCount.results.Count
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                else if (showResults && reconciliationResult?.Data == null)
+                                {
+                                    <div class="mt-4 text-muted">No data returned.</div>
+                                }
+
+                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                                            <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
+                                            <button class="btn btn-primary btn-sm" type="button" @onclick="ReconcileBatchAsync"
+                                                    disabled="@isReconciling">
+                                                @if (isReconciling)
+                                                {
+                                                    <span>Processing...</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Process</span>
+                                                }
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            
+                @if (showDeleteDialog)
+                {
+                    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+                        <div class="modal-dialog modal-dialog-centered" style="z-index: 1055;">
+                            <div class="modal-content shadow">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Delete Batch</h5>
+                                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                                </div>
+
+                                <div class="modal-body py-4">
+                                    <p class="mb-2">You are about to delete:</p>
+
+                                    <div class="alert alert-warning mb-3">
+                                        <strong>@selectedBatchName</strong>
+                                    </div>
+
+                                    <small class="text-muted">This action cannot be undone.</small>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                                    <button class="btn btn-danger " disabled="@showDeleteLoading" @onclick="() => VoidBatch()">Yes,
+                                        delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (showLockDialog)
+                    {
+                        @* <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+                            <div class="modal-dialog modal-dialog-centered" style="z-index: 1055;">
+                                <div class="modal-content shadow">
+                                    <div class="modal-header bg-warning bg-opacity-10 border-bottom border-warning">
+                                        <h5 class="modal-title">Lock Batch</h5>
+                                        <button type="button" class="btn-close" @onclick="() => showLockDialog = false"></button>
+                                    </div>
+
+                                    <div class="modal-body py-4">
+                                        <p class="mb-2">Are you sure you want to lock this batch?</p>
+                                        <small class="text-muted">Once locked, this batch cannot be modified.</small>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" @onclick="() => showLockDialog = false">Cancel</button>
+                                        <button class="btn btn-danger" disabled="@isLocked" @onclick="ConfirmLockBatch">
+                                            Yes, lock
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> *@
+                        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+                            <div class="modal-dialog modal-dialog-centered" style="z-index: 1055;">
+                                <div class="modal-content shadow border-0">
+                                    <div class="modal-body text-center py-4 px-4">
+                                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3"
+                                                @onclick="() => showLockDialog = false"></button>
+
+                                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10 mb-3"
+                                             style="width: 64px; height: 64px;">
+                                            <i class="fas fa-lock text-warning" style="font-size: 1.5rem;"></i>
+                                        </div>
+
+                                        <h5 class="fw-semibold mb-2">Lock this batch?</h5>
+                                        <p class="text-muted mb-0 px-2">
+                                            Once locked, this batch cannot be modified. This action can only be reversed by an administrator.
+                                        </p>
+                                    </div>
+
+                                    <div class="modal-footer border-top-0 justify-content-center pb-4 pt-0">
+                                        <button class="btn btn-light px-4" @onclick="() => showLockDialog = false">Cancel</button>
+                                        <button class="btn btn-warning px-4" disabled="@isLocking" @onclick="ConfirmLockBatch">
+                                            @if (isLocking)
+                                            {
+                                                <span><span class="spinner-border spinner-border-sm me-1"></span> Locking...</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Yes, lock it</span>
+                                            }
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+@code {
+
+    private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
+    private List<PaymentData> Paymentes = new();
+    private bool isLoading = true;
+    private bool showAlert = false;
+
+    private bool showLockDialog = false;
+    private DateTime FromDate = DateTime.Now;
+    private DateTime ToDate = DateTime.Now + TimeSpan.FromDays(7);
+    private string alertMessage = "";
+    private string alertType = "success";
+    private bool isReconciling = false;
+    private bool isLocking = false;
+    private bool isLocked = false;
+    private int _selectedBatchId = 0;
+    private int _selectedPaymentId = 0;
+    private ReconciliationResultsDTO? reconciliationResult = new ReconciliationResultsDTO();
+
+    private DeleteReconciliationResponse deleteReconciliationResponse = new DeleteReconciliationResponse();
+    private bool showResults = false;
+    private int selectedBatchId;
+    private int selectedBatchheaderId;                                                                                  
+    private string selectedBatchName = "";
+    private bool showDeleteDialog = false;
+    private bool showDeleteLoading = false;
+    private bool dataReady = false;
+    private IJSObjectReference? _module;
+
+    private DotNetObjectReference<ReconciliationScreen>? _dotNetHelper;
+    private void ConfirmDelete(int id, string name,int headerId)
+    {
+        selectedBatchId = id;
+        selectedBatchName = name;
+        selectedBatchheaderId = headerId;
+        showDeleteDialog = true;
+    }
+    private int SelectedBatchId
+    {
+        get => _selectedBatchId;
+        set
+        {
+            _selectedBatchId = value;
+        }
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteDialog = false;
+    }
+
+    private int SelectedPaymentId
+    {
+        get => _selectedPaymentId;
+        set
+        {
+            _selectedPaymentId = value;
+        }
+    }
+
+    [JSInvokable]
+    public void OnPaymentSelected(int paymentId)
+    {
+        Console.WriteLine($"Payment selected: {paymentId}");
+        _selectedPaymentId = paymentId;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
+    {
+        Console.WriteLine($"Batch selected: {batchId}");
+        _selectedBatchId = batchId;
+
+        FromDate = batchDataDTOs.Where(b => b.id == batchId).Select(b => b.FromDate).FirstOrDefault() ?? DateTime.Now;
+        ToDate = batchDataDTOs.Where(b => b.id == batchId).Select(b => b.ToDate).FirstOrDefault() ?? DateTime.Now;
+
+        StateHasChanged();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            batchDataDTOs = await BatchesService.GetAllAsync();
+            Paymentes = await PaymentService.GetAllAsync();
+
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load data", "danger");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _dotNetHelper = DotNetObjectReference.Create(this);
+                _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+                await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
+
+                await JsRuntime.InvokeVoidAsync("loadConfig");
+                await JsRuntime.InvokeVoidAsync("loadApps");
+
+                await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+
+        }
+        if (dataReady)
+        {
+            dataReady = false; // prevent infinite loops
+            if (_module == null)
+            {
+                _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "/css/datatables/datatables-ajax.js");
+            }
+            await _module.InvokeVoidAsync("initDataTable");
+        }
+
+    }
+
+    private void ShowAlert(string message, string type = "success")
+    {
+        alertMessage = message;
+        alertType = type;
+        showAlert = true;
+        StateHasChanged();
+    }
+
+    private async Task Download(int id)
+    {
+
+        try
+        {
+
+
+            string batchname = batchDataDTOs.Where(b => b.id == _selectedBatchId).Select(b => b.name).FirstOrDefault() ?? "";
+
+            var fileBytes = await BatchesService.DownloadReconciliationFile(id);
+            if (fileBytes == null)
+                return;
+
+            var base64 = Convert.ToBase64String(fileBytes);
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/js/downloadMerchant.js"
+            );
+            await JsRuntime.InvokeVoidAsync(
+                "downloadFileFromBytes",
+                $"ReconciliationResult_{batchname}.xlsx",
+                base64);
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+        }
+        finally
+        {
+            isLoading = false;
+        }
+
+    }
+
+    private async Task ConfirmLockBatch()
+    {
+
+        await LockBatch();
+    }
+    private async Task LockBatch()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+
+        isLocking = true;
+        StateHasChanged();
+
+        try
+        {
+
+            bool result = await BatchesService.LockBatchReco(reconciliationResult!.Data.matchedCount.headerId, true);
+            showLockDialog = false;
+            if (result)
+            {
+                var batchName = batchDataDTOs.FirstOrDefault(m => m.id == selectedBatchId)?.name;
+
+                ShowAlert($"Batch {batchName} locked successfully!", "success");
+                isLocked = true;
+
+            }
+            else
+            {
+                ShowAlert("Failed to lock the batch. Please try again.", "danger");
+            }
+        }
+        catch (Exception ex)
+        {
+            showLockDialog = false;
+            ShowAlert($"Error: {ex.Message}", "danger");
+
+        }
+        finally
+        {
+            showLockDialog = false;
+            isLocking = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task VoidBatch()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+        try
+        {
+            showDeleteLoading = true;
+            deleteReconciliationResponse = await BatchesService.VoidBatch(selectedBatchheaderId);
+            if (deleteReconciliationResponse.Success)
+            {
+                showResults = false;
+                ShowAlert($"The Reconciliation Data is Voided Now", "success");
+            }
+            else
+            {
+                ShowAlert(deleteReconciliationResponse.Message, "danger");
+            }
+
+            showDeleteDialog = false;
+            showDeleteLoading = false;
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error: {ex.Message}", "danger");
+            showDeleteDialog = false;
+        }
+        finally
+        {
+            isLocked = false;
+            showDeleteDialog = false;
+            StateHasChanged();
+        }
+
+    }
+
+
+    private async Task ReconcileBatchAsync()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+
+        isReconciling = true;
+        showResults = false;
+        try
+        {
+            reconciliationResult = await BatchesService.ReconcileBatchAsync(FromDate, ToDate, SelectedBatchId, SelectedPaymentId);
+
+            if (reconciliationResult == null)
+            {
+                ShowAlert("No response from server.", "danger");
+                return;
+            }
+
+            switch (reconciliationResult.StatusCode)
+            {
+                case 200:
+                    showResults = true;
+                    dataReady = true;
+
+                    isLocked = reconciliationResult.Data.matchedCount.results.Count > 0
+                            && reconciliationResult.Data.matchedCount.results[0].isLocked;
+
+                    ShowAlert("Reconciliation completed!", "success");
+                    break;
+
+                case 400:
+                case 404:
+                case 500:
+                    ShowAlert(reconciliationResult.Message!, "danger");
+                    break;
+
+                default:
+                    ShowAlert(reconciliationResult.Message ?? "Unknown error.", "danger");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error: {ex.Message}", "danger");
+            showResults = false;
+        }
+        finally
+        {
+            isReconciling = false;
+            StateHasChanged();
+        }
+    }
+
+
+
+
+}

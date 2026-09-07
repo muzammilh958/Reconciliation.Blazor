@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (117,8)-(288,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
+#line (137,8)-(347,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
 
     private List<PaymentData> Paymentes = new();
     private bool showDeleteDialog = false;
@@ -145,14 +145,8 @@ using Reconciliation.Blazor.Layout.Partials
     private bool isLoading = true;
     private bool hasError = false;
     private bool dataReady = false;
+    private bool isDataTableInitialized = false;
 
-    private async Task InitDataTableAsync()
-    {
-        if (_module != null)
-        {
-            await _module.InvokeVoidAsync("loadDataTableAjax");
-        }
-    }
     protected override async Task OnInitializedAsync()
     {
         try
@@ -161,8 +155,6 @@ using Reconciliation.Blazor.Layout.Partials
             hasError = false;
 
             Paymentes = await PaymentService.GetAllAsync();
-
-            
             dataReady = true;
         }
         catch (Exception ex)
@@ -176,20 +168,83 @@ using Reconciliation.Blazor.Layout.Partials
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/css/datatables/datatables-ajax.js"
+            );
+        }
+
+        // Only initialize DataTable when data is ready and not loading, and not already initialized
+        if (dataReady && !isLoading && _module != null && !isDataTableInitialized && Paymentes.Count > 0)
+        {
+            isDataTableInitialized = true;
+            
+            // Small delay to ensure DOM is fully rendered
+            await Task.Delay(100);
+            
+            try
+            {
+                await _module.InvokeVoidAsync("initDataTable");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error initializing DataTable: {ex.Message}");
+                isDataTableInitialized = false;
+            }
+        }
+    }
+
     private void OpenEdit(PaymentData Payment)
     {
+        // Destroy DataTable before navigation to prevent memory leaks
+        _ = DestroyDataTableAsync();
         Nav.NavigateTo($"/payment/edit/{Payment.id}");
     }
 
-  
-    private async Task LoadPaymentes()
-    {
-        Paymentes = await PaymentService.GetAllAsync();
-        StateHasChanged();
-    }
     private void OpenCreate()
     {
+        // Destroy DataTable before navigation to prevent memory leaks
+        _ = DestroyDataTableAsync();
         Nav.NavigateTo("/payment/add");
+    }
+
+    private async Task LoadPaymentes()
+    {
+        try
+        {
+            // Destroy existing DataTable before reloading
+            await DestroyDataTableAsync();
+            
+            Paymentes = await PaymentService.GetAllAsync();
+            isDataTableInitialized = false; // Reset flag to reinitialize
+            dataReady = true;
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading payments: {ex.Message}");
+        }
+    }
+
+    private async Task DestroyDataTableAsync()
+    {
+        if (_module != null && isDataTableInitialized)
+        {
+            try
+            {
+                await _module.InvokeVoidAsync("destroyDataTables");
+                isDataTableInitialized = false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error destroying DataTable: {ex.Message}");
+            }
+        }
     }
 
     private void ConfirmDelete(int id, string name)
@@ -204,7 +259,6 @@ using Reconciliation.Blazor.Layout.Partials
         showDeleteDialog = false;
     }
 
-
     private async Task DeletePayment(int PaymentId)
     {
         var result = await PaymentService.DeleteAsync(PaymentId.ToString());
@@ -212,6 +266,11 @@ using Reconciliation.Blazor.Layout.Partials
         if (result?.success == true)
         {
             showDeleteDialog = false;
+            
+            // Destroy DataTable before reloading
+            await DestroyDataTableAsync();
+            
+            // Reload data
             await LoadPaymentes();
 
             await ShowMessage(
@@ -221,26 +280,11 @@ using Reconciliation.Blazor.Layout.Partials
         }
         else
         {
+             showDeleteDialog = false;
             await ShowMessage(
                 result?.message ?? "Delete failed.",
                 "alert-danger"
             );
-        }
-    }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
-                "import",
-                "/css/datatables/datatables-ajax.js"
-            );
-        }
-        if (dataReady && !isLoading && _module != null)
-        {
-            dataReady = false; // prevent re-run
-
-            await _module.InvokeVoidAsync("initDataTable");
         }
     }
 
@@ -254,12 +298,11 @@ using Reconciliation.Blazor.Layout.Partials
             await ShowMessage(
                 "Payment name is required.",
                 "alert-danger");
+            isLoading = false;
             return;
         }
 
         var result = await PaymentService.UpdateAsync(editModel.id, editModel);
-
-       
 
         if (result?.success == true)
         {
@@ -269,11 +312,9 @@ using Reconciliation.Blazor.Layout.Partials
                 result.message ?? "Payment updated successfully.",
                 "alert-success"
             );
-
         }
         else
         {
-
             await ShowMessage(
                 result?.message ?? "Failed to update Payment.",
                 "alert-danger"
@@ -300,8 +341,6 @@ using Reconciliation.Blazor.Layout.Partials
     {
         showMessage = false;
     }
-
-    
 
 #line default
 #line hidden

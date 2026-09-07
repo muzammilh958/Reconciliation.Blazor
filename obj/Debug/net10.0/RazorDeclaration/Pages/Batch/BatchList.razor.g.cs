@@ -109,8 +109,8 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
     ;
 #nullable restore
-#line (2,2)-(2,42) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
-using Reconciliation.Blazor.Models.Batch
+#line (2,2)-(2,50) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+using global::Reconciliation.Blazor.Models.Batch
 
 #nullable disable
     ;
@@ -136,7 +136,7 @@ using Reconciliation.Blazor.Models.Batch
         }
         #pragma warning restore 1998
 #nullable restore
-#line (107,8)-(110,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+#line (108,8)-(111,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
 
     private List<BatchDataDTO> batches = new();
     private bool showDeleteDialog = false;
@@ -147,7 +147,7 @@ using Reconciliation.Blazor.Models.Batch
 #nullable disable
 
 #nullable restore
-#line (110,47)-(241,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+#line (111,47)-(241,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
 
     private BatchDataDTO editModel = new();
     private int selectedBatchId;
@@ -194,7 +194,7 @@ using Reconciliation.Blazor.Models.Batch
     private void OpenEdit(BatchDataDTO batch)
     {
         Nav.NavigateTo($"/batch/edit/{batch.id}");
-       
+
     }
 
    
@@ -237,9 +237,8 @@ using Reconciliation.Blazor.Models.Batch
         }
         else
         {
-            await ShowMessage(
-                result?.message ?? "Delete failed.",
-                "alert-danger"
+            showDeleteDialog = false;
+            await ShowMessage(result?.message ?? "Delete failed.", "alert-danger"
             );
         }
     }

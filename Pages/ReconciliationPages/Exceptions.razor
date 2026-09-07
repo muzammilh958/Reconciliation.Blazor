@@ -1,0 +1,254 @@
+﻿@page "/exceptions/management"
+
+@inject IExceptions ExceptionsService
+@inject IJSRuntime JsRuntime
+@inject IBatchesService BatchesService
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">Exceptions</h3>
+                    <small class="text-muted">Review, reconcile, and resolve unmatched transactions</small>
+                </div>
+            </div>
+            <div class="card-body">
+
+                @if (showAlert)
+                {
+                    <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                        @alertMessage
+                        <button type="button" class="btn-close" @onclick="() => showAlert = false"></button>
+                    </div>
+                }
+
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Loading batches...</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label class="form-label">Select Batch</label>
+                            <select class="form-control form-select select2" id="batchSelect" @bind="SelectedBatchId">
+                                <option value="0" selected disabled>Select Batch</option>
+                                @foreach (var batch in batchDataDTOs)
+                                {
+                                    <option value="@batch.id">@batch.name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                                <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
+                                <button class="btn btn-primary btn-sm" type="button" @onclick="GetExceptionRecords"
+                                        disabled="@isException">
+                                    @if (isException)
+                                    {
+                                        <span>Fetching Data...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Fetch Data</span>
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (showResults)
+                    {
+                        <h6 class="mt-3">Exception List</h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped dt-responsive align-middle mb-0" id="exceptionTable">
+                                <thead>
+                                    <tr>
+                                        <th>Batch Name</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                   
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool showAlert = false;
+    private bool isException = false;
+    private string alertMessage = "";
+    private string alertType = "success";
+
+    private bool showResults = false;
+    private bool isLoading = false;
+    private bool dataReady = false;
+    private bool hasError = false;
+
+    private int _selectedBatchId = 0;
+    private string _selectedBatchName = "";
+
+    private IJSObjectReference? _dataTableModule;
+    private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
+
+    private DotNetObjectReference<Reconciliation.Blazor.Pages.ReconciliationPages.Exceptions>? _dotNetHelper;
+
+    private int SelectedBatchId
+    {
+        get => _selectedBatchId;
+        set
+        {
+            _selectedBatchId = value;
+            _selectedBatchName = batchDataDTOs?
+                .FirstOrDefault(b => b.id == value)?
+                .name ?? string.Empty;
+        }
+    }
+
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
+    {
+        _selectedBatchId = batchId;
+        _selectedBatchName = batchDataDTOs.FirstOrDefault(b => b.id == batchId)?.name ?? "";
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            batchDataDTOs = await BatchesService.GetAllAsync() ?? new List<Models.Batch.BatchDataDTO>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load data", "danger");
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ShowAlert(string message, string type = "success")
+    {
+        alertMessage = message;
+        alertType = type;
+        showAlert = true;
+        StateHasChanged();
+    }
+
+    private void GetExceptionRecords()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+
+        showResults = true;
+        dataReady = true;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public async Task<object> GetExceptionData(
+        int batchId, int draw, int start, int length,
+        int? sortColumnIndex, string sortDirection, string searchValue = null)
+    {
+        int pageNumber = length > 0 ? (start / length) + 1 : 1;
+        int pageSize = length > 0 ? length : 10;
+        
+        // DataTables sends a column INDEX, not a name — map it here.
+        // 0 = Batch Name (server has no sortable batch-name field, falls back to Id)
+        // 1 = Description
+        string sortColumn = sortColumnIndex switch
+        {
+            1 => "exceptionDescription",
+            _ => null
+        };
+
+        try
+        {
+            var result = await ExceptionsService.GetExceptionsAsync(
+                batchId, pageNumber, pageSize, searchValue, sortColumn, sortDirection ?? "asc");
+
+            if (result?.success == false || result?.data == null)
+            {
+                ShowAlert($" {result?.message ?? "Unknown error"}", "danger");
+                return new { draw, recordsTotal = 0, recordsFiltered = 0, data = Array.Empty<object>() };
+            }
+
+            return new
+            {
+                draw,
+                recordsTotal = result.data.TotalCount,
+                recordsFiltered = result.data .TotalCount,
+                data = result.data.Items    
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"GetExceptionData error: {ex.Message}");
+            return new { draw, recordsTotal = 0, recordsFiltered = 0, data = Array.Empty<object>() };
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dataTableModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "/css/datatables/datatables-ajax.js");
+
+            try
+            {
+                _dotNetHelper = DotNetObjectReference.Create(this);
+
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+                await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
+                await JsRuntime.InvokeVoidAsync("loadConfig");
+                await JsRuntime.InvokeVoidAsync("loadApps");
+                await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+        }
+
+        if (dataReady && !isLoading)
+        {
+            dataReady = false;
+            try
+            {
+                if (_dataTableModule != null)
+                {
+                    await _dataTableModule.InvokeVoidAsync(
+                        "initExceptionTable", _selectedBatchId, _dotNetHelper, _selectedBatchName);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception table init error: {ex}");
+            }
+        }
+    }
+}

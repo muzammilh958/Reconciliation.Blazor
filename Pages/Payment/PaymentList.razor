@@ -4,27 +4,11 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JsRuntime;
 
-@if (showMessage)
-{
-    <div class="alert @messageClass alert-dismissible fade show shadow-sm mb-3" role="alert">
-        @messageText
-
-        <button type="button" class="btn-close" @onclick="CloseMessage">
-        </button>
-    </div>
-}
 
 
 <div class="row">
     <div class="col-12">
-        <div class="card  shadow-sm">
-            @* <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Payment</h4>
-
-                <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 px-3" @onclick="OpenCreate">
-                    + New Payment
-                </button>
-            </div> *@
+        <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
                     <h3 class="mb-0 fw-semibold">Payment</h3>
@@ -33,12 +17,20 @@
 
                 <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 px-3" @onclick="OpenCreate">
                     <i class="bi bi-plus-lg"></i>
-                       New Payment
+                    New Payment
                 </button>
             </div>
 
-
             <div class="card-body">
+                @if (showMessage)
+                {
+                    <div class="alert @messageClass alert-dismissible fade show shadow-sm mb-3" role="alert">
+                        @messageText
+
+                        <button type="button" class="btn-close" @onclick="CloseMessage">
+                        </button>
+                    </div>
+                }
                 @if (isLoading)
                 {
                     <div class="text-center py-5">
@@ -61,12 +53,11 @@
                 else
                 {
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle" data-tables="basic">
+                        <!-- Removed data-tables="basic" attribute to prevent auto-initialization -->
+                        <table class="table table-hover align-middle" id="paymentTable" data-tables="basic">
                             <thead class="table-light">
                                 <tr>
                                     <th>Name</th>
-                                    <th>Authorization Code</th>
-                                    <th>Merchant ID</th>
                                     <th>Order Id</th>
                                     <th>Tender</th>
                                     <th>Transaction Amount</th>
@@ -80,16 +71,13 @@
                                 {
                                     <tr>
                                         <td>@Payment.name</td>
-                                        <td>@Payment.AuthorizationCode</td>
-                                        <td>@Payment.MerchantID</td>
                                         <td>@Payment.OrderId</td>
                                         <td>@Payment.Tender</td>
                                         <td>@Payment.TransactionAmount</td>
                                         <td>@Payment.TransactionDate</td>
-                                        
 
                                         <td class="text-end">
-                                            <button class="btn btn-sm btn-primary btn-sm me-1"
+                                            <button class="btn btn-sm btn-primary me-1"
                                                     @onclick="() => OpenEdit(Payment)">
                                                 Edit
                                             </button>
@@ -105,196 +93,16 @@
                         </table>
                     </div>
                 }
-
             </div>
         </div>
     </div>
 </div>
 
-
-
-
-@code {
-    private List<PaymentData> Paymentes = new();
-    private bool showDeleteDialog = false;
-    private PaymentData editModel = new();
-    private int selectedPaymentId;
-    private string selectedPaymentName = "";
-    private IJSObjectReference? _module;
-
-    private bool showMessage;
-    private string messageText = "";
-    private string messageClass = "";
-    private bool isLoading = true;
-    private bool hasError = false;
-    private bool dataReady = false;
-
-    private async Task InitDataTableAsync()
-    {
-        if (_module != null)
-        {
-            await _module.InvokeVoidAsync("loadDataTableAjax");
-        }
-    }
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            isLoading = true;
-            hasError = false;
-
-            Paymentes = await PaymentService.GetAllAsync();
-
-            
-            dataReady = true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            hasError = true;
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private void OpenEdit(PaymentData Payment)
-    {
-        Nav.NavigateTo($"/payment/edit/{Payment.id}");
-    }
-
-  
-    private async Task LoadPaymentes()
-    {
-        Paymentes = await PaymentService.GetAllAsync();
-        StateHasChanged();
-    }
-    private void OpenCreate()
-    {
-        Nav.NavigateTo("/payment/add");
-    }
-
-    private void ConfirmDelete(int id, string name)
-    {
-        selectedPaymentId = id;
-        selectedPaymentName = name;
-        showDeleteDialog = true;
-    }
-
-    private void CancelDelete()
-    {
-        showDeleteDialog = false;
-    }
-
-
-    private async Task DeletePayment(int PaymentId)
-    {
-        var result = await PaymentService.DeleteAsync(PaymentId.ToString());
-
-        if (result?.success == true)
-        {
-            showDeleteDialog = false;
-            await LoadPaymentes();
-
-            await ShowMessage(
-                result.message ?? "Payment deleted successfully.",
-                "alert-success"
-            );
-        }
-        else
-        {
-            await ShowMessage(
-                result?.message ?? "Delete failed.",
-                "alert-danger"
-            );
-        }
-    }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
-                "import",
-                "/css/datatables/datatables-ajax.js"
-            );
-        }
-        if (dataReady && !isLoading && _module != null)
-        {
-            dataReady = false; // prevent re-run
-
-            await _module.InvokeVoidAsync("initDataTable");
-        }
-    }
-
-    private async Task UpdatePayment()
-    {
-        isLoading = true;
-        editModel.name = editModel.name?.Trim() ?? "";
-
-        if (string.IsNullOrWhiteSpace(editModel.name))
-        {
-            await ShowMessage(
-                "Payment name is required.",
-                "alert-danger");
-            return;
-        }
-
-        var result = await PaymentService.UpdateAsync(editModel.id, editModel);
-
-       
-
-        if (result?.success == true)
-        {
-            await LoadPaymentes();
-
-            await ShowMessage(
-                result.message ?? "Payment updated successfully.",
-                "alert-success"
-            );
-
-        }
-        else
-        {
-
-            await ShowMessage(
-                result?.message ?? "Failed to update Payment.",
-                "alert-danger"
-            );
-        }
-        isLoading = false;
-    }
-
-    private async Task ShowMessage(string text, string cssClass)
-    {
-        messageText = text;
-        messageClass = cssClass;
-        showMessage = true;
-
-        StateHasChanged();
-
-        await Task.Delay(3000);
-
-        showMessage = false;
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private void CloseMessage()
-    {
-        showMessage = false;
-    }
-
-    
-}
-
-
 @if (showDeleteDialog)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
-
         <div class="modal-dialog modal-dialog-centered" style="z-index: 1055;">
             <div class="modal-content shadow">
-
                 <div class="modal-header">
                     <h5 class="modal-title">Delete Payment</h5>
                     <button type="button" class="btn-close" @onclick="CancelDelete"></button>
@@ -321,8 +129,219 @@
                         Yes, delete
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
+}
+
+@code {
+    private List<PaymentData> Paymentes = new();
+    private bool showDeleteDialog = false;
+    private PaymentData editModel = new();
+    private int selectedPaymentId;
+    private string selectedPaymentName = "";
+    private IJSObjectReference? _module;
+
+    private bool showMessage;
+    private string messageText = "";
+    private string messageClass = "";
+    private bool isLoading = true;
+    private bool hasError = false;
+    private bool dataReady = false;
+    private bool isDataTableInitialized = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            hasError = false;
+
+            Paymentes = await PaymentService.GetAllAsync();
+            dataReady = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "/css/datatables/datatables-ajax.js"
+            );
+        }
+
+        // Only initialize DataTable when data is ready and not loading, and not already initialized
+        if (dataReady && !isLoading && _module != null && !isDataTableInitialized && Paymentes.Count > 0)
+        {
+            isDataTableInitialized = true;
+            
+            // Small delay to ensure DOM is fully rendered
+            await Task.Delay(100);
+            
+            try
+            {
+                await _module.InvokeVoidAsync("initDataTable");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error initializing DataTable: {ex.Message}");
+                isDataTableInitialized = false;
+            }
+        }
+    }
+
+    private void OpenEdit(PaymentData Payment)
+    {
+        // Destroy DataTable before navigation to prevent memory leaks
+        _ = DestroyDataTableAsync();
+        Nav.NavigateTo($"/payment/edit/{Payment.id}");
+    }
+
+    private void OpenCreate()
+    {
+        // Destroy DataTable before navigation to prevent memory leaks
+        _ = DestroyDataTableAsync();
+        Nav.NavigateTo("/payment/add");
+    }
+
+    private async Task LoadPaymentes()
+    {
+        try
+        {
+            // Destroy existing DataTable before reloading
+            await DestroyDataTableAsync();
+            
+            Paymentes = await PaymentService.GetAllAsync();
+            isDataTableInitialized = false; // Reset flag to reinitialize
+            dataReady = true;
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading payments: {ex.Message}");
+        }
+    }
+
+    private async Task DestroyDataTableAsync()
+    {
+        if (_module != null && isDataTableInitialized)
+        {
+            try
+            {
+                await _module.InvokeVoidAsync("destroyDataTables");
+                isDataTableInitialized = false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error destroying DataTable: {ex.Message}");
+            }
+        }
+    }
+
+    private void ConfirmDelete(int id, string name)
+    {
+        selectedPaymentId = id;
+        selectedPaymentName = name;
+        showDeleteDialog = true;
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteDialog = false;
+    }
+
+    private async Task DeletePayment(int PaymentId)
+    {
+        var result = await PaymentService.DeleteAsync(PaymentId.ToString());
+
+        if (result?.success == true)
+        {
+            showDeleteDialog = false;
+            
+            // Destroy DataTable before reloading
+            await DestroyDataTableAsync();
+            
+            // Reload data
+            await LoadPaymentes();
+
+            await ShowMessage(
+                result.message ?? "Payment deleted successfully.",
+                "alert-success"
+            );
+        }
+        else
+        {
+             showDeleteDialog = false;
+            await ShowMessage(
+                result?.message ?? "Delete failed.",
+                "alert-danger"
+            );
+        }
+    }
+
+    private async Task UpdatePayment()
+    {
+        isLoading = true;
+        editModel.name = editModel.name?.Trim() ?? "";
+
+        if (string.IsNullOrWhiteSpace(editModel.name))
+        {
+            await ShowMessage(
+                "Payment name is required.",
+                "alert-danger");
+            isLoading = false;
+            return;
+        }
+
+        var result = await PaymentService.UpdateAsync(editModel.id, editModel);
+
+        if (result?.success == true)
+        {
+            await LoadPaymentes();
+
+            await ShowMessage(
+                result.message ?? "Payment updated successfully.",
+                "alert-success"
+            );
+        }
+        else
+        {
+            await ShowMessage(
+                result?.message ?? "Failed to update Payment.",
+                "alert-danger"
+            );
+        }
+        isLoading = false;
+    }
+
+    private async Task ShowMessage(string text, string cssClass)
+    {
+        messageText = text;
+        messageClass = cssClass;
+        showMessage = true;
+
+        StateHasChanged();
+
+        await Task.Delay(3000);
+
+        showMessage = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void CloseMessage()
+    {
+        showMessage = false;
+    }
 }

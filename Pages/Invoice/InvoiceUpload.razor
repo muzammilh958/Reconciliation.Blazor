@@ -30,23 +30,14 @@
                     <div class="col-sm-6">
                         <label class="form-label">Select Batch</label>
                         <select id="batchSelect" class="form-control form-select select2" @bind="SelectedBatchId">
-                            <option value="0" selected disabled>Select Batch</option>
+                            <option value="0" disabled>Select Batch</option>
                             @foreach (var batch in batches)
                             {
                                 <option value="@batch.id">@batch.name</option>
                             }
                         </select>
                     </div>
-                    @* <div class="col-sm-6">
-                        <label class="form-label">Select Invoice</label>
-                        <select id="invoiceSelect" class="form-control form-select select2" @bind="SelectedInvoiceId">
-                            <option value="0" selected disabled>Select Invoice Type</option>
-                            @foreach (var invoice in invoiceType.data)
-                            {
-                                <option value="@invoice.id">@invoice.name</option>
-                            }
-                        </select>
-                    </div> *@
+
                     <div class="col-sm-6">
                         <label class="form-label">Select Payment</label>
 
@@ -62,26 +53,15 @@
                 <div class="row mt-3">
                     <div class="col-sm-6">
                         <label class="form-label">From Date</label>
-                        <input class="form-control" type="date" readonly @bind="FromDate" />
+                        <input class="form-control" type="date" readonly @bind="FromDate" disabled />
                     </div>
 
                     <div class="col-sm-6">
                         <label class="form-label">To Date</label>
-                        <input class="form-control" type="date" readonly @bind="ToDate" />
+                        <input class="form-control" type="date" readonly @bind="ToDate" disabled />
                     </div>
                 </div>
-                @* <div class="row mt-3">
-                    <div class="col-sm-6">
-                        <label class="form-label">File Upload</label>
-                        <div class="mb-3">
-                            <div class="filepond-uploader">
-                                <InputFile class="filepond filepond-input-multiple" data-allow-reorder="true"
-                                           accept=".xlsx,.xls" data-max-file-size="3MB" data-max-files="5" multiple
-                                           name="filepond" />
-                            </div>
-                        </div>
-                    </div>
-                </div> *@
+
                 <div class="col-12">
                     <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
                         <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
@@ -145,9 +125,23 @@
         set => _selectedPaymentId = value;
     }
 
-    private async Task OnInvoiceSelected(int invoiceId)
+    [JSInvokable]
+    public void OnBatchSelected(int batchId)
     {
-        SelectedInvoiceId = invoiceId;
+        SelectedBatchId = batchId; // reuses your existing setter logic (FromDate/ToDate + StateHasChanged)
+    }
+
+    [JSInvokable]
+    public void OnPaymentSelected(int paymentId)
+    {
+        SelectedPaymentId = paymentId;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnInvoiceSelected(int invoiceId)
+    {
+        SelectedInvoiceId = invoiceId; // your existing property already does the lookup + StateHasChanged
     }
 
     private int SelectedBatchId
@@ -177,17 +171,20 @@
                 await JsRuntime.InvokeVoidAsync("loadConfig");
                 await JsRuntime.InvokeVoidAsync("loadApps");
 
-                if (!_select2Initialized && !isLoading && batches.Any())
-                {
-                    _dotNetRef = DotNetObjectReference.Create(this);
-                    await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetRef);
-                    _select2Initialized = true;
-                }
+             
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"JS load error: {ex.Message}");
             }
+
+            
+        }
+        if (!_select2Initialized && !isLoading && batches.Any())
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetRef);
+            _select2Initialized = true;
         }
     }
     protected override async Task OnInitializedAsync()
@@ -264,7 +261,7 @@
         }
         catch (Exception ex)
         {
-            
+
             ShowAlert(ExtractFriendlyMessage(ex), "danger");
             Console.WriteLine(ex); // full stack trace
         }

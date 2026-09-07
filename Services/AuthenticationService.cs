@@ -64,11 +64,13 @@ namespace Reconciliation.Blazor.Services
 
         private readonly ITokenProvider _tokenProvider;
         private readonly AppState _appState;
-        public AuthenticationService(HttpClient httpClient, ITokenProvider tokenProvider, AppState appState)
+        private readonly IJSRuntime _jsRuntime; 
+        public AuthenticationService(HttpClient httpClient, ITokenProvider tokenProvider, AppState appState, IJSRuntime jsRuntime)
         {
             _httpClient = httpClient;
             _tokenProvider = tokenProvider;
             _appState = appState;
+            _jsRuntime = jsRuntime;
         }
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -112,7 +114,7 @@ namespace Reconciliation.Blazor.Services
                     var refresh = result.Data.RefreshToken ?? "";
 
                     await SetTokensAsync(token, refresh);
-                    await _tokenProvider.SetTokensAsync(token, refresh);
+               
 
                     var user = result.Data.User; // MUST exist
 
@@ -168,7 +170,7 @@ namespace Reconciliation.Blazor.Services
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("api/auth/refresh-token", request);
+                var response = await _httpClient.PostAsJsonAsync(ApiEndpoints.Auth.RefreshToken, request);
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
@@ -216,21 +218,38 @@ namespace Reconciliation.Blazor.Services
 
         private async Task<string?> GetFromLocalStorage(string key)
         {
-            // Note: In a real Blazor app, you would use JS interop to access localStorage
-            // For now, we'll use a simple in-memory storage
-            return null;
+             try
+            {
+                return await _jsRuntime.InvokeAsync<string>("localStorage.getItem", key);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private async Task SetInLocalStorage(string key, string value)
         {
-            // Note: In a real Blazor app, you would use JS interop to store in localStorage
-            await Task.CompletedTask;
+             try
+            {
+                await _jsRuntime.InvokeVoidAsync("localStorage.setItem", key, value);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving to localStorage: {ex.Message}");
+            }
         }
 
         private async Task RemoveFromLocalStorage(string key)
         {
-            // Note: In a real Blazor app, you would use JS interop to remove from localStorage
-            await Task.CompletedTask;
+           try
+            {
+                await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", key);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error removing from localStorage: {ex.Message}");
+            }
         }
 
         public async Task<AuthResponse> ForgetPasswordAsync(string email)

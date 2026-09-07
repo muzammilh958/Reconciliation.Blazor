@@ -4,8 +4,9 @@
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
-@using Reconciliation.Blazor.Services
-@using Reconciliation.Blazor.Models.Auth
+@using Reconciliation.Blazor.Core.Endpoints
+@using global::Reconciliation.Blazor.Models.Auth
+@using global::Reconciliation.Blazor.Services
 @inject TokenServices TokenService
 
 @inject IAuthenticationService AuthService
@@ -160,11 +161,43 @@
     [Inject] private TokenServices TokenServices { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private HttpClient HttpClient { get; set; }
+    
+    [Inject] private JwtAuthStateProvider AuthStateProviders { get; set; }
       private const string TokenKey = "authToken";
 
     protected override async Task OnInitializedAsync()
     {
-        
+        var token = await TokenServices.GetToken();
+        if (!string.IsNullOrEmpty(token))
+        {
+            var isValid = await ValidateTokenWithApi(token);
+            if (isValid)
+            {
+                NavigationManager.NavigateTo("/dashboard", true);
+                return;
+            }
+            else
+            {
+                await TokenServices.RemoveToken();
+                await _localStorage.RemoveItemAsync("userInfo");
+                await AuthStateProvider.NotifyUserLogout();
+            }
+        }
+    }
+     private async Task<bool> ValidateTokenWithApi(string token)
+    {
+        try
+        {
+            HttpClient.DefaultRequestHeaders.Authorization = 
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await HttpClient.GetAsync(ApiEndpoints.Auth.ValidateToken);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private async Task HandleLogin()

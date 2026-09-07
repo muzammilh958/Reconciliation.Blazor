@@ -136,13 +136,14 @@
                                 <ul class="sub-menu">
                                     @foreach (var submenu in menu.children)
                                     {
-                                        <li class="side-nav-item">
+                                        <li class="side-nav-item @(IsActive(submenu.url) ? "active" : "")">
                                             @if (!string.IsNullOrWhiteSpace(submenu.url))
                                             {
-                                                <a href="@submenu.url"
+                                               <a href="@submenu.url"
                                                 class="side-nav-link @(IsActive(submenu.url) ? "active" : "")">
                                                     <span class="menu-text">@submenu.title</span>
-                                                </a>
+                                                </a> 
+                                             
                                             }
                                         </li>
                                     }

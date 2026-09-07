@@ -3,15 +3,7 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JsRuntime;
 
-@if (showMessage)
-{
-    <div class="alert @messageClass alert-dismissible fade show shadow-sm mb-3" role="alert">
-        @messageText
 
-        <button type="button" class="btn-close" @onclick="CloseMessage">
-        </button>
-    </div>
-}
 
 <div class="row">
     <div class="col-12">
@@ -37,6 +29,15 @@
 
 
             <div class="card-body">
+                @if (showMessage)
+                {
+                    <div class="alert @messageClass alert-dismissible fade show shadow-sm mb-3" role="alert">
+                        @messageText
+
+                        <button type="button" class="btn-close" @onclick="CloseMessage">
+                        </button>
+                    </div>
+                }
                 @if (isLoading)
                 {
                     <div class="text-center py-5">

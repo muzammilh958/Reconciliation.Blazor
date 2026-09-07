@@ -109,8 +109,8 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
     ;
 #nullable restore
-#line (2,2)-(2,42) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\EditBatch.razor"
-using Reconciliation.Blazor.Models.Batch
+#line (2,2)-(2,50) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\EditBatch.razor"
+using global::Reconciliation.Blazor.Models.Batch
 
 #nullable disable
     ;

@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (85,8)-(207,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
+#line (96,8)-(221,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
 
     // ======================== STATE VARIABLES ========================
     private bool isLoading = false;
@@ -152,6 +152,9 @@ using Reconciliation.Blazor.Layout.Partials
     private string searchTerm = "";
     private int pageSize = 25;
     private int currentPage = 1;
+    private bool isDownloading = false;
+    
+    private int? downloadingInvoiceId = null;
     private IJSObjectReference? _module;
 
     // ======================== LIFECYCLE ========================
@@ -260,7 +263,7 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (263,9)-(393,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
+#line (277,9)-(417,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
 
 
     private void CloseDetailView()
@@ -306,9 +309,14 @@ using Reconciliation.Blazor.Layout.Partials
     // ======================== ACTION HANDLERS ========================
     private async Task DownloadFile(UploadedData merchant)
     {
+        if (isDownloading) return;
+
         try
         {
-
+            isDownloading = true;
+            downloadingInvoiceId = merchant.id;
+            StateHasChanged(); 
+          
             var fileBytes = await merchantService.DownloadMerchantFile(merchant.id);
             if (fileBytes == null)
                 return;
@@ -327,11 +335,16 @@ using Reconciliation.Blazor.Layout.Partials
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-
+            isDownloading = false;
+            downloadingInvoiceId = null;
+            StateHasChanged();
         }
         finally
-        {
+        {   
             isLoading = false;
+            isDownloading = false;
+            downloadingInvoiceId = null;
+            StateHasChanged();
         }
     }
 

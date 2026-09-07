@@ -113,8 +113,8 @@ using Reconciliation.Blazor.Layout.Partials
     [global::Microsoft.AspNetCore.Components.RouteAttribute(
     // language=Route,Component
 #nullable restore
-#line (1,7)-(1,33) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
-"/merchant/reconciliation"
+#line (1,7)-(1,36) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
+"/transaction/reconciliation"
 
 #line default
 #line hidden
@@ -130,11 +130,11 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (190,8)-(379,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
+#line (233,8)-(522,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ReconciliationScreen.razor"
 
 
     private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
-    private List<PaymentData> Paymentes = new();    
+    private List<PaymentData> Paymentes = new();
     private bool isLoading = true;
     private bool showAlert = false;
     private DateTime FromDate = DateTime.Now;
@@ -142,16 +142,27 @@ using Reconciliation.Blazor.Layout.Partials
     private string alertMessage = "";
     private string alertType = "success";
     private bool isReconciling = false;
+    private bool isLocked = false;
     private int _selectedBatchId = 0;
     private int _selectedPaymentId = 0;
-    private ReconciliationResult? reconciliationResult = new ReconciliationResult();
-    private bool showResults = false;
+    private ReconciliationResultsDTO? reconciliationResult = new ReconciliationResultsDTO();
 
+    private DeleteReconciliationResponse deleteReconciliationResponse = new DeleteReconciliationResponse();
+    private bool showResults = false;
+    private int selectedBatchId;
+    private string selectedBatchName = "";
+    private bool showDeleteDialog = false;
+    private bool showDeleteLoading = false;
     private bool dataReady = false;
     private IJSObjectReference? _module;
 
     private DotNetObjectReference<ReconciliationScreen>? _dotNetHelper;
-
+    private void ConfirmDelete(int id, string name)
+    {
+        selectedBatchId = id;
+        selectedBatchName = name;
+        showDeleteDialog = true;
+    }
     private int SelectedBatchId
     {
         get => _selectedBatchId;
@@ -160,7 +171,12 @@ using Reconciliation.Blazor.Layout.Partials
             _selectedBatchId = value;
         }
     }
-    
+
+    private void CancelDelete()
+    {
+        showDeleteDialog = false;
+    }
+
     private int SelectedPaymentId
     {
         get => _selectedPaymentId;
@@ -177,15 +193,15 @@ using Reconciliation.Blazor.Layout.Partials
         _selectedPaymentId = paymentId;
         StateHasChanged();
     }
-    
+
     [JSInvokable]
     public void OnBatchSelected(int batchId)
     {
         Console.WriteLine($"Batch selected: {batchId}");
         _selectedBatchId = batchId;
 
-        FromDate=batchDataDTOs.Where(b => b.id == batchId).Select(b => b.FromDate).FirstOrDefault() ?? DateTime.Now;
-        ToDate=batchDataDTOs.Where(b => b.id == batchId).Select(b => b.ToDate).FirstOrDefault() ?? DateTime.Now;
+        FromDate = batchDataDTOs.Where(b => b.id == batchId).Select(b => b.FromDate).FirstOrDefault() ?? DateTime.Now;
+        ToDate = batchDataDTOs.Where(b => b.id == batchId).Select(b => b.ToDate).FirstOrDefault() ?? DateTime.Now;
 
         StateHasChanged();
     }
@@ -215,11 +231,11 @@ using Reconciliation.Blazor.Layout.Partials
         {
             try
             {
-                  _dotNetHelper = DotNetObjectReference.Create(this);
+                _dotNetHelper = DotNetObjectReference.Create(this);
                 _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
                 await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
                 await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
-                
+
                 await JsRuntime.InvokeVoidAsync("loadConfig");
                 await JsRuntime.InvokeVoidAsync("loadApps");
 
@@ -229,7 +245,7 @@ using Reconciliation.Blazor.Layout.Partials
             {
                 Console.WriteLine($"JS load error: {ex.Message}");
             }
-            
+
         }
         if (dataReady)
         {
@@ -241,7 +257,7 @@ using Reconciliation.Blazor.Layout.Partials
             }
             await _module.InvokeVoidAsync("initDataTable");
         }
-        
+
     }
 
     private void ShowAlert(string message, string type = "success")
@@ -252,6 +268,79 @@ using Reconciliation.Blazor.Layout.Partials
         StateHasChanged();
     }
 
+    private async Task LockBatch()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+
+        isLocked = true;
+        StateHasChanged();
+
+        try
+        {
+            bool result = await BatchesService.LockBatch(SelectedBatchId);
+            if (result)
+            {
+                ShowAlert($"Batch {SelectedBatchId} locked successfully!", "success");
+            }
+            else
+            {
+                ShowAlert("Failed to lock the batch. Please try again.", "danger");
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error: {ex.Message}", "danger");
+
+        }
+        finally
+        {
+            isLocked = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task VoidBatch()
+    {
+        if (SelectedBatchId <= 0)
+        {
+            ShowAlert("Please select a valid Batch first.", "warning");
+            return;
+        }
+        try
+        {
+            showDeleteLoading = true;
+            deleteReconciliationResponse = await BatchesService.VoidBatch(SelectedBatchId);
+            if (deleteReconciliationResponse.Success)
+            {
+                ShowAlert($"The Reconciliation Data is Voided Now", "success");
+            }
+            else
+            {
+                ShowAlert(deleteReconciliationResponse.Message, "danger");
+            }
+
+            showDeleteDialog = false;
+            showDeleteLoading = false;
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error: {ex.Message}", "danger");
+            showDeleteDialog = false;
+        }
+        finally
+        {
+            isLocked = false;
+            showDeleteDialog = false;
+            StateHasChanged();
+        }
+
+    }
+
+
     private async Task ReconcileBatchAsync()
     {
         if (SelectedBatchId <= 0)
@@ -261,12 +350,25 @@ using Reconciliation.Blazor.Layout.Partials
         }
 
         isReconciling = true;
-        showResults = false; // hide previous results
+        showResults = false;
         try
         {
             Console.WriteLine($"Date Status: {FromDate}, {ToDate} SelectedBatchId: {SelectedBatchId}, SelectedPaymentId: {SelectedPaymentId}");
-            reconciliationResult = await BatchesService.ReconcileBatchAsync(FromDate,ToDate,SelectedBatchId,SelectedPaymentId);
-            Console.WriteLine($"Result Status: {reconciliationResult?.statusCode}");
+            reconciliationResult = await BatchesService.ReconcileBatchAsync(FromDate, ToDate, SelectedBatchId, SelectedPaymentId);
+
+            // Debug logging
+            Console.WriteLine($"Result Status: {reconciliationResult?.StatusCode}");
+            Console.WriteLine($"Data is null: {reconciliationResult?.Data == null}");
+            Console.WriteLine($"MatchedCount is null: {reconciliationResult?.Data?.MatchedCount == null}");
+            Console.WriteLine($"MatchedCount count: {reconciliationResult?.Data?.MatchedCount?.Count ?? 0}");
+
+            if (reconciliationResult?.Data?.MatchedCount != null)
+            {
+                foreach (var item in reconciliationResult.Data.MatchedCount)
+                {
+                    Console.WriteLine($"Order: {item.OrderId}, Status: {item.ReconStatus}");
+                }
+            }
 
             if (reconciliationResult == null)
             {
@@ -274,10 +376,10 @@ using Reconciliation.Blazor.Layout.Partials
                 return;
             }
 
-            switch (reconciliationResult.statusCode)
+            switch (reconciliationResult.StatusCode)
             {
                 case 200:
-                    showResults = true; // <<--- set BEFORE alert
+                    showResults = true;
                     dataReady = true;
                     ShowAlert("Reconciliation completed!", "success");
                     break;
@@ -285,11 +387,11 @@ using Reconciliation.Blazor.Layout.Partials
                 case 400:
                 case 404:
                 case 500:
-                    ShowAlert(reconciliationResult.message!, "danger");
+                    ShowAlert(reconciliationResult.Message!, "danger");
                     break;
 
                 default:
-                    ShowAlert(reconciliationResult.message ?? "Unknown error.", "danger");
+                    ShowAlert(reconciliationResult.Message ?? "Unknown error.", "danger");
                     break;
             }
         }
@@ -301,8 +403,6 @@ using Reconciliation.Blazor.Layout.Partials
         finally
         {
             isReconciling = false;
-            // StateHasChanged is already called inside ShowAlert,
-            // but calling it here ensures UI updates if no alert was shown.
             StateHasChanged();
         }
     }

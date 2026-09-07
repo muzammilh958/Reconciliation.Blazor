@@ -125,6 +125,55 @@ using Reconciliation.Blazor.Pages.Dashboard
         {
         }
         #pragma warning restore 1998
+#nullable restore
+#line (33,8)-(39,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\App.razor"
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 🔥 App start pe authentication check karein
+        await AuthStateProvider.GetAuthenticationStateAsync();
+    }
+
+#line default
+#line hidden
+#nullable disable
+
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (3,9)-(3,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\App.razor"
+NavigationManager
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (3,27)-(3,44) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\App.razor"
+NavigationManager
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (2,9)-(2,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\App.razor"
+JwtAuthStateProvider
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (2,30)-(2,47) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\App.razor"
+AuthStateProvider
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
     }
 }
 #pragma warning restore 1591

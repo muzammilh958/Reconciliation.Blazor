@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reconciliation.Blazor</title>
+    <base href="/" />
+    <link href="_framework/dotnet.jl9l0wyyzr.js" rel="preload" as="script" fetchpriority="high" crossorigin="anonymous" integrity="sha256-10MHXiZftpx05D9rnEzysXN+HTt4pcDVqfHeOxnO6F8=" />
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/login.css" />
+    <link rel="stylesheet" href="css/signup.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="scss/components/_print.scss" />
+    <link rel="stylesheet" href="scss/config/_theme-minimal.scss" />
+    <link rel="stylesheet" href="scss/structure/_horizontal.scss" />
+    <link rel="stylesheet" href="scss/structure/_layout.scss" />
+    <link rel="stylesheet" href="scss/structure/_datatables-ajax" />
+    <link rel="stylesheet" href="scss/structure/_footer.scss" />
+    <link rel="stylesheet" href="scss/plugins/_apexcharts.scss" />
+    <link rel="stylesheet" href="scss/plugins/_calendar.scss" />
+    <link rel="stylesheet" href="scss/plugins/_choice.scss" />
+    <link rel="stylesheet" href="scss/plugins/_colorpicker.scss" />
+    <link rel="stylesheet" href="scss/plugins/_datatables.scss" />
+    <link rel="stylesheet" href="scss/plugins/_daterangepicker.scss" />
+    <link rel="stylesheet" href="scss/plugins/_dropzone.scss" />
+    <link rel="stylesheet" href="scss/plugins/_filepond.scss" />
+    <link rel="stylesheet" href="scss/plugins/_flatpickr.scss" />
+    <link rel="stylesheet" href="scss/plugins/_jvectormap.scss" />
+    <link rel="stylesheet" href="scss/_variables-dark.scss" />
+    <link rel="stylesheet" href="scss/_variables.scss" />
+    <link rel="stylesheet" href="scss/app.scss" />
+
+    <link rel="stylesheet" href="scss/structure/_sidenav.scss" />
+    <link rel="stylesheet" href="scss/plugins/_select2.scss" />
+    
+    <link rel="stylesheet" href="plugins/select2/select2.min.css"/>
+    <link rel="icon" type="image/png" href="images/logos/logo-reconciliation.png" />
+    <link href="Reconciliation.Blazor.styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script type="importmap">{
+  "imports": {
+    "./_framework/blazor.webassembly.js": "./_framework/blazor.webassembly.958z1vx7fr.js",
+    "./_framework/dotnet.js": "./_framework/dotnet.jl9l0wyyzr.js",
+    "./_framework/dotnet.native.js": "./_framework/dotnet.native.soli2tluij.js",
+    "./_framework/dotnet.runtime.js": "./_framework/dotnet.runtime.web2r9gqbh.js"
+  },
+  "scopes": {},
+  "integrity": {
+    "./_framework/blazor.webassembly.958z1vx7fr.js": "sha256-A59Tr9HqEhHMu8kU7kruLI9ayw5MRS6Lvc6z7jCbghk=",
+    "./_framework/blazor.webassembly.js": "sha256-A59Tr9HqEhHMu8kU7kruLI9ayw5MRS6Lvc6z7jCbghk=",
+    "./_framework/dotnet.jl9l0wyyzr.js": "sha256-10MHXiZftpx05D9rnEzysXN+HTt4pcDVqfHeOxnO6F8=",
+    "./_framework/dotnet.js": "sha256-10MHXiZftpx05D9rnEzysXN+HTt4pcDVqfHeOxnO6F8=",
+    "./_framework/dotnet.native.js": "sha256-TOSqY1b9vsdKZIcajDhve68SxAMowD6ImZXeApYkPNU=",
+    "./_framework/dotnet.native.soli2tluij.js": "sha256-TOSqY1b9vsdKZIcajDhve68SxAMowD6ImZXeApYkPNU=",
+    "./_framework/dotnet.runtime.js": "sha256-SOUHEQ3FhDAibBSR2u90NWZpoBjPuWRmH0BAATUlhJU=",
+    "./_framework/dotnet.runtime.web2r9gqbh.js": "sha256-SOUHEQ3FhDAibBSR2u90NWZpoBjPuWRmH0BAATUlhJU="
+  }
+}</script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+       
+        <div class="app-loader">
+
+            <div class="loader-container">
+
+                <div class="loader-brand">
+
+                    <img src="images/logos/logo-reconciliation.png" alt="Reconciliation Logo">
+
+                    <div class="brand-text">
+                        <h2>Reconciliation</h2>
+                        <span>Financial Management Platform</span>
+                    </div>
+
+                </div>
+
+                <div class="loader-animation">
+                    <div class="spinner-ring"></div>
+                </div>
+
+                <div class="loader-message">
+                    <h5>Loading Application</h5>
+                    <p>Please wait while we securely prepare your workspace...</p>
+                </div>
+
+                <div class="loader-progress">
+                    <div class="loader-progress-bar"></div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <script src="_framework/blazor.webassembly.958z1vx7fr.js"></script>
+    <script src="./js/config.js"></script>
+
+    <script src="./js/pages/form-date-range-picker.js"></script>
+    <script src="./plugins/lucide/lucide.min.js"></script>
+
+    <script src="./js/app.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+
+
+    <script src="js/pages/form-fileupload.js"></script>
+    <script src="plugins/select2/select2.min.js"></script>
+    <!-- FilePond CSS -->
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+    <!-- FilePond JS -->
+    <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script>
+         (function() {
+         
+            // Get the token from localStorage
+            const token = localStorage.getItem('authToken');
+            
+            // Get current path
+            const currentPath = window.location.pathname;
+            
+            // List of public pages that don't require authentication
+            const publicPages = ['/', '/login', '/signup', '/forgot-password', '/reset-password'];
+            
+            // Check if user is logged in and trying to access login page
+            if (token && token !== '' && token !== 'null' && token !== 'undefined') {
+               
+                // If on login page or root, redirect to dashboard
+                if (currentPath === '/' || currentPath === '/login' || currentPath === '') {
+                    // window.location.href = '/dashboard';
+                    return;
+                }
+            } else {
+                console.log('No token found');
+                
+                // If not logged in and trying to access protected page, redirect to login
+                if (!publicPages.includes(currentPath) && currentPath !== '/') {
+                    console.log('Redirecting to login...');
+                    // window.location.href = '/';
+                    return;
+                }
+            }
+            
+        })();
+        if (typeof FilePond !== 'undefined') {
+            // Register image preview plugin if loaded
+            if (typeof FilePondPluginImagePreview !== 'undefined') {
+                FilePond.registerPlugin(FilePondPluginImagePreview);
+            }
+        }
+        window.initFlatpickr = function () {
+            flatpickr('.flatpickr', {
+                dateFormat: "Y-m-d",
+                allowInput: true,
+                onChange: function (selectedDates, dateStr, instance) {
+                    // This will trigger Blazor's @bind update
+                    const event = new Event('input', {
+                        bubbles: true
+                    });
+                    instance.input.dispatchEvent(event);
+                }
+            });
+        };
+
+        window.updateFlatpickrValues = function (fromDate, toDate) {
+            const inputs = document.querySelectorAll('.flatpickr');
+            if (inputs.length >= 2) {
+                if (fromDate && inputs[0]._flatpickr) {
+                    inputs[0]._flatpickr.setDate(fromDate, false);
+                }
+                if (toDate && inputs[1]._flatpickr) {
+                    inputs[1]._flatpickr.setDate(toDate, false);
+                }
+            }
+        };
+    </script>
+</body>
+
+</html>
