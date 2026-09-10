@@ -123,7 +123,7 @@ using Reconciliation.Blazor.Layout.Partials
     #nullable restore
     public partial class MerchantUpload : global::Microsoft.AspNetCore.Components.ComponentBase, 
 #nullable restore
-#line (114,13)-(114,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
+#line (111,13)-(111,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
 IDisposable
 
 #line default
@@ -138,7 +138,7 @@ IDisposable
         }
         #pragma warning restore 1998
 #nullable restore
-#line (116,8)-(354,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
+#line (113,8)-(351,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
 
     private List<byte[]> fileBytes = new();
     private List<string> fileNames = new();

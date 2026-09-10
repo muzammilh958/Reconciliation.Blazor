@@ -17,8 +17,7 @@ public class ManualAdjustmentService : IManualAdjustment
         _http = http;
         _tokenProvider = tokenProvider;
     }
-    public async Task<ManualAdjustmentDTO> GetManualAdjustmentRecords(DateTime StartDate, DateTime EndDate, int batchId, int paymentId,int pageNumber,int pageSize,
-    string searchValue = null)
+    public async Task<ManualAdjustmentDTO> GetManualAdjustmentRecords(DateTime StartDate, DateTime EndDate, int batchId, int paymentId,int pageNumber,int pageSize, string searchValue = "")
     {
         try
         {

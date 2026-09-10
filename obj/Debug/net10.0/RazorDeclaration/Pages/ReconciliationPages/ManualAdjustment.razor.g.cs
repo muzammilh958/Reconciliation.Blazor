@@ -254,7 +254,7 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (321,13)-(670,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ManualAdjustment.razor"
+#line (321,13)-(668,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ManualAdjustment.razor"
 
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -273,10 +273,8 @@ using Reconciliation.Blazor.Layout.Partials
                 _formFileUploadModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
                 await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
                 await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
-
                 await JsRuntime.InvokeVoidAsync("loadConfig");
                 await JsRuntime.InvokeVoidAsync("loadApps");
-
                 await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
 
             }

@@ -80,31 +80,28 @@
 
                 <div class="col-12">
                     <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
-                        <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
-                        @* <button class="btn btn-success btn-sm" type="button" @onclick="ReconcileBatchAsync"
-                                disabled="@isReconciling">
-                            @if (isReconciling)
-                            {
-                                <span>Reconciling...</span>
-                            }
-                            else
-                            {
+                        @if (ispostLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <button class="btn btn-outline-secondary btn-sm" type="button">Cancel</button>
 
-                                <span>Reconcile Batch</span>
-                            }
-                        </button> *@
-                        <button class="btn btn-primary btn-sm" type="button" @onclick="SaveAsync"
-                                disabled="@ispostLoading">
-                            @if (ispostLoading)
-                            {
-                                <span>Importing...</span>
-                            }
-                            else
-                            {
 
-                                <span>Import</span>
-                            }
-                        </button>
+                            <button class="btn btn-primary btn-sm" type="button" @onclick="SaveAsync"
+                            disabled="@ispostLoading">
+                                @if (ispostLoading)
+                                {
+                                    <span>Importing...</span>
+                                }
+                                else
+                                {
+
+                                    <span>Import</span>
+                                }
+                            </button>            
+                        }
                     </div>
                 </div>
             </div>

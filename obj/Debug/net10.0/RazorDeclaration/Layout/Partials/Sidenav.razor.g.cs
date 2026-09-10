@@ -108,12 +108,18 @@ using Reconciliation.Blazor.Layout.Partials
 
 #nullable disable
     ;
+#nullable restore
+#line (1,2)-(1,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+using System.Security.Claims
+
+#nullable disable
+    ;
     #line default
     #line hidden
     #nullable restore
     public partial class Sidenav : global::Microsoft.AspNetCore.Components.ComponentBase, 
 #nullable restore
-#line (1,13)-(1,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (2,13)-(2,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 IDisposable
 
 #line default
@@ -128,29 +134,36 @@ IDisposable
         }
         #pragma warning restore 1998
 #nullable restore
-#line (162,8)-(248,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (135,8)-(213,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 
-    private List<MenuItemDto> menuResponse = new();
-    private bool isLoading = true;
-    private bool hasError = false;
+    private List<MenuItemDto> menus = new();
+    private string? userRole;
     private IJSObjectReference? _module;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            menuResponse = await MenuService.GetAllAsync();
-        }
-        catch
-        {
-            hasError = true;
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        // Get user role
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        userRole = authState.User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
 
-        // Re-render on client-side navigation so active/inactive state updates
+        // Get all menus
+        var allMenus = await MenuService.GetAllAsync();
+
+        // Filter menus by role (only 4 lines!)
+        menus = allMenus
+            .Where(m => string.IsNullOrEmpty(m.Role) || m.Role == userRole)
+            .Select(m => new MenuItemDto
+            {
+                id = m.id,
+                sectionTitle = m.sectionTitle,
+                title = m.title,
+                url = m.url,
+                children = m.children?.Where(c => string.IsNullOrEmpty(c.Role) || c.Role == userRole).ToList(),
+                Role = m.Role
+            })
+            .Where(m => m.children == null || m.children.Any())
+            .ToList();
+
         NavigationManager.LocationChanged += OnLocationChanged;
     }
 
@@ -159,9 +172,6 @@ IDisposable
         InvokeAsync(StateHasChanged);
     }
 
-    /// <summary>
-    /// Normalized current path: no query/hash, no trailing slash.
-    /// </summary>
     private string CurrentPath
     {
         get
@@ -172,27 +182,15 @@ IDisposable
         }
     }
 
-    private static string Normalize(string path)
-    {
-        var trimmed = path.Split('?')[0].Split('#')[0];
-        return "/" + trimmed.Trim('/');
-    }
-
     private bool IsActive(string? path)
     {
-        if (string.IsNullOrWhiteSpace(path))
-            return false;
-
-        // Exact match only — prevents "/users" matching "/users-profile"
-        return string.Equals(CurrentPath, Normalize(path), StringComparison.OrdinalIgnoreCase);
+        if (string.IsNullOrWhiteSpace(path)) return false;
+        return string.Equals(CurrentPath, "/" + path.Split('?')[0].Split('#')[0].Trim('/'), StringComparison.OrdinalIgnoreCase);
     }
 
     private bool IsParentMenuActive(MenuItemDto menu)
     {
-        if (menu?.children == null || menu.children.Count == 0)
-            return false;
-
-        return menu.children.Any(c => !string.IsNullOrWhiteSpace(c?.url) && IsActive(c.url));
+        return menu?.children?.Any(c => !string.IsNullOrWhiteSpace(c?.url) && IsActive(c.url)) ?? false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -222,7 +220,25 @@ IDisposable
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (4,9)-(4,21) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (6,9)-(6,36) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+AuthenticationStateProvider
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (6,37)-(6,49) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+AuthProvider
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (5,9)-(5,21) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 IMenuService
 
 #line default
@@ -230,7 +246,7 @@ IMenuService
 #nullable disable
          
 #nullable restore
-#line (4,22)-(4,33) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (5,22)-(5,33) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 MenuService
 
 #line default
@@ -240,7 +256,7 @@ MenuService
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (3,9)-(3,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (4,9)-(4,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 NavigationManager
 
 #line default
@@ -248,7 +264,7 @@ NavigationManager
 #nullable disable
          
 #nullable restore
-#line (3,27)-(3,44) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (4,27)-(4,44) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 NavigationManager
 
 #line default
@@ -258,7 +274,7 @@ NavigationManager
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (2,9)-(2,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (3,9)-(3,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 IJSRuntime
 
 #line default
@@ -266,7 +282,7 @@ IJSRuntime
 #nullable disable
          
 #nullable restore
-#line (2,20)-(2,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (3,20)-(3,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 JsRuntime
 
 #line default

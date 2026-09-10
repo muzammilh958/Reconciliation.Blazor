@@ -15,4 +15,5 @@ public class MenuItemDto
     public string? sectionTitle { get; set; }
     public string? url { get; set; }   // FIX
     public List<MenuItemDto> children { get; set; } = new();
+    public string? Role { get; set; } 
 }

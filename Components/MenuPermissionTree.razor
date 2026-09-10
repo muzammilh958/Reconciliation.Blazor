@@ -1,0 +1,69 @@
+﻿@using Reconciliation.Blazor.Models
+
+<div class="menu-tree">
+
+    @foreach (var menu in Menus)
+    {
+        <div class="menu-item">
+
+            <div class="d-flex align-items-center gap-2">
+
+                @if (menu.children.Any())
+                {
+                    <button type="button"
+                            class="btn btn-sm btn-link p-0"
+                            @onclick="() => ToggleMenu(menu.id)">
+                        @(ExpandedMenus.Contains(menu.id) ? "▼" : "▶")
+                    </button>
+                }
+                else
+                {
+                    <span style="width:20px;"></span>
+                }
+
+                <input type="checkbox"
+                       class="form-check-input"
+                       checked="@menu.hasPermission"
+                       @onclick="() => OnMenuClicked.InvokeAsync(menu.id)" />
+
+                <span>@menu.title</span>
+
+            </div>
+
+            @if (menu.children.Any() &&
+                 ExpandedMenus.Contains(menu.id))
+            {
+                <div class="ms-4">
+
+                    <MenuPermissionTree
+                        Menus="menu.children"
+                        ExpandedMenus="ExpandedMenus"
+                        OnMenuClicked="OnMenuClicked" />
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public List<MenuPermissionDto> Menus { get; set; } = new();
+
+    [Parameter]
+    public HashSet<int> ExpandedMenus { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<int> OnMenuClicked { get; set; }
+
+    private void ToggleMenu(int menuId)
+    {
+        if (!ExpandedMenus.Add(menuId))
+        {
+            ExpandedMenus.Remove(menuId);
+        }
+    }
+}

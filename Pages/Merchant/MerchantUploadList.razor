@@ -49,6 +49,9 @@
                                     <th>From Date</th>
                                     <th>To Date</th>
                                     <th>Row Count</th>
+                                    <th>Error Rows</th>
+                                    <th>Import Rows</th>
+                                    <th>Import Status</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -58,10 +61,26 @@
                                     <tr>
                                         <td>@merchantUpload.batch.name</td>
                                         <td>@merchantUpload.payment.name</td>
-                                       <td>@merchantUpload.fromDate.ToString("dd-MM-yyyy")</td>
+                                        <td>@merchantUpload.fromDate.ToString("dd-MM-yyyy")</td>
                                         <td>@merchantUpload.toDate.ToString("dd-MM-yyyy") </td>
                                         <td>@merchantUpload.rowCount</td>
-                                       
+                                        <td>@merchantUpload.errorCount</td>
+                                        <td>@(merchantUpload.rowCount - merchantUpload.errorCount)</td>
+                                        <td>
+                                             @if (merchantUpload.importStatus == "PartialError")
+                                            {
+                                                <span class="badge badge-label badge-soft-warning">Partial Error</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-label badge-soft-success">Success</span>
+                                            }
+                                            
+                                        
+                                        </td>
+
+
+                                      
                                         <td class="text-end">
                                             <button 
                                             class="btn btn-sm btn-success"

@@ -1,0 +1,114 @@
+/* =========================================================
+   TOPBAR LOGO
+   ========================================================= */
+
+.logo-topbar {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.logo-topbar a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo-topbar .logo-lg {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.logo-topbar .logo-sm {
+    display: none;
+}
+
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+@media (min-width: 1200px) {
+
+    .logo-topbar {
+        width: 260px;
+        min-width: 260px;
+        height: 100px;
+    }
+
+    .logo-topbar .logo-lg {
+        font-size: 16px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (min-width: 768px) and (max-width: 1199px) {
+
+    .logo-topbar {
+        width: 210px;
+        min-width: 210px;
+        height: 70px;
+    }
+
+    .logo-topbar .logo-lg {
+        font-size: 14px;
+        line-height: 1.2;
+        white-space: normal;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .logo-topbar {
+        width: auto;
+        min-width: 0;
+        height: 56px;
+        flex-shrink: 1;
+    }
+
+    .logo-topbar .logo-lg {
+        display: none;
+    }
+
+    .logo-topbar .logo-sm {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 1px;
+
+        width: 42px;
+        height: 42px;
+    }
+
+    .logo-topbar .logo-sm img {
+        max-width: 38px;
+        max-height: 38px;
+        object-fit: contain;
+    }
+}
+
+.topbar-left {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.topbar-left .sidenav-toggle-button {
+    flex-shrink: 0;
+}

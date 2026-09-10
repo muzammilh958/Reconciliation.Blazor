@@ -47,6 +47,9 @@ namespace Reconciliation.Blazor.Core.Endpoints
         public static class Menu
         {
             public static string GetAll => Base + "/Menu/structure";
+            public static string GetRoleMenuPermissions => Base + "/MenuPermissions/permissions/role/";
+            public static string GetRoles => Base + "/MenuPermissions/roles";
+            public static string SetPermissions => Base + "/MenuPermissions/set-permissions";
 
         }
 

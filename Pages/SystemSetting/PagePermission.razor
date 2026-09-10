@@ -1,0 +1,297 @@
+﻿@page "/page/permission"
+
+@using System.Text.Json
+@using Reconciliation.Blazor.Models
+@inject IMenuService MenuService
+@inject TokenServices TokenServices
+@inject NavigationManager Nav
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    Page Permission
+                </h5>
+            </div>
+
+            <div class="card-body">
+                @if (showAlert)
+                {
+                    <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                        @alertMessage
+                        <button type="button" class="btn-close" @onclick="() => showAlert = false"></button>
+                    </div>
+                }
+
+              
+                @if (!IsLoading){
+                        <div class="mb-3">
+                        <label class="form-label">Select Role</label>
+                        <select class="form-select" @bind="SelectedRoleId" @bind:after="OnRoleChanged">
+                            <option value="">-- Select a role --</option>
+                            @foreach (var role in Roles)
+                            {
+                                <option value="@role.Id">@role.Name</option>
+                            }
+                        </select>
+                    </div>
+                }
+                @if (IsLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                        <div class="mt-2">Loading Page Permissions...</div>
+                    </div>
+                }
+               
+                else
+                {
+                    
+                  
+                    <MenuPermissionTree Menus="Menus" ExpandedMenus="ExpandedMenus" OnMenuClicked="OnMenuClicked" />
+                }
+
+          
+                <div class="col-12">
+                    <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
+                            Cancel
+                        </button>
+                        <button class="btn btn-primary btn-sm" @onclick="submitted" type="submit"
+                                disabled="@isPostingLoading">
+                            @if (isPostingLoading)
+                            {
+                                <span>Saving...</span>
+                            }
+                            else
+                            {
+                                <span>Save</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<RoleDto> Roles = [];
+    private List<MenuPermissionDto> Menus = [];
+    private HashSet<int> ExpandedMenus = [];
+
+    private string SelectedUserId = "";
+    private string SelectedRoleId = "";
+    
+    private bool IsLoading;
+    private bool isPostingLoading = false;
+    private List<UserDto> Users = new();
+    private bool showAlert = false;
+    private string alertMessage = "";
+    private string alertType = "success";
+
+   
+
+    private async Task OnUserChanged()
+    {
+        if (string.IsNullOrEmpty(SelectedUserId))
+        {
+            Menus.Clear();
+            return;
+        }
+
+        await LoadMenus();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+      
+        await LoadRoles();
+    }
+
+    private async Task LoadRoles()
+    {
+        try
+        {
+            Roles = await MenuService.GetAllRolesAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load roles", "danger");
+        }
+    }
+    private async Task OnRoleChanged()
+    {
+        if (string.IsNullOrEmpty(SelectedRoleId))
+        {
+            Menus.Clear();
+            return;
+        }
+
+        await LoadMenus();
+    }
+
+
+    private async Task LoadMenus()
+    {
+        IsLoading = true;
+        showAlert = false; // Reset alert before loading
+
+        try
+        {
+            Menus = await MenuService.GetRoleMenuPermissionsAsync(SelectedRoleId);
+            @* Users = await MenuService.GetAllUsersAsync(); *@
+            ExpandedMenus.Clear();
+
+            // Optional: expand top-level menus
+            foreach (var menu in Menus)
+            {
+                ExpandedMenus.Add(menu.id);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("Failed to load data", "danger");
+            
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged(); // Ensure UI updates after loading completes
+        }
+    }
+    private async Task submitted()
+    {
+        isPostingLoading = true;
+        showAlert = false; // Reset alert before submission
+
+        try
+        {
+            if (string.IsNullOrEmpty(SelectedRoleId))
+            {
+                ShowAlert("Please select a role first", "danger");
+                return;
+            }
+            var menuItemIds = GetMenuIdsWithPermission(Menus);
+
+            // Create request object
+            var request = new SetPermissionsRequest
+            {
+                RoleId = SelectedRoleId,
+                MenuItemIds = menuItemIds
+            };
+
+            // Call the API
+            var result = await MenuService.SetPermissionsAsync(request);
+        
+            if (result.success)
+            {
+                ShowAlert(result.message ?? "Permissions updated successfully", "success");
+            }
+            else
+            {
+                ShowAlert(result.message ?? "Failed to update permissions", "danger");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            ShowAlert("An error occurred while updating permissions", "danger");
+        }
+        finally
+        {
+            isPostingLoading = false;
+            StateHasChanged(); // Ensure UI updates after submission completes
+        }
+    }
+
+    private List<int> GetMenuIdsWithPermission(List<MenuPermissionDto> menus)
+    {
+        var menuIds = new List<int>();
+    
+        foreach (var menu in menus)
+        {
+             var childIds = menu.children.Any()
+            ? GetMenuIdsWithPermission(menu.children)
+            : new List<int>();
+
+            if (menu.hasPermission || childIds.Any())
+            {
+                menuIds.Add(menu.id);
+            }
+            menuIds.AddRange(childIds);
+           
+        }
+    
+        return menuIds;
+    }
+    private async Task OnMenuClicked(int menuId)
+    {
+        var menu = FindMenu(Menus, menuId);
+
+        if (menu == null)
+            return;
+
+        var newValue = !menu.hasPermission;
+
+        SetPermission(menu, newValue);
+
+        UpdateParentPermissions(Menus);
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private static MenuPermissionDto? FindMenu(List<MenuPermissionDto> menus, int menuId)
+    {
+        foreach (var menu in menus)
+        {
+            if (menu.id == menuId)
+                return menu;
+
+            if (menu.children.Any())
+            {
+                var result = FindMenu(menu.children, menuId);
+
+                if (result != null)
+                    return result;
+            }
+        }
+
+        return null;
+    }
+
+    private static void SetPermission(MenuPermissionDto menu, bool permission)
+    {
+        menu.hasPermission = permission;
+        foreach (var child in menu.children)
+        {
+            SetPermission(child, permission);
+        }
+    }
+    private static void UpdateParentPermissions(List<MenuPermissionDto> menus)
+    {
+        foreach (var menu in menus)
+        {
+            if (menu.children.Any())
+            {
+                UpdateParentPermissions(menu.children);
+
+                menu.hasPermission = menu.children.All(x => x.hasPermission);
+            }
+        }
+    }
+    private void ShowAlert(string message, string type = "success")
+    {
+        alertMessage = message;
+        alertType = type;
+        showAlert = true;
+        StateHasChanged();
+    }
+    private void Cancel()
+    {
+        
+    }
+}

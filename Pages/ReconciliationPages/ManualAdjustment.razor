@@ -336,10 +336,8 @@
                 _formFileUploadModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
                 await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
                 await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
-
                 await JsRuntime.InvokeVoidAsync("loadConfig");
                 await JsRuntime.InvokeVoidAsync("loadApps");
-
                 await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
 
             }

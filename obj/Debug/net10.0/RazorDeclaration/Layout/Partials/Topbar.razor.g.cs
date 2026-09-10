@@ -125,7 +125,7 @@ using Reconciliation.Blazor.Models.Auth;
         }
         #pragma warning restore 1998
 #nullable restore
-#line (133,8)-(169,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+#line (111,8)-(147,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
 
     [Inject]
     public required IJSRuntime JsRuntime { get; set; }
@@ -169,7 +169,7 @@ using Reconciliation.Blazor.Models.Auth;
 #nullable disable
 
 #nullable restore
-#line (169,64)-(181,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+#line (147,64)-(159,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
 
         await JsRuntime.InvokeVoidAsync("toggleSidebar");
 
@@ -189,7 +189,7 @@ using Reconciliation.Blazor.Models.Auth;
 #nullable disable
 
 #nullable restore
-#line (182,11)-(196,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
+#line (160,11)-(174,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Topbar.razor"
 
         AppState.Clear();
         Nav.NavigateTo("/", forceLoad: true);

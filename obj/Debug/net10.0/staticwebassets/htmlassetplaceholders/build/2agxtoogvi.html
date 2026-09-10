@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reconciliation.Blazor</title>
     <base href="/" />
-    <link href="_framework/dotnet.zqjudcrxd0.js" rel="preload" as="script" fetchpriority="high" crossorigin="anonymous" integrity="sha256-e4zcgM94MPBLdcumG6CVfGugNmUy6JAcEn6kvV6GAUg=" />
+    <link href="_framework/dotnet.49tuxu6jyh.js" rel="preload" as="script" fetchpriority="high" crossorigin="anonymous" integrity="sha256-aPeNymViSACmdwaiN6I69ZKNNJA1cU8aJKdVo8vJzQc=" />
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/login.css" />
     <link rel="stylesheet" href="css/signup.css" />
     <link rel="stylesheet" href="css/site.css" />
@@ -44,9 +45,9 @@
   "imports": {
     "./_framework/Microsoft.DotNet.HotReload.WebAssembly.Browser.lib.module.js": "./_framework/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js",
     "./_framework/blazor.webassembly.js": "./_framework/blazor.webassembly.958z1vx7fr.js",
+    "./_framework/dotnet.js": "./_framework/dotnet.49tuxu6jyh.js",
     "./_framework/dotnet.native.js": "./_framework/dotnet.native.puryxhmhq9.js",
     "./_framework/dotnet.runtime.js": "./_framework/dotnet.runtime.web2r9gqbh.js",
-    "./_framework/dotnet.js": "./_framework/dotnet.zqjudcrxd0.js",
     "./css/datatables/buttons.bootstrap5.min.js": "./css/datatables/buttons.bootstrap5.min.l6sf9bviwo.js",
     "./css/datatables/buttons.html5.min.js": "./css/datatables/buttons.html5.min.aumqzo8v12.js",
     "./css/datatables/buttons.print.min.js": "./css/datatables/buttons.print.min.izkmabkjh3.js",
@@ -235,12 +236,12 @@
     "./_framework/Microsoft.DotNet.HotReload.WebAssembly.Browser.lib.module.js": "sha256-A8e6zZwhOqf7lDQqbbCYcAUv4wGE9aQxOo4WyYxR//0=",
     "./_framework/blazor.webassembly.958z1vx7fr.js": "sha256-A59Tr9HqEhHMu8kU7kruLI9ayw5MRS6Lvc6z7jCbghk=",
     "./_framework/blazor.webassembly.js": "sha256-A59Tr9HqEhHMu8kU7kruLI9ayw5MRS6Lvc6z7jCbghk=",
-    "./_framework/dotnet.js": "sha256-e4zcgM94MPBLdcumG6CVfGugNmUy6JAcEn6kvV6GAUg=",
+    "./_framework/dotnet.49tuxu6jyh.js": "sha256-aPeNymViSACmdwaiN6I69ZKNNJA1cU8aJKdVo8vJzQc=",
+    "./_framework/dotnet.js": "sha256-aPeNymViSACmdwaiN6I69ZKNNJA1cU8aJKdVo8vJzQc=",
     "./_framework/dotnet.native.js": "sha256-gQbHHzCnWx8iDOC65EKbql7bEltJkfao7lmkAbIRajw=",
     "./_framework/dotnet.native.puryxhmhq9.js": "sha256-gQbHHzCnWx8iDOC65EKbql7bEltJkfao7lmkAbIRajw=",
     "./_framework/dotnet.runtime.js": "sha256-SOUHEQ3FhDAibBSR2u90NWZpoBjPuWRmH0BAATUlhJU=",
     "./_framework/dotnet.runtime.web2r9gqbh.js": "sha256-SOUHEQ3FhDAibBSR2u90NWZpoBjPuWRmH0BAATUlhJU=",
-    "./_framework/dotnet.zqjudcrxd0.js": "sha256-e4zcgM94MPBLdcumG6CVfGugNmUy6JAcEn6kvV6GAUg=",
     "./css/datatables/buttons.bootstrap5.min.js": "sha256-bWE6hOgMQBByo0TH+wpTRa/AF7v1dGPfkS8dT4IBAWM=",
     "./css/datatables/buttons.bootstrap5.min.l6sf9bviwo.js": "sha256-bWE6hOgMQBByo0TH+wpTRa/AF7v1dGPfkS8dT4IBAWM=",
     "./css/datatables/buttons.html5.min.aumqzo8v12.js": "sha256-3mbBrdKCQba4hh3ooXHzLGV9oxqTqQmQlItbVLad72c=",
@@ -613,40 +614,47 @@
 
 <body>
     <div id="app">
-       
-        <div class="app-loader">
 
-            <div class="loader-container">
+    <div class="app-loader">
 
-                <div class="loader-brand">
+        <div class="loader-content">
 
-                    <img src="images/logos/logo-reconciliation.png" alt="Reconciliation Logo">
-
-                    <div class="brand-text">
-                        <h2>Reconciliation</h2>
-                        <span>Financial Management Platform</span>
-                    </div>
-
+            <!-- Brand -->
+            <div class="loader-brand">
+                <div class="loader-logo">
+                    <img src="images/logos/logo-reconciliation.png"
+                         alt="Reconciliation Management System">
                 </div>
 
-                <div class="loader-animation">
-                    <div class="spinner-ring"></div>
+                <div class="loader-title">
+                    <h2>Reconciliation</h2>
+                    <span>Management System</span>
                 </div>
+            </div>
 
-                <div class="loader-message">
-                    <h5>Loading Application</h5>
-                    <p>Please wait while we securely prepare your workspace...</p>
-                </div>
+            <!-- Loading -->
+            <div class="loader-status">
 
                 <div class="loader-progress">
                     <div class="loader-progress-bar"></div>
                 </div>
 
+                <div class="loader-text">
+                    <span>Preparing your workspace</span>
+                    <span class="loader-dots">
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                    </span>
+                </div>
+
             </div>
 
         </div>
+
     </div>
 
+</div>
 
     <script src="_framework/blazor.webassembly.958z1vx7fr.js"></script>
     <script src="./js/config.js"></script>

@@ -134,6 +134,7 @@
         {
             isLoading = true;
             batchDataDTOs = await BatchesService.GetAllAsync() ?? new List<Models.Batch.BatchDataDTO>();
+            dataReady = true;
         }
         catch (Exception ex)
         {
@@ -226,7 +227,7 @@
                 await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
                 await JsRuntime.InvokeVoidAsync("loadConfig");
                 await JsRuntime.InvokeVoidAsync("loadApps");
-                await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
+                @* await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper); *@
             }
             catch (Exception ex)
             {
@@ -239,6 +240,10 @@
             dataReady = false;
             try
             {
+                   await JsRuntime.InvokeVoidAsync(
+                "initMerchantSelect2",
+                _dotNetHelper
+            );
                 if (_dataTableModule != null)
                 {
                     await _dataTableModule.InvokeVoidAsync(

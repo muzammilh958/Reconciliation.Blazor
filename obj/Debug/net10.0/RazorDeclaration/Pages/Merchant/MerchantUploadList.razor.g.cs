@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (96,8)-(221,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
+#line (115,8)-(240,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
 
     // ======================== STATE VARIABLES ========================
     private bool isLoading = false;
@@ -263,7 +263,7 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (277,9)-(417,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
+#line (296,9)-(436,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
 
 
     private void CloseDetailView()

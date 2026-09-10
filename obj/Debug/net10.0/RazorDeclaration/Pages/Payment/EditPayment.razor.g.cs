@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (138,8)-(229,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\EditPayment.razor"
+#line (144,8)-(235,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\EditPayment.razor"
 
     [Parameter]
     public int Id { get; set; }

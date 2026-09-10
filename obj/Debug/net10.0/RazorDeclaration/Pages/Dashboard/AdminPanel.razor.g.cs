@@ -123,14 +123,6 @@ using Microsoft.AspNetCore.Components
 #line hidden
 #nullable disable
 
-#nullable restore
-#line (8,12)-(8,40) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
-[Authorize(Roles = "Admin")]
-
-#line default
-#line hidden
-#nullable disable
-
     [global::Microsoft.AspNetCore.Components.LayoutAttribute(typeof(
 #nullable restore
 #line (3,9)-(3,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"

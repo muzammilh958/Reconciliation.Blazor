@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (92,8)-(254,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"
+#line (92,8)-(230,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"
 
     private bool showAlert = false;
     private bool isException = false;
@@ -176,6 +176,7 @@ using Reconciliation.Blazor.Layout.Partials
         {
             isLoading = true;
             batchDataDTOs = await BatchesService.GetAllAsync() ?? new List<Models.Batch.BatchDataDTO>();
+            dataReady = true;
         }
         catch (Exception ex)
         {
@@ -268,7 +269,15 @@ using Reconciliation.Blazor.Layout.Partials
                 await JsRuntime.InvokeVoidAsync("loadFormFileUpload");
                 await JsRuntime.InvokeVoidAsync("loadConfig");
                 await JsRuntime.InvokeVoidAsync("loadApps");
-                await JsRuntime.InvokeVoidAsync("initMerchantSelect2", _dotNetHelper);
+                
+
+#line default
+#line hidden
+#nullable disable
+
+#nullable restore
+#line (230,93)-(259,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"
+
             }
             catch (Exception ex)
             {
@@ -281,6 +290,10 @@ using Reconciliation.Blazor.Layout.Partials
             dataReady = false;
             try
             {
+                   await JsRuntime.InvokeVoidAsync(
+                "initMerchantSelect2",
+                _dotNetHelper
+            );
                 if (_dataTableModule != null)
                 {
                     await _dataTableModule.InvokeVoidAsync(

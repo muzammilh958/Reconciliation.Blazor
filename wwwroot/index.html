@@ -9,6 +9,7 @@
     <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/login.css" />
     <link rel="stylesheet" href="css/signup.css" />
     <link rel="stylesheet" href="css/site.css" />
@@ -51,40 +52,47 @@
 
 <body>
     <div id="app">
-       
-        <div class="app-loader">
 
-            <div class="loader-container">
+    <div class="app-loader">
 
-                <div class="loader-brand">
+        <div class="loader-content">
 
-                    <img src="images/logos/logo-reconciliation.png" alt="Reconciliation Logo">
-
-                    <div class="brand-text">
-                        <h2>Reconciliation</h2>
-                        <span>Financial Management Platform</span>
-                    </div>
-
+            <!-- Brand -->
+            <div class="loader-brand">
+                <div class="loader-logo">
+                    <img src="images/logos/logo-reconciliation.png"
+                         alt="Reconciliation Management System">
                 </div>
 
-                <div class="loader-animation">
-                    <div class="spinner-ring"></div>
+                <div class="loader-title">
+                    <h2>Reconciliation</h2>
+                    <span>Management System</span>
                 </div>
+            </div>
 
-                <div class="loader-message">
-                    <h5>Loading Application</h5>
-                    <p>Please wait while we securely prepare your workspace...</p>
-                </div>
+            <!-- Loading -->
+            <div class="loader-status">
 
                 <div class="loader-progress">
                     <div class="loader-progress-bar"></div>
                 </div>
 
+                <div class="loader-text">
+                    <span>Preparing your workspace</span>
+                    <span class="loader-dots">
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                    </span>
+                </div>
+
             </div>
 
         </div>
+
     </div>
 
+</div>
 
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
     <script src="./js/config.js"></script>
