@@ -130,14 +130,27 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (197,8)-(255,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\AddUser.razor"
+#line (109,8)-(214,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\AddUser.razor"
 
     private bool isLoading = false;
 
     private CreateUserDto Model = new();
     private List<RolesDto>? roles = new();
     private string selectedRole = "";
+
+    private string _selectedBatchId = "";
+    private string SelectedBatchId
+    {
+        get => _selectedBatchId;
+        set => _selectedBatchId = value;
+    }
+
     private List<string> errors = new();
+     // --- Added for Select2 ---
+    private DotNetObjectReference<AddUser>? _dotNetRef; // TODO: replace "AddUser" with your actual @code class name
+    private bool _select2Initialized = false;
+    // --------------------------
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -150,6 +163,30 @@ using Reconciliation.Blazor.Layout.Partials
             Console.WriteLine($"Error loading roles: {ex.Message}");
             roles = new List<RolesDto>();
         }
+    }
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+        }
+
+        // --- Added for Select2 ---
+        if (!_select2Initialized && roles != null && roles.Any())
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initUserSelect2", _dotNetRef);
+            _select2Initialized = true;
+        }
+        // --------------------------
     }
     private async Task HandleSubmit()
     {
@@ -189,11 +226,39 @@ using Reconciliation.Blazor.Layout.Partials
     {
         Nav.NavigateTo("/UserList");
     }
+    public void Dispose()
+    {
+        _dotNetRef?.Dispose();
+    }
+    [JSInvokable]
+    public void OnRoleSelected(string roleName)
+    {
+        selectedRole = roleName;
+        StateHasChanged();
+    }
 
 #line default
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (5,9)-(5,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\AddUser.razor"
+IJSRuntime
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (5,20)-(5,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\AddUser.razor"
+JsRuntime
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (3,9)-(3,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\AddUser.razor"

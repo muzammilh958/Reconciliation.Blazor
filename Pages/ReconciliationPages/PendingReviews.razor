@@ -5,12 +5,14 @@
 @inject IPendingReviewsServices PendingReviewsServices
 @inject IJSRuntime JsRuntime;
 
+@inject MenuNavigationService MenuNavigationService
+
 <div class="row">
     <div class="col-12">
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h3 class="mb-0 fw-semibold">Pending Review</h3>
+                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.GetMenu()</h3>
                     <small class="text-muted">Manage Manual Reconciliation Pending Requests</small>
                 </div>
             </div>

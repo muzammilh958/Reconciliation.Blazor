@@ -134,12 +134,12 @@ IDisposable
         }
         #pragma warning restore 1998
 #nullable restore
-#line (135,8)-(213,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (134,8)-(168,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 
     private List<MenuItemDto> menus = new();
     private string? userRole;
     private IJSObjectReference? _module;
-
+    private string currentTitle = "";
     protected override async Task OnInitializedAsync()
     {
         // Get user role
@@ -169,7 +169,20 @@ IDisposable
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        InvokeAsync(StateHasChanged);
+        
+
+#line default
+#line hidden
+#nullable disable
+
+#nullable restore
+#line (168,44)-(239,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+
+         InvokeAsync(() =>
+        {
+            currentTitle = FindTitleForCurrentPath();
+            StateHasChanged();
+        });
     }
 
     private string CurrentPath
@@ -214,13 +227,35 @@ IDisposable
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
 
+    private string FindTitleForCurrentPath()
+    {
+        foreach (var menu in menus)
+        {
+            if (IsActive(menu.url))
+                return menu.title;
+
+            if (menu.children != null)
+            {
+                var match = menu.children.FirstOrDefault(c => IsActive(c.url));
+                if (match != null)
+                    return match.title;
+            }
+        }
+        return "Reconciliation Management System";
+    }
+
+    private void OpenMenu(MenuItemDto submenu)
+    {
+        MenuNavigationService.SetMenu(submenu.title!);
+    }
+
 #line default
 #line hidden
 #nullable disable
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (6,9)-(6,36) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (7,9)-(7,36) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 AuthenticationStateProvider
 
 #line default
@@ -228,8 +263,26 @@ AuthenticationStateProvider
 #nullable disable
          
 #nullable restore
-#line (6,37)-(6,49) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (7,37)-(7,49) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 AuthProvider
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (6,9)-(6,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (6,31)-(6,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+MenuNavigationService
 
 #line default
 #line hidden

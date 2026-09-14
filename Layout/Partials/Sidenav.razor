@@ -3,7 +3,9 @@
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 @inject IMenuService MenuService
+@inject MenuNavigationService MenuNavigationService
 @inject AuthenticationStateProvider AuthProvider
+
 
 <div class="sidenav-menu">
     <a href="/dashboard" class="logo">
@@ -40,10 +42,7 @@
                 </div>
                 <div>
                     <a class="dropdown-toggle drop-arrow-none link-reset sidenav-user-set-icon"
-                       data-bs-toggle="dropdown"
-                       data-bs-offset="0,12"
-                       href="#!"
-                       aria-haspopup="false"
+                       data-bs-toggle="dropdown" data-bs-offset="0,12" href="#!" aria-haspopup="false"
                        aria-expanded="false">
                         <i class="ti ti-settings fs-24 align-middle ms-1"></i>
                     </a>
@@ -89,15 +88,16 @@
 
                 <li class="side-nav-title">@menu.sectionTitle</li>
                 <li class="side-nav-item">
-                    <a data-bs-toggle="collapse" 
-                       href="#@collapseId" 
-                       aria-expanded="@(parentActive ? "true" : "false")" 
-                       aria-controls="@collapseId" 
-                       class="side-nav-link @(parentActive ? "active" : "")">
+                    <a data-bs-toggle="collapse" href="#@collapseId" aria-expanded="@(parentActive ? "true" : "false")"
+                       aria-controls="@collapseId" class="side-nav-link @(parentActive ? "active" : "")">
                         <span class="menu-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="inbox" class="lucide lucide-inbox">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 data-lucide="inbox" class="lucide lucide-inbox">
                                 <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
-                                <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                                <path
+                                    d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z">
+                                </path>
                             </svg>
                         </span>
                         <span class="menu-text">@menu.title</span>
@@ -116,8 +116,7 @@
                                     <li class="side-nav-item @(IsActive(submenu.url) ? "active" : "")">
                                         @if (!string.IsNullOrWhiteSpace(submenu.url))
                                         {
-                                            <a href="@submenu.url" 
-                                               class="side-nav-link @(IsActive(submenu.url) ? "active" : "")">
+                                            <a href="@submenu.url"   @onclick="() => OpenMenu(submenu)" class="side-nav-link @(IsActive(submenu.url) ? "active" : "")">
                                                 <span class="menu-text">@submenu.title</span>
                                             </a>
                                         }
@@ -136,7 +135,7 @@
     private List<MenuItemDto> menus = new();
     private string? userRole;
     private IJSObjectReference? _module;
-
+    private string currentTitle = "";
     protected override async Task OnInitializedAsync()
     {
         // Get user role
@@ -166,7 +165,12 @@
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        InvokeAsync(StateHasChanged);
+        @* InvokeAsync(StateHasChanged); *@
+         InvokeAsync(() =>
+        {
+            currentTitle = FindTitleForCurrentPath();
+            StateHasChanged();
+        });
     }
 
     private string CurrentPath
@@ -209,5 +213,27 @@
     public void Dispose()
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private string FindTitleForCurrentPath()
+    {
+        foreach (var menu in menus)
+        {
+            if (IsActive(menu.url))
+                return menu.title;
+
+            if (menu.children != null)
+            {
+                var match = menu.children.FirstOrDefault(c => IsActive(c.url));
+                if (match != null)
+                    return match.title;
+            }
+        }
+        return "Reconciliation Management System";
+    }
+
+    private void OpenMenu(MenuItemDto submenu)
+    {
+        MenuNavigationService.SetMenu(submenu.title!);
     }
 }

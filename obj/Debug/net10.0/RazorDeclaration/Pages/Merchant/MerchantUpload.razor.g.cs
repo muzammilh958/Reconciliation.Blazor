@@ -123,7 +123,7 @@ using Reconciliation.Blazor.Layout.Partials
     #nullable restore
     public partial class MerchantUpload : global::Microsoft.AspNetCore.Components.ComponentBase, 
 #nullable restore
-#line (111,13)-(111,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
+#line (112,13)-(112,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
 IDisposable
 
 #line default
@@ -138,7 +138,7 @@ IDisposable
         }
         #pragma warning restore 1998
 #nullable restore
-#line (113,8)-(351,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
+#line (114,8)-(352,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
 
     private List<byte[]> fileBytes = new();
     private List<string> fileNames = new();
@@ -382,6 +382,24 @@ IDisposable
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (8,9)-(8,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (8,31)-(8,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (7,9)-(7,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"

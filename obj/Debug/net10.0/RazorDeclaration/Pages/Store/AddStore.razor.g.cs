@@ -130,13 +130,12 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (64,8)-(125,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\AddStore.razor"
+#line (58,8)-(115,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\AddStore.razor"
 
     private StoreDTO model = new();
     private bool isLoading = false;
     private string? message;
     private bool isSuccess;
-
     private bool showMessage;
     private string messageText = "";
     private string messageClass = "";
@@ -153,12 +152,9 @@ using Reconciliation.Blazor.Layout.Partials
 
             if (isSuccess)
             {
-                await ShowMessage(
-          result.message ?? "Store deleted successfully.",
-          "alert-success"
-      );
+                await ShowMessage( result.message ?? "Store deleted successfully.",  "alert-success" );
                 await Task.Delay(1500);
-                // optional redirect
+              
                 Nav.NavigateTo("/store/list");
             }
         }
@@ -197,6 +193,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (6,9)-(6,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\AddStore.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (6,31)-(6,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\AddStore.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (4,9)-(4,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\AddStore.razor"

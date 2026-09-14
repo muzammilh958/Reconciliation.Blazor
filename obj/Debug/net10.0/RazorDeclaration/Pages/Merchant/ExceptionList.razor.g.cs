@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (107,8)-(218,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
+#line (108,8)-(219,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
 
     private bool showAlert = false;
     private string alertMessage = "";
@@ -249,7 +249,7 @@ using Reconciliation.Blazor.Layout.Partials
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (7,9)-(7,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
+#line (8,9)-(8,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
 IJSRuntime
 
 #line default
@@ -257,8 +257,26 @@ IJSRuntime
 #nullable disable
          
 #nullable restore
-#line (7,20)-(7,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
+#line (8,20)-(8,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
 JsRuntime
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (7,9)-(7,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (7,31)-(7,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
+MenuNavigationService
 
 #line default
 #line hidden

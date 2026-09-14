@@ -155,21 +155,29 @@ public class MerchantService : IMerchantService
 
     public async Task<byte[]?> DownloadMerchantFile(int id)
     {
-        var token = await _tokenProvider.GetAccessTokenAsync();
+        try
+        {
+            var token = await _tokenProvider.GetAccessTokenAsync();
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"{ApiEndpoints.Merchant.Download}/{id}");
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"{ApiEndpoints.Merchant.Download}/{id}");
 
-        request.Headers.Authorization =
-            new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
 
-        var response = await _http.SendAsync(request);
+            var response = await _http.SendAsync(request);
 
-        if (!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            return await response.Content.ReadAsByteArrayAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"DownloadMerchantFile error: {ex.Message}");
             return null;
-
-        return await response.Content.ReadAsByteArrayAsync();
+        }
     }
 
     public async Task<TransactionLineResponse> GetAllTransactionLines(string id)

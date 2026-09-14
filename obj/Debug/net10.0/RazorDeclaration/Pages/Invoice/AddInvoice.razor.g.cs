@@ -199,6 +199,24 @@ using Reconciliation.Blazor.Layout.Partials
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
+#line (5,9)-(5,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\AddInvoice.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (5,31)-(5,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\AddInvoice.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
 #line (4,9)-(4,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\AddInvoice.razor"
 NavigationManager
 

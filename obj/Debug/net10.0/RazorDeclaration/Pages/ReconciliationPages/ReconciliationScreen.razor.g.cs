@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (314,8)-(637,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
+#line (311,8)-(634,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
 
 
     private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
@@ -461,7 +461,25 @@ using Reconciliation.Blazor.Layout.Partials
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (9,9)-(9,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
+#line (6,9)-(6,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (6,31)-(6,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (5,9)-(5,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
 IJSRuntime
 
 #line default
@@ -469,7 +487,7 @@ IJSRuntime
 #nullable disable
          
 #nullable restore
-#line (9,20)-(9,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
+#line (5,20)-(5,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
 JsRuntime
 
 #line default
@@ -479,7 +497,7 @@ JsRuntime
          = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (7,9)-(7,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
+#line (4,9)-(4,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
 NavigationManager
 
 #line default
@@ -487,26 +505,8 @@ NavigationManager
 #nullable disable
          
 #nullable restore
-#line (7,27)-(7,44) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
+#line (4,27)-(4,44) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
 NavigationManager
-
-#line default
-#line hidden
-#nullable disable
-         { get; set; }
-         = default!;
-        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
-#nullable restore
-#line (5,9)-(5,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
-IPaymentService
-
-#line default
-#line hidden
-#nullable disable
-         
-#nullable restore
-#line (5,25)-(5,39) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
-PaymentService
 
 #line default
 #line hidden
@@ -516,7 +516,7 @@ PaymentService
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (3,9)-(3,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
-IBatchesService
+IPaymentService
 
 #line default
 #line hidden
@@ -524,6 +524,24 @@ IBatchesService
          
 #nullable restore
 #line (3,25)-(3,39) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
+PaymentService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (2,9)-(2,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
+IBatchesService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (2,25)-(2,39) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ReconciliationScreen.razor"
 BatchesService
 
 #line default

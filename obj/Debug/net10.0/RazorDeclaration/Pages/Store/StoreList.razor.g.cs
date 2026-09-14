@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (100,8)-(236,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\StoreList.razor"
+#line (101,8)-(237,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\StoreList.razor"
 
     private List<StoreDTO> stores = new();
     private bool showDeleteDialog = false;
@@ -272,6 +272,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (7,9)-(7,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\StoreList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (7,31)-(7,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\StoreList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (5,9)-(5,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\StoreList.razor"

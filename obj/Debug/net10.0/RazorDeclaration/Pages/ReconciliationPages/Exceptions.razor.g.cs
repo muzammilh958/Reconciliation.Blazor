@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (92,8)-(230,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"
+#line (93,8)-(231,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"
 
     private bool showAlert = false;
     private bool isException = false;
@@ -276,7 +276,7 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (230,93)-(259,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"
+#line (231,93)-(260,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"
 
             }
             catch (Exception ex)
@@ -311,6 +311,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (6,9)-(6,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (6,31)-(6,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (5,9)-(5,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\Exceptions.razor"

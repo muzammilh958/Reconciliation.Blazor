@@ -1,6 +1,7 @@
 ﻿@page "/invoice/view-invoice-types"
 @inject IInvoiceTypeService invoiceService
 @inject NavigationManager Nav
+@inject MenuNavigationService MenuNavigationService
 @inject IJSRuntime JsRuntime;
 
 
@@ -17,7 +18,7 @@
             </div> *@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h3 class="mb-0 fw-semibold">Invoice Types</h3>
+                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.GetMenu()</h3>
                     <small class="text-muted">Manage Invoice Types</small>
                 </div>
 

@@ -70,10 +70,12 @@ namespace Reconciliation.Blazor
         }
 
 
-        private async Task<bool> ValidateTokenWithApi(string token)
+        public async Task<bool> ValidateTokenWithApi()
         {
             try
             {
+
+                var token = await _tokenServices.GetToken();
 
                 if (IsTokenExpiredLocally(token))
                 {

@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (137,8)-(347,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
+#line (139,8)-(349,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
 
     private List<PaymentData> Paymentes = new();
     private bool showDeleteDialog = false;
@@ -346,6 +346,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (7,9)-(7,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (7,31)-(7,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (5,9)-(5,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"

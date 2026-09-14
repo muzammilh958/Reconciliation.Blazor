@@ -196,21 +196,29 @@ public class InvoiceTypeService : IInvoiceTypeService
 
     public async Task<byte[]?> DownloadInvoiceFile(int id)
     {
-        var token = await _tokenProvider.GetAccessTokenAsync();
+        try
+        {
+            var token = await _tokenProvider.GetAccessTokenAsync();
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"{ApiEndpoints.Invoice.Download}/{id}");
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"{ApiEndpoints.Invoice.Download}/{id}");
 
-        request.Headers.Authorization =
-            new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
 
-        var response = await _http.SendAsync(request);
+            var response = await _http.SendAsync(request);
 
-        if (!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            return await response.Content.ReadAsByteArrayAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
             return null;
-
-        return await response.Content.ReadAsByteArrayAsync();
+        }
     }
 
    

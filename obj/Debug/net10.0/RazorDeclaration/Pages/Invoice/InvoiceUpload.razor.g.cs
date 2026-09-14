@@ -136,7 +136,7 @@ using System.Text.Json
         }
         #pragma warning restore 1998
 #nullable restore
-#line (87,8)-(116,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (88,8)-(117,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 
     private bool isLoading = true;
     private bool ispostLoading = false;
@@ -173,7 +173,7 @@ using System.Text.Json
 #nullable disable
 
 #nullable restore
-#line (117,64)-(291,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (118,64)-(292,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 
                 StateHasChanged();
             }
@@ -353,6 +353,24 @@ using System.Text.Json
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (11,9)-(11,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (11,31)-(11,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (9,9)-(9,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"

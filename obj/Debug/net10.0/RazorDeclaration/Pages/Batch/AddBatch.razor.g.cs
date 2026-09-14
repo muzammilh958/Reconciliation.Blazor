@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (84,8)-(145,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\AddBatch.razor"
+#line (90,8)-(151,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\AddBatch.razor"
 
     private Models.Batch.BatchDataDTO model = new();
     private bool isLoading = false;
@@ -159,7 +159,7 @@ using Reconciliation.Blazor.Layout.Partials
 
             if (isSuccess)
             {
-                await ShowMessage( result.message ?? "Batch deleted successfully.", "alert-success");
+                await ShowMessage(result!.message ?? "Batch created successfully.", "alert-success");
                 await Task.Delay(1500);
                 // optional redirect
                 Nav.NavigateTo("/batch/list");
@@ -197,6 +197,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (5,9)-(5,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\AddBatch.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (5,31)-(5,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\AddBatch.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (3,9)-(3,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\AddBatch.razor"

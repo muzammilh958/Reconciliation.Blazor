@@ -5,14 +5,15 @@
 
 @inject NavigationManager Navigation
 @inject IJSRuntime JsRuntime
+@inject MenuNavigationService MenuNavigationService
 
 <div class="row">
     <div class="col-12">
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h3 class="mb-0 fw-semibold">Payment</h3>
-                    <small class="text-muted">Upload Payment</small>
+                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.GetMenu()</h3>
+                    <small class="text-muted">Import Payment File</small>
                 </div>
             </div>
 

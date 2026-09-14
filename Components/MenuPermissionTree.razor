@@ -4,46 +4,48 @@
 
     @foreach (var menu in Menus)
     {
-        <div class="menu-item">
+        @if (!string.IsNullOrEmpty(menu.url?.ToString()) || menu.children.Any())
+        {
+            <div class="menu-item">
 
-            <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
 
-                @if (menu.children.Any())
+                    @if (menu.children.Any())
+                    {
+                        <button type="button"
+                        class="btn btn-sm btn-link p-0"
+                        @onclick="() => ToggleMenu(menu.id)">
+                            @(ExpandedMenus.Contains(menu.id) ? "▼" : "▶")
+                        </button>
+                    }
+                    else
+                    {
+                        <span style="width:20px;"></span>
+                    }
+
+                    <input type="checkbox"
+                    class="form-check-input"
+                    checked="@menu.hasPermission"
+                    @onclick="() => OnMenuClicked.InvokeAsync(menu.id)" />
+
+                    <span>@menu.title</span>
+
+                </div>
+
+                @if (menu.children.Any() && ExpandedMenus.Contains(menu.id))
                 {
-                    <button type="button"
-                            class="btn btn-sm btn-link p-0"
-                            @onclick="() => ToggleMenu(menu.id)">
-                        @(ExpandedMenus.Contains(menu.id) ? "▼" : "▶")
-                    </button>
-                }
-                else
-                {
-                    <span style="width:20px;"></span>
-                }
+                    <div class="ms-4">
 
-                <input type="checkbox"
-                       class="form-check-input"
-                       checked="@menu.hasPermission"
-                       @onclick="() => OnMenuClicked.InvokeAsync(menu.id)" />
-
-                <span>@menu.title</span>
-
-            </div>
-
-            @if (menu.children.Any() &&
-                 ExpandedMenus.Contains(menu.id))
-            {
-                <div class="ms-4">
-
-                    <MenuPermissionTree
+                        <MenuPermissionTree
                         Menus="menu.children"
                         ExpandedMenus="ExpandedMenus"
                         OnMenuClicked="OnMenuClicked" />
 
-                </div>
-            }
+                    </div>
+                }
 
-        </div>
+            </div>                
+        }
     }
 
 </div>

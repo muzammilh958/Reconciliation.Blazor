@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (115,8)-(240,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
+#line (116,8)-(241,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
 
     // ======================== STATE VARIABLES ========================
     private bool isLoading = false;
@@ -263,7 +263,7 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (296,9)-(436,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
+#line (297,9)-(437,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
 
 
     private void CloseDetailView()
@@ -409,6 +409,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (10,9)-(10,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (10,31)-(10,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (7,9)-(7,25) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"

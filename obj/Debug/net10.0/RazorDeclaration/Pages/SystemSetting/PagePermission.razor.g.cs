@@ -142,7 +142,7 @@ using Reconciliation.Blazor.Models
         }
         #pragma warning restore 1998
 #nullable restore
-#line (80,8)-(145,13) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\PagePermission.razor"
+#line (82,8)-(147,13) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\PagePermission.razor"
 
     private List<RoleDto> Roles = [];
     private List<MenuPermissionDto> Menus = [];
@@ -215,7 +215,7 @@ using Reconciliation.Blazor.Models
 #nullable disable
 
 #nullable restore
-#line (145,64)-(297,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\PagePermission.razor"
+#line (147,64)-(299,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\PagePermission.razor"
 
             ExpandedMenus.Clear();
 
@@ -373,6 +373,24 @@ using Reconciliation.Blazor.Models
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (9,9)-(9,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\PagePermission.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (9,31)-(9,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\PagePermission.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (7,9)-(7,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\PagePermission.razor"

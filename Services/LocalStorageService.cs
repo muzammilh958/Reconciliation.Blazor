@@ -41,9 +41,10 @@ namespace Reconciliation.Blazor.Services
             {
                 await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", key);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Silently fail if localStorage is not available
+                Console.WriteLine($"Error removing item from localStorage: {ex.Message}");
+               
             }
         }
 

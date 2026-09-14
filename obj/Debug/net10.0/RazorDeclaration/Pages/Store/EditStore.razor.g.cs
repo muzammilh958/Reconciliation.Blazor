@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (83,8)-(177,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\EditStore.razor"
+#line (84,8)-(178,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\EditStore.razor"
 
 
     private string messageText = "";
@@ -230,6 +230,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (7,9)-(7,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\EditStore.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (7,31)-(7,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\EditStore.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (5,9)-(5,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Store\EditStore.razor"

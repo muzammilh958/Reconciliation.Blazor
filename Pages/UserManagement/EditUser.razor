@@ -2,14 +2,16 @@
 @inject IUserService UserService
 @inject NavigationManager Nav
 @inject IJSRuntime JsRuntime
+@implements IDisposable
 
+@inject MenuNavigationService MenuNavigationService
 <div class="row">
     <div class="col-12">
         <div class="card">
 
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h3 class="mb-0 fw-semibold">Edit User</h3>
+                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.GetMenu()</h3>
                     <small class="text-muted">Update user details and permissions</small>
                 </div>
             </div>
@@ -44,7 +46,7 @@
                     
                         <div class="col-md-6">
                             <label class="form-label">Role</label>
-                            <select class="form-select" @bind="SelectedRole">
+                            <select id="roleSelect" class="form-select select2" @bind="SelectedRole">
                                 <option value="">-- Select a role --</option>
                                 @foreach (var role in AvailableRoles)
                                 {
@@ -84,6 +86,11 @@
     private bool isLoading = true;
     private bool hasError = false;
     private bool isSaving = false;
+     // --- Added for Select2 ---
+    private DotNetObjectReference<EditUser>? _dotNetRef; // TODO: replace "EditUser" with your actual @code class name
+    private bool _select2Initialized = false;
+    // --------------------------
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -125,6 +132,40 @@
             isLoading = false;
         }
     }
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+        }
+
+        // --- Added for Select2 ---
+        // Wait until roles have loaded AND the page is past the loading/error state,
+        // so the <select> has actually rendered its <option>s.
+        if (!_select2Initialized && !isLoading && !hasError && AvailableRoles.Any())
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initUserEditSelect2", _dotNetRef, SelectedRole);
+            _select2Initialized = true;
+        }
+        // --------------------------
+    }
+
+    [JSInvokable]
+    public void OnRoleSelected(string roleId)
+    {
+        SelectedRole = roleId;
+        StateHasChanged();
+    }
+
 
     private async Task SaveEdit()
     {
@@ -172,5 +213,9 @@
     private void Cancel()
     {
         Nav.NavigateTo("/users/list");
+    }
+     public void Dispose()
+    {
+        _dotNetRef?.Dispose();
     }
 }

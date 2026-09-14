@@ -6,16 +6,18 @@
 @inject TokenServices TokenServices
 @inject NavigationManager Nav
 
+@inject MenuNavigationService MenuNavigationService
 <div class="row">
     <div class="col-12">
         <div class="card">
 
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    Page Permission
-                </h5>
+           
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.GetMenu()</h3>
+                    <small class="text-muted">Manage Page Permissions</small>
+                </div>
             </div>
-
             <div class="card-body">
                 @if (showAlert)
                 {

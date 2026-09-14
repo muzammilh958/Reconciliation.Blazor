@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (202,8)-(318,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ManualAdjustment.razor"
+#line (203,8)-(319,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ManualAdjustment.razor"
 
 
     private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
@@ -254,7 +254,7 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (321,13)-(668,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ManualAdjustment.razor"
+#line (322,13)-(669,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ManualAdjustment.razor"
 
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -607,6 +607,24 @@ SelectedPaymentId, 1, 40);
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (8,9)-(8,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ManualAdjustment.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (8,31)-(8,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ManualAdjustment.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (6,9)-(6,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\ManualAdjustment.razor"

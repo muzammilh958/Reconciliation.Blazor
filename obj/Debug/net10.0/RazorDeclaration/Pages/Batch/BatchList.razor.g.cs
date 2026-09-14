@@ -136,7 +136,7 @@ using global::Reconciliation.Blazor.Models.Batch
         }
         #pragma warning restore 1998
 #nullable restore
-#line (108,8)-(111,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+#line (115,8)-(118,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
 
     private List<BatchDataDTO> batches = new();
     private bool showDeleteDialog = false;
@@ -147,7 +147,7 @@ using global::Reconciliation.Blazor.Models.Batch
 #nullable disable
 
 #nullable restore
-#line (111,47)-(241,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+#line (118,47)-(248,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
 
     private BatchDataDTO editModel = new();
     private int selectedBatchId;
@@ -283,6 +283,24 @@ using global::Reconciliation.Blazor.Models.Batch
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (8,9)-(8,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (8,31)-(8,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (6,9)-(6,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"

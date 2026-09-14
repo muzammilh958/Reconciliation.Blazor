@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (110,8)-(204,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"
+#line (100,8)-(194,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"
 
     private IJSObjectReference? _module;
     private List<UserDto> Users = new();
@@ -230,6 +230,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (6,9)-(6,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (6,31)-(6,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (4,9)-(4,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\UserList.razor"

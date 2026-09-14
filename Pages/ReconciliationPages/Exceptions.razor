@@ -3,13 +3,14 @@
 @inject IExceptions ExceptionsService
 @inject IJSRuntime JsRuntime
 @inject IBatchesService BatchesService
+@inject MenuNavigationService MenuNavigationService
 
 <div class="row">
     <div class="col-12">
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h3 class="mb-0 fw-semibold">Exceptions</h3>
+                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.GetMenu()</h3>
                     <small class="text-muted">Review, reconcile, and resolve unmatched transactions</small>
                 </div>
             </div>

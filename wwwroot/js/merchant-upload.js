@@ -80,3 +80,31 @@ window.openInvoiceModal = function (data) {
 
     modal.show();
 };
+
+window.initUserSelect2 = function (dotNetRef) {
+    $('#roleSelect').select2({
+        placeholder: "Select Role",
+        width: '100%'
+    }).on('change', function () {
+        const value = $(this).val();
+        dotNetRef.invokeMethodAsync('OnRoleSelected', value || "");
+    });
+};
+
+window.initUserEditSelect2 = function (dotNetRef, currentRoleId) {
+    const $select = $('#roleSelect').select2({
+        placeholder: "-- Select a role --",
+        width: '100%'
+    });
+
+    // Pre-select the user's current role, since Select2 needs to be told
+    // explicitly after taking over the native <select>
+    if (currentRoleId) {
+        $select.val(currentRoleId).trigger('change.select2');
+    }
+
+    $select.on('change', function () {
+        const value = $(this).val();
+        dotNetRef.invokeMethodAsync('OnRoleSelected', value || "");
+    });
+};

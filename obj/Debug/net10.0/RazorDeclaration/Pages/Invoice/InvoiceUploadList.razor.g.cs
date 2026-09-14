@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (101,8)-(194,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUploadList.razor"
+#line (102,8)-(195,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUploadList.razor"
 
     InvoiceUploadedList invoiceUploadedList = new InvoiceUploadedList();
     private bool isLoading = true;
@@ -229,6 +229,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (5,9)-(5,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUploadList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (5,31)-(5,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUploadList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (4,9)-(4,28) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUploadList.razor"

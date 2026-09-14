@@ -121,7 +121,15 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
     )]
     #nullable restore
-    public partial class EditUser : global::Microsoft.AspNetCore.Components.ComponentBase
+    public partial class EditUser : global::Microsoft.AspNetCore.Components.ComponentBase, 
+#nullable restore
+#line (5,13)-(5,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\EditUser.razor"
+IDisposable
+
+#line default
+#line hidden
+#nullable disable
+
     #nullable disable
     {
         #pragma warning disable 1998
@@ -130,7 +138,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (77,8)-(176,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\EditUser.razor"
+#line (79,8)-(221,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\EditUser.razor"
 
     [Parameter]
     public Guid Id { get; set; }
@@ -141,6 +149,11 @@ using Reconciliation.Blazor.Layout.Partials
     private bool isLoading = true;
     private bool hasError = false;
     private bool isSaving = false;
+     // --- Added for Select2 ---
+    private DotNetObjectReference<EditUser>? _dotNetRef; // TODO: replace "EditUser" with your actual @code class name
+    private bool _select2Initialized = false;
+    // --------------------------
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -182,6 +195,40 @@ using Reconciliation.Blazor.Layout.Partials
             isLoading = false;
         }
     }
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+        }
+
+        // --- Added for Select2 ---
+        // Wait until roles have loaded AND the page is past the loading/error state,
+        // so the <select> has actually rendered its <option>s.
+        if (!_select2Initialized && !isLoading && !hasError && AvailableRoles.Any())
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initUserEditSelect2", _dotNetRef, SelectedRole);
+            _select2Initialized = true;
+        }
+        // --------------------------
+    }
+
+    [JSInvokable]
+    public void OnRoleSelected(string roleId)
+    {
+        SelectedRole = roleId;
+        StateHasChanged();
+    }
+
 
     private async Task SaveEdit()
     {
@@ -230,11 +277,33 @@ using Reconciliation.Blazor.Layout.Partials
     {
         Nav.NavigateTo("/users/list");
     }
+     public void Dispose()
+    {
+        _dotNetRef?.Dispose();
+    }
 
 #line default
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (7,9)-(7,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\EditUser.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (7,31)-(7,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\EditUser.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (4,9)-(4,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\EditUser.razor"

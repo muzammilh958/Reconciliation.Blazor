@@ -8,19 +8,14 @@ public class ApiAuthHandler  : DelegatingHandler
         private readonly NavigationManager _navigationManager;
         private readonly JwtAuthStateProvider _authStateProvider;
 
-        public ApiAuthHandler(
-            TokenServices tokenServices,
-            NavigationManager navigationManager,
-            JwtAuthStateProvider authStateProvider)
+        public ApiAuthHandler(TokenServices tokenServices,NavigationManager navigationManager,JwtAuthStateProvider authStateProvider)
         {
             _tokenServices = tokenServices;
             _navigationManager = navigationManager;
             _authStateProvider = authStateProvider;
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request,
-            CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,  CancellationToken cancellationToken)
         {
             // Token add karein har request mein
             var token = await _tokenServices.GetToken();

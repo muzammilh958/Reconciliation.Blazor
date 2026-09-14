@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (104,8)-(239,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
+#line (105,8)-(240,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
 
     private InvoiceTypeList InvoiceTypes = new();
     private bool showDeleteDialog = false;
@@ -273,7 +273,7 @@ using Reconciliation.Blazor.Layout.Partials
 
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
-#line (4,9)-(4,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
+#line (5,9)-(5,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
 IJSRuntime
 
 #line default
@@ -281,8 +281,26 @@ IJSRuntime
 #nullable disable
          
 #nullable restore
-#line (4,20)-(4,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
+#line (5,20)-(5,29) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
 JsRuntime
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (4,9)-(4,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (4,31)-(4,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
+MenuNavigationService
 
 #line default
 #line hidden

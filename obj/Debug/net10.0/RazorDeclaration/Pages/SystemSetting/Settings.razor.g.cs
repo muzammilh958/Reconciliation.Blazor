@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (79,8)-(107,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\Settings.razor"
+#line (83,8)-(111,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\Settings.razor"
 
 
     
@@ -164,6 +164,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (4,9)-(4,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\Settings.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (4,31)-(4,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\Settings.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (2,9)-(2,24) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\SystemSetting\Settings.razor"

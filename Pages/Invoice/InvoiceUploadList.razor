@@ -2,6 +2,7 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JsRuntime;
 @inject IInvoiceTypeService invoiceServices;
+@inject MenuNavigationService MenuNavigationService
 
 <div class="row">
     <div class="col-12">
@@ -9,8 +10,8 @@
            
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h3 class="mb-0 fw-semibold">Invoice Upload List</h3>
-                    <small class="text-muted">Manage Invoice Uploads</small>
+                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.GetMenu()</h3>
+                    <small class="text-muted">Manage Invoice Imports</small>
                 </div>
 
                 

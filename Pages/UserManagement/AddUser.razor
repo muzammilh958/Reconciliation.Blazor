@@ -2,93 +2,7 @@
 @inject IUserService UserService
 @inject NavigationManager Nav
 
-@* <div class="row">
-    <div class="col-12">
-
-        <div class="card shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h3 class="mb-0 fw-semibold">Add Users</h3>
-                    <small class="text-muted">Users</small>
-                </div>
-            </div>
-            <div class="card-body">
-
-                <EditForm Model="@Model" OnValidSubmit="HandleSubmit">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    @if (errors.Any())
-                    {
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach (var e in errors)
-                                {
-                                    <li>@e</li>
-                                }
-                            </ul>
-                        </div>
-                    }
-                    <div class="mb-3">
-                        <label>Full Name</label>
-                        <InputText class="form-control" @bind-Value="Model.FullName" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Email</label>
-                        <InputText class="form-control" @bind-Value="Model.Email" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Password</label>
-                        <InputText type="password" class="form-control" @bind-Value="Model.Password" />
-
-                        <small class="text-muted">
-                            Must contain uppercase, lowercase, and a special character.
-                        </small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Role</label>
-                        <InputSelect class="form-control" @bind-Value="selectedRole">
-                            <option value="">Select Role</option>
-                            @foreach (var role in roles)
-                            {
-                                <option value="@role.Name">@role.Name</option>
-                            }
-
-                        </InputSelect>
-                    </div>
-
-                    <div class="form-check mb-3">
-                        <InputCheckbox class="form-check-input" @bind-Value="Model.IsLocked" />
-                        <label class="form-check-label">Is Locked</label>
-                    </div>
-
-                    @* <button class="btn btn-success" type="submit">Save</button>
-            <button class="btn btn-secondary" type="button" @onclick="Cancel">Cancel</button> 
-                    <div class="col-12">
-                        <div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
-                            <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
-                                Cancel
-                            </button>
-                            <button class="btn btn-primary btn-sm" type="submit" disabled="@isLoading">
-                                @if (isLoading)
-                                {
-                                    <span>Saving...</span>
-                                }
-                                else
-                                {
-                                    <span>Save</span>
-                                }
-                            </button>
-                        </div>
-                    </div>
-                </EditForm>
-
-            </div>
-        </div>
-    </div>
-</div> *@
+@inject IJSRuntime JsRuntime
 
 <div class="row">
     <div class="col-12">
@@ -147,16 +61,14 @@
 
                         <!-- Role and Is Locked - Two Columns -->
                         <div class="col-md-6">
-                           
                                 <label class="form-label">Role</label>
-                                <InputSelect class="form-control" @bind-Value="selectedRole">
+                                <select id="roleSelect" class="form-control form-select select2" @bind="selectedRole">
                                     <option value="">Select Role</option>
                                     @foreach (var role in roles)
                                     {
                                         <option value="@role.Name">@role.Name</option>
                                     }
-                                </InputSelect>
-                        
+                                </select>
                         </div>
 
                         <div class="col-md-6">
@@ -200,7 +112,20 @@
     private CreateUserDto Model = new();
     private List<RolesDto>? roles = new();
     private string selectedRole = "";
+
+    private string _selectedBatchId = "";
+    private string SelectedBatchId
+    {
+        get => _selectedBatchId;
+        set => _selectedBatchId = value;
+    }
+
     private List<string> errors = new();
+     // --- Added for Select2 ---
+    private DotNetObjectReference<AddUser>? _dotNetRef; // TODO: replace "AddUser" with your actual @code class name
+    private bool _select2Initialized = false;
+    // --------------------------
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -213,6 +138,30 @@
             Console.WriteLine($"Error loading roles: {ex.Message}");
             roles = new List<RolesDto>();
         }
+    }
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
+                await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JS load error: {ex.Message}");
+            }
+        }
+
+        // --- Added for Select2 ---
+        if (!_select2Initialized && roles != null && roles.Any())
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initUserSelect2", _dotNetRef);
+            _select2Initialized = true;
+        }
+        // --------------------------
     }
     private async Task HandleSubmit()
     {
@@ -251,5 +200,15 @@
     private void Cancel()
     {
         Nav.NavigateTo("/UserList");
+    }
+    public void Dispose()
+    {
+        _dotNetRef?.Dispose();
+    }
+    [JSInvokable]
+    public void OnRoleSelected(string roleName)
+    {
+        selectedRole = roleName;
+        StateHasChanged();
     }
 }

@@ -22,6 +22,11 @@ builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 
 // Add Authentication Services
 builder.Services.AddScoped<JwtAuthStateProvider>();
+builder.Services.AddHttpClient("Api", client =>
+{
+    client.BaseAddress = new Uri(ApiEndpoints.Base);
+})
+.AddHttpMessageHandler<ApiAuthHandler>();
 
 builder.Services.AddScoped<AuthenticationStateProvider>(
     sp => sp.GetRequiredService<JwtAuthStateProvider>());
@@ -43,19 +48,15 @@ builder.Services.AddScoped<IExceptionService, ExceptionService>();
 builder.Services.AddScoped<IManualAdjustment, ManualAdjustmentService>();
 builder.Services.AddScoped<IPendingReviewsServices, PendingReviews>();
 builder.Services.AddScoped<IExceptions, ExceptionsServices>();
+builder.Services.AddScoped<MenuNavigationService>();
 
 builder.Services.AddScoped<AppState>();
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<TokenServices>();
 
-builder.Services.AddTransient<ApiAuthHandler>();
+builder.Services.AddScoped<ApiAuthHandler>();
 
-builder.Services.AddHttpClient("Api", client =>
-{
-    client.BaseAddress = new Uri(ApiEndpoints.Base);
-})
-.AddHttpMessageHandler<ApiAuthHandler>();
 
 builder.Services.AddScoped(sp => new HttpClient
 {

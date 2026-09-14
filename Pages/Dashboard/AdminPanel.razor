@@ -1,14 +1,24 @@
 @page "/dashboard"
 
-@layout MainLayout
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Components
 
-@attribute [Authorize]  // Add this line first
-@* @attribute [Authorize(Roles = "Admin")]  // Keep this line *@
+@attribute [Authorize]
+@* @attribute [Authorize(Roles = "Admin")] *@
 
-@inject AppState AppState
+@layout MainLayout
+
 @inject IDashboardService DashboardService
+
+<PageTitle>Dashboard</PageTitle>
+
+@if (hasError)
+{
+    <div class="alert alert-danger d-flex justify-content-between align-items-center">
+        <span>Failed to load dashboard data.</span>
+        <button class="btn btn-sm btn-outline-danger" @onclick="LoadAsync">Retry</button>
+    </div>
+}
 
 <div class="row row-cols-xxl-4 row-cols-md-2 row-cols-1">
 
@@ -16,12 +26,10 @@
     <div class="col">
         <div class="card">
             <div class="card-body">
-
                 @if (isLoading)
                 {
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="skeleton skeleton-circle"></div>
-
                         <div class="text-end">
                             <div class="skeleton skeleton-number"></div>
                             <div class="skeleton skeleton-text"></div>
@@ -36,14 +44,12 @@
                                 <i class="ti ti-rotate-clockwise-2"></i>
                             </span>
                         </div>
-
                         <div class="text-end">
-                            <h3 class="mb-2 fw-normal">@dashboardresponse.data.batchCount</h3>
+                            <h3 class="mb-2 fw-normal">@(dashboardresponse?.data?.batchCount ?? 0)</h3>
                             <p class="mb-0 text-muted">Total Batch</p>
                         </div>
                     </div>
                 }
-
             </div>
         </div>
     </div>
@@ -52,12 +58,10 @@
     <div class="col">
         <div class="card">
             <div class="card-body">
-
                 @if (isLoading)
                 {
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="skeleton skeleton-circle"></div>
-
                         <div class="text-end">
                             <div class="skeleton skeleton-number"></div>
                             <div class="skeleton skeleton-text"></div>
@@ -72,14 +76,12 @@
                                 <i class="ti ti-shopping-cart"></i>
                             </span>
                         </div>
-
                         <div class="text-end">
-                            <h3 class="mb-2 fw-normal">@dashboardresponse.data.storeCount</h3>
+                            <h3 class="mb-2 fw-normal">@(dashboardresponse?.data?.storeCount ?? 0)</h3>
                             <p class="mb-0 text-muted">Total Store</p>
                         </div>
                     </div>
                 }
-
             </div>
         </div>
     </div>
@@ -88,12 +90,10 @@
     <div class="col">
         <div class="card">
             <div class="card-body">
-
                 @if (isLoading)
                 {
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="skeleton skeleton-circle"></div>
-
                         <div class="text-end">
                             <div class="skeleton skeleton-number"></div>
                             <div class="skeleton skeleton-text"></div>
@@ -108,14 +108,12 @@
                                 <i class="ti ti-users"></i>
                             </span>
                         </div>
-
                         <div class="text-end">
-                            <h3 class="mb-2 fw-normal">@dashboardresponse.data.userCount</h3>
+                            <h3 class="mb-2 fw-normal">@(dashboardresponse?.data?.userCount ?? 0)</h3>
                             <p class="mb-0 text-muted">Active User</p>
                         </div>
                     </div>
                 }
-
             </div>
         </div>
     </div>
@@ -124,12 +122,10 @@
     <div class="col">
         <div class="card">
             <div class="card-body">
-
                 @if (isLoading)
                 {
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="skeleton skeleton-circle"></div>
-
                         <div class="text-end">
                             <div class="skeleton skeleton-number"></div>
                             <div class="skeleton skeleton-text"></div>
@@ -144,39 +140,41 @@
                                 <i class="ti ti-credit-card"></i>
                             </span>
                         </div>
-
                         <div class="text-end">
-                            <h3 class="mb-2 fw-normal">@dashboardresponse.data.paymentCount</h3>
+                            <h3 class="mb-2 fw-normal">@(dashboardresponse?.data?.paymentCount ?? 0)</h3>
                             <p class="mb-0 text-muted">Total Payment</p>
                         </div>
                     </div>
                 }
-
             </div>
         </div>
     </div>
 
 </div>
+
 @code {
-    
+
     private bool isLoading = true;
     private bool hasError = false;
-    private bool dataReady = false;
-    private DashboardResponse dashboardresponse = new();
+    private DashboardResponse? dashboardresponse;
 
     protected override async Task OnInitializedAsync()
     {
-       
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
         try
         {
             isLoading = true;
             hasError = false;
             dashboardresponse = await DashboardService.GetAllAsync();
-            dataReady = true;
         }
-        catch
+        catch (Exception ex)
         {
             hasError = true;
+            Console.WriteLine($"Dashboard load failed: {ex.Message}");
         }
         finally
         {

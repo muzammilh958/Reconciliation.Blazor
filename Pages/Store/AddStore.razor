@@ -3,26 +3,20 @@
 @inject IStoreService storeService
 @inject NavigationManager Nav
 
+@inject MenuNavigationService MenuNavigationService
 <div class="row">
     <div class="col-12">
-
         <div class="card shadow-sm">
-            @* <div class="card-header">
-                <h5 class="card-title">Add Store</h5>
-            </div> *@
-
-             <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h3 class="mb-0 fw-semibold">Add Store</h3>
+                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.GetMenu()</h3>
                     <small class="text-muted">Store</small>
                 </div>
-
             </div>
             <div class="card-body">
 
                 <EditForm Model="@model" OnValidSubmit="HandleSubmit">
                     <DataAnnotationsValidator />
-                    @* <ValidationSummary /> *@
                     @if (!string.IsNullOrEmpty(message))
                     {
                         <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">
@@ -66,7 +60,6 @@
     private bool isLoading = false;
     private string? message;
     private bool isSuccess;
-
     private bool showMessage;
     private string messageText = "";
     private string messageClass = "";
@@ -83,12 +76,9 @@
 
             if (isSuccess)
             {
-                await ShowMessage(
-          result.message ?? "Store deleted successfully.",
-          "alert-success"
-      );
+                await ShowMessage( result.message ?? "Store deleted successfully.",  "alert-success" );
                 await Task.Delay(1500);
-                // optional redirect
+              
                 Nav.NavigateTo("/store/list");
             }
         }

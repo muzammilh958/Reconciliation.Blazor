@@ -11,6 +11,7 @@ namespace Reconciliation.Blazor.Pages.Dashboard
     using global::System.Collections.Generic;
     using global::System.Linq;
     using global::System.Threading.Tasks;
+    using global::Microsoft.AspNetCore.Components;
 #nullable restore
 #line (1,2)-(1,23) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\_Imports.razor"
 using System.Net.Http
@@ -78,12 +79,6 @@ using Reconciliation.Blazor.Components
 #nullable disable
     ;
 #nullable restore
-#line (13,2)-(13,42) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\_Imports.razor"
-using Microsoft.AspNetCore.Authorization
-
-#nullable disable
-    ;
-#nullable restore
 #line (14,2)-(14,22) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\_Imports.razor"
 using Blazored.Toast
 
@@ -102,21 +97,21 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
     ;
 #nullable restore
-#line (4,2)-(4,53) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
-using Microsoft.AspNetCore.Components.Authorization
+#line (3,2)-(3,42) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+using Microsoft.AspNetCore.Authorization
 
 #nullable disable
     ;
 #nullable restore
-#line (5,2)-(5,39) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
-using Microsoft.AspNetCore.Components
+#line (4,2)-(4,53) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+using Microsoft.AspNetCore.Components.Authorization
 
 #nullable disable
     ;
     #line default
     #line hidden
 #nullable restore
-#line (7,12)-(7,23) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (6,12)-(6,23) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 [Authorize]
 
 #line default
@@ -125,7 +120,7 @@ using Microsoft.AspNetCore.Components
 
     [global::Microsoft.AspNetCore.Components.LayoutAttribute(typeof(
 #nullable restore
-#line (3,9)-(3,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (9,9)-(9,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 MainLayout
 
 #line default
@@ -152,27 +147,30 @@ MainLayout
         }
         #pragma warning restore 1998
 #nullable restore
-#line (160,8)-(186,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (155,8)-(184,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 
-    
+
     private bool isLoading = true;
     private bool hasError = false;
-    private bool dataReady = false;
-    private DashboardResponse dashboardresponse = new();
+    private DashboardResponse? dashboardresponse;
 
     protected override async Task OnInitializedAsync()
     {
-       
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
         try
         {
             isLoading = true;
             hasError = false;
             dashboardresponse = await DashboardService.GetAllAsync();
-            dataReady = true;
         }
-        catch
+        catch (Exception ex)
         {
             hasError = true;
+            Console.WriteLine($"Dashboard load failed: {ex.Message}");
         }
         finally
         {
@@ -196,24 +194,6 @@ IDashboardService
 #nullable restore
 #line (11,27)-(11,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 DashboardService
-
-#line default
-#line hidden
-#nullable disable
-         { get; set; }
-         = default!;
-        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
-#nullable restore
-#line (10,9)-(10,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
-AppState
-
-#line default
-#line hidden
-#nullable disable
-         
-#nullable restore
-#line (10,18)-(10,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
-AppState
 
 #line default
 #line hidden

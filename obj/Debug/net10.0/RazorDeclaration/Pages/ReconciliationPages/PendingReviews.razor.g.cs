@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (212,8)-(508,13) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\PendingReviews.razor"
+#line (214,8)-(510,13) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\PendingReviews.razor"
 
     private bool showAlert = false;
     private bool isLoading = false;
@@ -434,7 +434,7 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (509,34)-(514,13) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\PendingReviews.razor"
+#line (511,34)-(516,13) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\PendingReviews.razor"
 
             StateHasChanged();
         }
@@ -447,7 +447,7 @@ using Reconciliation.Blazor.Layout.Partials
 #nullable disable
 
 #nullable restore
-#line (514,41)-(519,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\PendingReviews.razor"
+#line (516,41)-(521,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\PendingReviews.razor"
 
             StateHasChanged();
         }
@@ -458,6 +458,24 @@ using Reconciliation.Blazor.Layout.Partials
 #line hidden
 #nullable disable
 
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (8,9)-(8,30) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\PendingReviews.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (8,31)-(8,52) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\PendingReviews.razor"
+MenuNavigationService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
 #nullable restore
 #line (6,9)-(6,19) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\ReconciliationPages\PendingReviews.razor"

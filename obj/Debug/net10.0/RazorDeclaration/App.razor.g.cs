@@ -126,12 +126,18 @@ using Reconciliation.Blazor.Pages.Dashboard
         }
         #pragma warning restore 1998
 #nullable restore
-#line (33,8)-(39,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\App.razor"
+#line (33,8)-(45,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\App.razor"
 
     protected override async Task OnInitializedAsync()
     {
-        // 🔥 App start pe authentication check karein
-        await AuthStateProvider.GetAuthenticationStateAsync();
+       Console.WriteLine("App.razor: OnInitializedAsync called");
+       bool isValid = await AuthStateProvider.ValidateTokenWithApi();
+       
+        if (!isValid)
+        {
+            // Agar token invalid hai, user ko login page pe redirect karein
+            NavigationManager.NavigateTo("/");
+        }
     }
 
 #line default

@@ -79,7 +79,7 @@
                                 <ValidationMessage For="@(() => model.StoreId)" />
                             </div>
 
-                            <!-- Transaction Amount -->
+                           
                             <div class="col-md-6">
                                 <label class="form-label">Transaction Amount</label>
                                 <InputText class="form-control" @bind-Value="model.TransactionAmount"
@@ -87,7 +87,7 @@
                                 <ValidationMessage For="@(() => model.TransactionAmount)" />
                             </div>
 
-                            <!-- Authorization Code -->
+                            
                             <div class="col-md-6">
                                 <label class="form-label">Authorization Code</label>
                                 <InputText class="form-control" @bind-Value="model.AuthorizationCode"
@@ -95,7 +95,7 @@
                                 <ValidationMessage For="@(() => model.AuthorizationCode)" />
                             </div>
 
-                            <!-- Merchant ID -->
+                            
                             <div class="col-md-6">
                                 <label class="form-label">Merchant ID</label>
                                 <InputText class="form-control" @bind-Value="model.MerchantID"
@@ -110,7 +110,6 @@
 
                         </div>
 
-                        <!-- Buttons -->
                         <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                             <button class="btn btn-outline-secondary btn-sm" type="button" @onclick="Cancel">
                                 Cancel
@@ -157,8 +156,6 @@
             isLoading = true;
             hasError = false;
 
-            // NOTE: assumes IPaymentService has a GetByIdAsync(int id) method.
-            // Update this call if your service uses a different method name.
             var existing = await PaymentService.GetByIdAsync(Id);
 
             if (existing is null)

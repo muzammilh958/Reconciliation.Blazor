@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (144,8)-(235,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\EditPayment.razor"
+#line (143,8)-(232,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\EditPayment.razor"
 
     [Parameter]
     public int Id { get; set; }
@@ -147,8 +147,6 @@ using Reconciliation.Blazor.Layout.Partials
             isLoading = true;
             hasError = false;
 
-            // NOTE: assumes IPaymentService has a GetByIdAsync(int id) method.
-            // Update this call if your service uses a different method name.
             var existing = await PaymentService.GetByIdAsync(Id);
 
             if (existing is null)
