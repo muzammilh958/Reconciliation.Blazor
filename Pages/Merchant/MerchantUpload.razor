@@ -145,7 +145,28 @@
     private DotNetObjectReference<MerchantUpload>? _dotNetRef; // TODO: replace "Upload" with your actual @code class name
     private bool _select2Initialized = false;
     // --------------------------
+  protected override void OnInitialized()
+    {
+        MenuNavigationService.OnChange += OnMenuChanged;
+    }
 
+    private void OnMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnChange -= OnMenuChanged;
+          _dotNetRef?.Dispose();
+
+    }
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+   
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -337,10 +358,7 @@
     }
 
     // --- Added for Select2 ---
-    public void Dispose()
-    {
-        _dotNetRef?.Dispose();
-    }
+ 
     // --------------------------
 
     public class FileData

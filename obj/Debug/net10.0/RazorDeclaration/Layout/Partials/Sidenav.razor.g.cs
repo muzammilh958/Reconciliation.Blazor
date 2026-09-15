@@ -134,7 +134,7 @@ IDisposable
         }
         #pragma warning restore 1998
 #nullable restore
-#line (134,8)-(168,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (135,8)-(174,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 
     private List<MenuItemDto> menus = new();
     private string? userRole;
@@ -163,7 +163,12 @@ IDisposable
             })
             .Where(m => m.children == null || m.children.Any())
             .ToList();
+        
+        var currentUrl = NavigationManager.Uri; // full URL (e.g. https://site.com/dashboard)
+        var relativePath = CurrentPath; // aapka existing getter, e.g. "/dashboard"
 
+        currentTitle = FindTitleForCurrentPath();
+        MenuNavigationService.SetMenu(currentTitle);
         NavigationManager.LocationChanged += OnLocationChanged;
     }
 
@@ -176,13 +181,14 @@ IDisposable
 #nullable disable
 
 #nullable restore
-#line (168,44)-(239,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (174,44)-(246,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 
-         InvokeAsync(() =>
-        {
-            currentTitle = FindTitleForCurrentPath();
-            StateHasChanged();
-        });
+        InvokeAsync(() =>
+       {
+           MenuNavigationService.SetMenu(FindTitleForCurrentPath());
+           currentTitle = FindTitleForCurrentPath();
+           StateHasChanged();
+       });
     }
 
     private string CurrentPath
@@ -241,7 +247,7 @@ IDisposable
                     return match.title;
             }
         }
-        return "Reconciliation Management System";
+        return "";
     }
 
     private void OpenMenu(MenuItemDto submenu)

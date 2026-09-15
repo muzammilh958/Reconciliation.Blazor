@@ -136,7 +136,7 @@ using global::Reconciliation.Blazor.Models.Batch
         }
         #pragma warning restore 1998
 #nullable restore
-#line (115,8)-(118,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+#line (119,8)-(122,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
 
     private List<BatchDataDTO> batches = new();
     private bool showDeleteDialog = false;
@@ -147,7 +147,7 @@ using global::Reconciliation.Blazor.Models.Batch
 #nullable disable
 
 #nullable restore
-#line (118,47)-(248,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+#line (122,47)-(252,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
 
     private BatchDataDTO editModel = new();
     private int selectedBatchId;

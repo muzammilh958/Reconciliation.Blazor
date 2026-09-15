@@ -96,6 +96,20 @@
     private bool showMessage;
     private string messageText = "";
     private string messageClass = "";
+    protected override void OnInitialized()
+    {
+        MenuNavigationService.OnMenuChanged += HandleMenuChanged;
+    }
+
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnMenuChanged -= HandleMenuChanged;
+    }
     private async Task HandleSubmit()
     {
         isLoading = true;

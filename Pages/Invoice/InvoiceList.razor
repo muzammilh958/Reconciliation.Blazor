@@ -115,7 +115,20 @@
     private bool isLoading = true;
     private bool hasError = false;
     private bool dataReady = false;
+protected override void OnInitialized()
+    {
+        MenuNavigationService.OnMenuChanged += HandleMenuChanged;
+    }
 
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnMenuChanged -= HandleMenuChanged;
+    }
     private async Task InitDataTableAsync()
     {
         if (_module != null)

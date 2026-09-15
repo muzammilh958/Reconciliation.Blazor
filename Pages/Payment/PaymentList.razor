@@ -151,6 +151,20 @@
     private bool hasError = false;
     private bool dataReady = false;
     private bool isDataTableInitialized = false;
+    protected override void OnInitialized()
+    {
+        MenuNavigationService.OnChange += OnMenuChanged;
+    }
+
+    private void OnMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnChange -= OnMenuChanged;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -272,24 +286,16 @@
         {
             showDeleteDialog = false;
             
-            // Destroy DataTable before reloading
             await DestroyDataTableAsync();
             
-            // Reload data
             await LoadPaymentes();
 
-            await ShowMessage(
-                result.message ?? "Payment deleted successfully.",
-                "alert-success"
-            );
+            await ShowMessage(result.message ?? "Payment deleted successfully.","alert-success");
         }
         else
         {
-             showDeleteDialog = false;
-            await ShowMessage(
-                result?.message ?? "Delete failed.",
-                "alert-danger"
-            );
+            showDeleteDialog = false;
+            await ShowMessage(result?.message ?? "Delete failed.","alert-danger");
         }
     }
 
@@ -300,9 +306,7 @@
 
         if (string.IsNullOrWhiteSpace(editModel.name))
         {
-            await ShowMessage(
-                "Payment name is required.",
-                "alert-danger");
+            await ShowMessage("Payment name is required.","alert-danger");
             isLoading = false;
             return;
         }
@@ -313,17 +317,11 @@
         {
             await LoadPaymentes();
 
-            await ShowMessage(
-                result.message ?? "Payment updated successfully.",
-                "alert-success"
-            );
+            await ShowMessage(result.message ?? "Payment updated successfully.","alert-success");
         }
         else
         {
-            await ShowMessage(
-                result?.message ?? "Failed to update Payment.",
-                "alert-danger"
-            );
+            await ShowMessage(result?.message ?? "Failed to update Payment.","alert-danger");
         }
         isLoading = false;
     }

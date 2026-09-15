@@ -143,8 +143,19 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadStaticData();
+        MenuNavigationService.OnMenuChanged += HandleMenuChanged;
     }
 
+
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnMenuChanged -= HandleMenuChanged;
+    }
     private async Task LoadStaticData()
     {
         try

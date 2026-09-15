@@ -8,9 +8,9 @@ public class PendingReviewRequest
 }
 public class PendingReviewsDTO
 {
-    public bool success { get; set; }
-    public string message { get; set; }
-    public List<PendingReviewsData> data { get; set; }
+    public bool success { get; set; } = false;
+    public string message { get; set; } ="";
+    public List<PendingReviewsData> data { get; set; }  = new();
     public int statusCode { get; set; }
     public object errors { get; set; }
 }

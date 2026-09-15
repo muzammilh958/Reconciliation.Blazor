@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Reconciliation.Blazor.Core.Endpoints;
@@ -152,20 +152,26 @@ public class MenuService : IMenuService
 
 public class MenuNavigationService
 {
-    public string? CurrentTitle { get; private set; }
+    private string _title = "";
+    public event Action? OnChange;
 
     public void SetMenu(string title)
     {
-        CurrentTitle = title;
+        if (_title == title) return; // avoid duplicate
+        _title = title;
+        OnChange?.Invoke();
     }
 
-    public string? GetMenu()
-    {
-        return CurrentTitle;
-    }
+    public string GetMenu() => _title;
+    public string? CurrentTitle { get; private set; }
+    public event Action? OnMenuChanged;
+
+
+  
 
     public void Clear()
     {
         CurrentTitle = null;
+        OnMenuChanged?.Invoke();
     }
 }

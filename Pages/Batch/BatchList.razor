@@ -14,7 +14,7 @@
         <div class="card">
             <div class="card-header justify-content-between">
                 <div>
-                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.CurrentTitle</h3>
+                    <h3 class="mb-0 fw-semibold">@MenuNavigationService.GetMenu() </h3>
                     <small class="text-muted">Manage Batch</small>
                 </div>
 
@@ -57,52 +57,56 @@
                 {
                     <div class="row">
                         <div class="col-sm-12">
-                            <table class="table table-striped dt-responsive align-middle mb-0" data-tables="basic">
-                                <thead class="thead-sm text-uppercase fs-xxs">
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>From Date</th>
-                                        <th>To Date</th>
-                                        <th>Is Lock</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    @foreach (var batch in batches)
-                                    {
+                            <div class="table-responsive">
+                                <table class="table table-striped dt-responsive align-middle mb-0" data-tables="basic">
+                                    <thead class="thead-sm text-uppercase fs-xxs">
                                         <tr>
-                                            <td>@batch.name</td>
-                                            <td>@(batch.FromDate.HasValue ? batch.FromDate.Value.ToString("dd-MM-yyyy") : "")
-                                            </td>
-                                            <td>@(batch.ToDate.HasValue ? batch.ToDate.Value.ToString("dd-MM-yyyy") : "")</td>
-
-                                            <td>
-                                                @if (batch.IsLocked)
-                                                {
-                                                    <span class="badge badge-label badge-soft-danger">Locked</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge badge-label badge-soft-success">Unlocked</span>
-                                                }
-                                            </td>
-
-                                            <td class="text-end">
-                                                <button class="btn btn-sm btn-primary btn-sm me-1"
-                                                        @onclick="() => OpenEdit(batch)">
-                                                    Edit
-                                                </button>
-
-                                                <button class="btn btn-sm btn-danger"
-                                                        @onclick="() => ConfirmDelete(batch.id, batch.name)">
-                                                    Delete
-                                                </button>
-                                            </td>
+                                            <th>Name</th>
+                                            <th>From Date</th>
+                                            <th>To Date</th>
+                                            <th>Is Lock</th>
+                                            <th class="text-end">Actions</th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                    </thead>
+
+                                    <tbody>
+                                        @foreach (var batch in batches)
+                                        {
+                                            <tr>
+                                                <td>@batch.name</td>
+                                                <td>@(batch.FromDate.HasValue? batch.FromDate.Value.ToString("dd-MM-yyyy") :
+                                       "")
+                                                </td>
+                                                <td>@(batch.ToDate.HasValue ? batch.ToDate.Value.ToString("dd-MM-yyyy") : "")
+                                                </td>
+
+                                                <td>
+                                                    @if (batch.IsLocked)
+                                                    {
+                                                        <span class="badge badge-label badge-soft-danger">Locked</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-label badge-soft-success">Unlocked</span>
+                                                    }
+                                                </td>
+
+                                                <td class="text-end">
+                                                    <button class="btn btn-sm btn-primary btn-sm me-1"
+                                                            @onclick="() => OpenEdit(batch)">
+                                                        Edit
+                                                    </button>
+
+                                                    <button class="btn btn-sm btn-danger"
+                                                            @onclick="() => ConfirmDelete(batch.id, batch.name!)">
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 }
@@ -135,7 +139,20 @@
             await _module.InvokeVoidAsync("loadDataTableAjax");
         }
     }
+    protected override void OnInitialized()
+    {
+        MenuNavigationService.OnChange += OnMenuChanged;
+    }
 
+    private void OnMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnChange -= OnMenuChanged;
+    }
     protected override async Task OnInitializedAsync()
     {
         try

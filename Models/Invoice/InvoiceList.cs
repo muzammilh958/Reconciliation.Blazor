@@ -24,7 +24,7 @@ public class InvoiceTypeList
 
   public class FetchInvoiceTypeResponse
     {
-        public string name { get; set; }
+        public string name { get; set; } = "";
         public bool flgActive { get; set; }
         public bool flgDelete { get; set; }
         public int id { get; set; }
@@ -35,7 +35,7 @@ public class InvoiceTypeList
     public class SingleInvoiceTypeResponse
     {
         public bool success { get; set; }
-        public string message { get; set; }
+        public string message { get; set; } = "";
         public FetchInvoiceTypeResponse data { get; set; }
         public int statusCode { get; set; }
         public object errors { get; set; }

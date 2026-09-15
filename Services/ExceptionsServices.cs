@@ -15,7 +15,7 @@ public class ExceptionsServices : IExceptions
         _http = http;
         _tokenProvider = tokenProvider;
     }
-    public async Task<RecReconciliationExceptionDTO> GetExceptionsAsync(int batchId, int pageNumber, int pageSize, string searchValue = null, string sortColumn = null, string sortDirection = "desc")
+    public async Task<RecReconciliationExceptionDTO> GetExceptionsAsync(int batchId, int pageNumber, int pageSize, string searchValue = "", string sortColumn ="", string sortDirection = "desc")
     {
         try
         {

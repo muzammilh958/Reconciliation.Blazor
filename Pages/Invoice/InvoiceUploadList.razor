@@ -33,7 +33,7 @@
                         Failed to load Invoice Uploads.
                     </div>
                 }
-                else if (invoiceUploadedList.data.Count == 0)
+                else if (invoiceUploadedList!.data!.Count == 0)
                 {
                     <div class="text-center text-muted py-4">
                         No Invoice Uploads found
@@ -108,7 +108,20 @@
     private int? downloadingInvoiceId = null;
 
     private IJSObjectReference? _module;
+     protected override void OnInitialized()
+    {
+        MenuNavigationService.OnChange += OnMenuChanged;
+    }
 
+    private void OnMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnChange -= OnMenuChanged;
+    }
     private async Task InitDataTableAsync()
     {
         if (_module != null)

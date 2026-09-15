@@ -105,6 +105,20 @@
 
     private DotNetObjectReference<InvoiceUpload>? _dotNetRef; // TODO: replace "Upload" with your actual @code class name
     private bool _select2Initialized = false;
+    protected override void OnInitialized()
+    {
+        MenuNavigationService.OnMenuChanged += HandleMenuChanged;
+    }
+
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnMenuChanged -= HandleMenuChanged;
+    }
     private int SelectedInvoiceId
     {
         get => _selectedInvoiceId;

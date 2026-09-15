@@ -20927,3 +20927,13 @@ thead th{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;white-sp
 #invoiceModal .modal-footer {
     padding: 15px 24px;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cursor-pointer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}

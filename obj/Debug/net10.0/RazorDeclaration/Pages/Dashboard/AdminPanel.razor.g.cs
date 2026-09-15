@@ -147,7 +147,7 @@ MainLayout
         }
         #pragma warning restore 1998
 #nullable restore
-#line (155,8)-(184,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+#line (155,8)-(194,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 
 
     private bool isLoading = true;
@@ -178,6 +178,16 @@ MainLayout
         }
     }
 
+    private void GoToBatchList()
+    {
+        NavigationManager.NavigateTo("/batch/list");
+    }
+
+    private void GoToStoreList()
+    {
+        NavigationManager.NavigateTo("/invoice/view-invoice-types");
+    }
+
 #line default
 #line hidden
 #nullable disable
@@ -194,6 +204,24 @@ IDashboardService
 #nullable restore
 #line (11,27)-(11,43) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
 DashboardService
+
+#line default
+#line hidden
+#nullable disable
+         { get; set; }
+         = default!;
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private 
+#nullable restore
+#line (5,9)-(5,26) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+NavigationManager
+
+#line default
+#line hidden
+#nullable disable
+         
+#nullable restore
+#line (5,27)-(5,44) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Dashboard\AdminPanel.razor"
+NavigationManager
 
 #line default
 #line hidden

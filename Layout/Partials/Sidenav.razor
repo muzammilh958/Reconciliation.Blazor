@@ -116,7 +116,8 @@
                                     <li class="side-nav-item @(IsActive(submenu.url) ? "active" : "")">
                                         @if (!string.IsNullOrWhiteSpace(submenu.url))
                                         {
-                                            <a href="@submenu.url"   @onclick="() => OpenMenu(submenu)" class="side-nav-link @(IsActive(submenu.url) ? "active" : "")">
+                                            <a href="@submenu.url" @onclick="() => OpenMenu(submenu)"
+                                               class="side-nav-link @(IsActive(submenu.url) ? "active" : "")">
                                                 <span class="menu-text">@submenu.title</span>
                                             </a>
                                         }
@@ -159,18 +160,26 @@
             })
             .Where(m => m.children == null || m.children.Any())
             .ToList();
-
+        
+        // ✅ Subscribe AFTER menus loaded
         NavigationManager.LocationChanged += OnLocationChanged;
+
+        // ✅ Ab title set karo (menus ready hain)
+        currentTitle = FindTitleForCurrentPath();
+        Console.WriteLine("Menu Path Service (Init): " + currentTitle);
+        MenuNavigationService.SetMenu(currentTitle);
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        @* InvokeAsync(StateHasChanged); *@
-         InvokeAsync(() =>
-        {
-            currentTitle = FindTitleForCurrentPath();
-            StateHasChanged();
-        });
+       
+        InvokeAsync(() =>
+            {
+                currentTitle = FindTitleForCurrentPath();
+                Console.WriteLine("Menu Path Service (LocationChanged): " + currentTitle);
+                MenuNavigationService.SetMenu(currentTitle);
+                StateHasChanged();
+            });
     }
 
     private string CurrentPath
@@ -229,7 +238,7 @@
                     return match.title;
             }
         }
-        return "Reconciliation Management System";
+        return "";
     }
 
     private void OpenMenu(MenuItemDto submenu)
