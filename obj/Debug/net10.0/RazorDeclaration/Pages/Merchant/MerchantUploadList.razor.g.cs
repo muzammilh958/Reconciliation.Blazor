@@ -130,17 +130,14 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (116,8)-(241,5) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
+#line (110,8)-(308,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
 
-    // ======================== STATE VARIABLES ========================
     private bool isLoading = false;
     private bool hasError = false;
     private bool dataReady = false;
 
     private MerchantUploadResponse merchantUploadResponse = new();
 
-    // Detail modal state
-    
     private bool isDetailLoading = false;
     private string? detailError;
     private UploadDetail? uploadDetail;
@@ -157,12 +154,20 @@ using Reconciliation.Blazor.Layout.Partials
     private int? downloadingInvoiceId = null;
     private IJSObjectReference? _module;
 
-    // ======================== LIFECYCLE ========================
     protected override async Task OnInitializedAsync()
     {
         await LoadStaticData();
+        MenuNavigationService.OnMenuChanged += HandleMenuChanged;
     }
 
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+    public void Dispose()
+    {
+        MenuNavigationService.OnMenuChanged -= HandleMenuChanged;
+    }
     private async Task LoadStaticData()
     {
         try
@@ -182,9 +187,6 @@ using Reconciliation.Blazor.Layout.Partials
             isLoading = false;
         }
     }
-
-    // ======================== VIEW / DETAIL LOGIC ========================
-   
     private async Task InitDataTableAsync()
     {
         if (_module != null)
@@ -211,18 +213,18 @@ using Reconciliation.Blazor.Layout.Partials
     private UploadDetail MapTransactionLinesToUploadDetail(List<TransactionLine> lines)
     {
         var headers = new List<string>
-    {
-        "Order ID",
-        "Store ID",
-        "Amount",
-        "Tender Type",
-        "Auth Code",
-        "Transaction Date",
-        "Business Day",
-        "Recon Status",
-        "Exception Type",
-        "Variance Amount"
-    };
+        {
+            "Order ID",
+            "Store ID",
+            "Amount",
+            "Tender Type",
+            "Auth Code",
+            "Transaction Date",
+            "Business Day",
+            "Recon Status",
+            "Exception Type",
+            "Variance Amount"
+        };
 
         var rows = new List<UploadDetailRow>();
 
@@ -244,9 +246,6 @@ using Reconciliation.Blazor.Layout.Partials
                 HasError = line.varianceAmount != 0
             });
 
-            // Optionally mark row as error if any cell has error
-            // but row.HasError is computed from cells automatically in your model
-
             rows.Add(row);
         }
 
@@ -256,15 +255,6 @@ using Reconciliation.Blazor.Layout.Partials
             Rows = rows
         };
     }
-    
-
-#line default
-#line hidden
-#nullable disable
-
-#nullable restore
-#line (297,9)-(437,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUploadList.razor"
-
 
     private void CloseDetailView()
     {
@@ -272,13 +262,6 @@ using Reconciliation.Blazor.Layout.Partials
         detailError = null;
     }
 
-    private void HandleModalKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Escape")
-            CloseDetailView();
-    }
-
-    // ======================== SEARCH & PAGINATION ========================
     private IEnumerable<UploadDetailRow> GetFilteredRows()
     {
         if (uploadDetail == null || !uploadDetail.Rows.Any())
@@ -292,21 +275,6 @@ using Reconciliation.Blazor.Layout.Partials
         );
     }
 
-    private IEnumerable<UploadDetailRow> GetPagedRows(IEnumerable<UploadDetailRow>? filtered = null)
-    {
-        var source = filtered ?? GetFilteredRows();
-        return source.Skip((currentPage - 1) * pageSize).Take(pageSize);
-    }
-
-    private void ChangePage(int page)
-    {
-        var totalPages = (int)Math.Ceiling((double)GetFilteredRows().Count() / pageSize);
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        currentPage = page;
-    }
-
-    // ======================== ACTION HANDLERS ========================
     private async Task DownloadFile(UploadedData merchant)
     {
         if (isDownloading) return;
@@ -322,15 +290,8 @@ using Reconciliation.Blazor.Layout.Partials
                 return;
 
             var base64 = Convert.ToBase64String(fileBytes);
-            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
-                "import",
-                "/js/downloadMerchant.js"
-            );
-            await JsRuntime.InvokeVoidAsync(
-                "downloadFileFromBytes",
-                $"Merchant_{merchant.batch.name}.xlsx",
-                base64);
-
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import","/js/downloadMerchant.js");
+            await JsRuntime.InvokeVoidAsync("downloadFileFromBytes",$"Merchant_{merchant.batch.name}.xlsx",base64);
         }
         catch (Exception ex)
         {
@@ -346,42 +307,6 @@ using Reconciliation.Blazor.Layout.Partials
             downloadingInvoiceId = null;
             StateHasChanged();
         }
-    }
-
-    private async Task DownloadErrorsOnly()
-    {
-        if (uploadDetail == null || uploadDetail.ErrorCount == 0) return;
-        await Task.Delay(300);
-        Console.WriteLine($"Downloading error rows only for upload ID: {selectedUploadId}");
-    }
-
-    private async Task ExportAllToCsv()
-    {
-        if (uploadDetail == null) return;
-        await Task.Delay(300);
-        Console.WriteLine($"Exporting all {uploadDetail.TotalRows} rows to CSV for upload ID: {selectedUploadId}");
-    }
-
-    // ======================== DATA MODELS (nested) ========================
-    public class MerchantUpload
-    {
-        public int Id { get; set; }
-        public Batch Batch { get; set; } = new();
-        public Payment Payment { get; set; } = new();
-        public DateTime FromDate { get; set; }
-        public DateTime ToDate { get; set; }
-        public int RowCount { get; set; }
-        public int ErrorCount { get; set; }
-    }
-
-    public class Batch
-    {
-        public string Name { get; set; } = "";
-    }
-
-    public class Payment
-    {
-        public string Name { get; set; } = "";
     }
 
     public class UploadDetail

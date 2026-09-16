@@ -36,43 +36,58 @@
                         <!-- Full Name - Full Width -->
                         <div class="col-md-6">
                            
-                                <label class="form-label">Full Name</label>
-                                <InputText class="form-control" @bind-Value="Model.FullName" />
+                            <label class="form-label">Full Name</label>
+                            <InputText class="form-control" @bind-Value="Model.FullName" />
                            
                         </div>
 
                         <!-- Email and Password - Two Columns -->
                         <div class="col-md-6">
                             
-                                <label class="form-label">Email</label>
-                                <InputText class="form-control" @bind-Value="Model.Email" />
+                            <label class="form-label">Email</label>
+                            <InputText class="form-control" @bind-Value="Model.Email" />
                            
                         </div>
 
                         <div class="col-md-6">
                         
-                                <label class="form-label">Password</label>
-                                <InputText type="password" class="form-control" @bind-Value="Model.Password" />
-                                <small class="text-muted d-block mt-1">
-                                    Must contain uppercase, lowercase, and a special character.
-                                </small>
+                            <label class="form-label">Password</label>
+                            <InputText type="password" class="form-control" @bind-Value="Model.Password" />
+                            <small class="text-muted d-block mt-1">
+                                Must contain uppercase, lowercase, and a special character.
+                            </small>
                           
                         </div>
 
                         <!-- Role and Is Locked - Two Columns -->
                         <div class="col-md-6">
-                                <label class="form-label">Role</label>
-                                <select id="roleSelect" class="form-control form-select select2" @bind="selectedRole">
-                                    <option value="">Select Role</option>
+                            <label class="form-label">Role</label>
+                            
+                            @* <select id="roleSelect" class="form-control select2" data-toggle="select2"
+                                    @bind="selectedRole">
+                                <option value="">Select Role</option>
+                                @if (roles!.Count > 0)
+                                {
                                     @foreach (var role in roles)
                                     {
                                         <option value="@role.Name">@role.Name</option>
                                     }
-                                </select>
+                                }
+                            </select> *@
+                            <select class="select2" id="roleSelect" @bind="selectedRole" style="width:100%;">
+                                <option value="">Select Role</option>
+                                @if (roles!.Count > 0)
+                                {
+                                    @foreach (var role in roles)
+                                    {
+                                        <option value="@role.Name">@role.Name</option>
+                                    }
+                                }
+                            </select>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="d-flex align-items-center" >
+                            <div class="d-flex align-items-center">
                                 <div class="form-check">
                                     <InputCheckbox class="form-check-input" @bind-Value="Model.IsLocked" />
                                     <label class="form-check-label">Is Locked</label>
@@ -112,7 +127,7 @@
     private CreateUserDto Model = new();
     private List<RolesDto>? roles = new();
     private string selectedRole = "";
-
+    private IJSObjectReference? _module;
     private string _selectedBatchId = "";
     private string SelectedBatchId
     {
@@ -121,7 +136,7 @@
     }
 
     private List<string> errors = new();
-     // --- Added for Select2 ---
+    // --- Added for Select2 ---
     private DotNetObjectReference<AddUser>? _dotNetRef; // TODO: replace "AddUser" with your actual @code class name
     private bool _select2Initialized = false;
     // --------------------------
@@ -139,7 +154,10 @@
             roles = new List<RolesDto>();
         }
     }
-     protected override async Task OnAfterRenderAsync(bool firstRender)
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
@@ -147,6 +165,8 @@
             {
                 await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
                 await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+                _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-select2.js");
+                await JsRuntime.InvokeVoidAsync("loadFormSelect");
             }
             catch (Exception ex)
             {

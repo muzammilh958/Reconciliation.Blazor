@@ -134,7 +134,7 @@ IDisposable
         }
         #pragma warning restore 1998
 #nullable restore
-#line (135,8)-(174,9) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
+#line (135,8)-(248,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
 
     private List<MenuItemDto> menus = new();
     private string? userRole;
@@ -164,31 +164,25 @@ IDisposable
             .Where(m => m.children == null || m.children.Any())
             .ToList();
         
-        var currentUrl = NavigationManager.Uri; // full URL (e.g. https://site.com/dashboard)
-        var relativePath = CurrentPath; // aapka existing getter, e.g. "/dashboard"
-
-        currentTitle = FindTitleForCurrentPath();
-        MenuNavigationService.SetMenu(currentTitle);
+        // ✅ Subscribe AFTER menus loaded
         NavigationManager.LocationChanged += OnLocationChanged;
+
+        // ✅ Ab title set karo (menus ready hain)
+        currentTitle = FindTitleForCurrentPath();
+        Console.WriteLine("Menu Path Service (Init): " + currentTitle);
+        MenuNavigationService.SetMenu(currentTitle);
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        
-
-#line default
-#line hidden
-#nullable disable
-
-#nullable restore
-#line (174,44)-(246,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Layout\Partials\Sidenav.razor"
-
+       
         InvokeAsync(() =>
-       {
-           MenuNavigationService.SetMenu(FindTitleForCurrentPath());
-           currentTitle = FindTitleForCurrentPath();
-           StateHasChanged();
-       });
+            {
+                currentTitle = FindTitleForCurrentPath();
+                Console.WriteLine("Menu Path Service (LocationChanged): " + currentTitle);
+                MenuNavigationService.SetMenu(currentTitle);
+                StateHasChanged();
+            });
     }
 
     private string CurrentPath

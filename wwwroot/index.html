@@ -4,10 +4,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reconciliation.Blazor</title>
+    <title>Reconciliation</title>
     <base href="/" />
     <link rel="preload" id="webassembly" />
+    
+    <link rel="stylesheet" href="plugins/select2/select2.min.css" />
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="css/custom.css" />
     <link rel="stylesheet" href="css/login.css" />
@@ -35,8 +38,7 @@
 
     <link rel="stylesheet" href="scss/structure/_sidenav.scss" />
     <link rel="stylesheet" href="scss/plugins/_select2.scss" />
-    
-    <link rel="stylesheet" href="plugins/select2/select2.min.css"/>
+
     <link rel="icon" type="image/png" href="images/logos/logo-reconciliation.png" />
     <link href="Reconciliation.Blazor.styles.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -46,44 +48,45 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/styles/choices.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js"></script>
 </head>
 
 <body>
     <div id="app">
 
-    <div class="app-loader">
+        <div class="app-loader">
 
-        <div class="loader-content">
+            <div class="loader-content">
 
-            <!-- Brand -->
-            <div class="loader-brand">
-                <div class="loader-logo">
-                    <img src="images/logos/logo-reconciliation.png"
-                         alt="Reconciliation Management System">
+                <!-- Brand -->
+                <div class="loader-brand">
+                    <div class="loader-logo">
+                        <img src="images/logos/logo-reconciliation.png" alt="Reconciliation Management System">
+                    </div>
+
+                    <div class="loader-title">
+                        <h2>Reconciliation</h2>
+                        <span>Management System</span>
+                    </div>
                 </div>
 
-                <div class="loader-title">
-                    <h2>Reconciliation</h2>
-                    <span>Management System</span>
-                </div>
-            </div>
+                <!-- Loading -->
+                <div class="loader-status">
 
-            <!-- Loading -->
-            <div class="loader-status">
+                    <div class="loader-progress">
+                        <div class="loader-progress-bar"></div>
+                    </div>
 
-                <div class="loader-progress">
-                    <div class="loader-progress-bar"></div>
-                </div>
+                    <div class="loader-text">
+                        <span>Preparing your workspace</span>
+                        <span class="loader-dots">
+                            <i></i>
+                            <i></i>
+                            <i></i>
+                        </span>
+                    </div>
 
-                <div class="loader-text">
-                    <span>Preparing your workspace</span>
-                    <span class="loader-dots">
-                        <i></i>
-                        <i></i>
-                        <i></i>
-                    </span>
                 </div>
 
             </div>
@@ -91,8 +94,6 @@
         </div>
 
     </div>
-
-</div>
 
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
     <script src="./js/config.js"></script>
@@ -113,20 +114,20 @@
     <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script>
-         (function() {
-         
+        (function () {
+
             // Get the token from localStorage
             const token = localStorage.getItem('authToken');
-            
+
             // Get current path
             const currentPath = window.location.pathname;
-            
+
             // List of public pages that don't require authentication
             const publicPages = ['/', '/login', '/signup', '/forgot-password', '/reset-password'];
-            
+
             // Check if user is logged in and trying to access login page
             if (token && token !== '' && token !== 'null' && token !== 'undefined') {
-               
+
                 // If on login page or root, redirect to dashboard
                 if (currentPath === '/' || currentPath === '/login' || currentPath === '') {
                     // window.location.href = '/dashboard';
@@ -134,7 +135,7 @@
                 }
             } else {
                 console.log('No token found');
-                
+
                 // If not logged in and trying to access protected page, redirect to login
                 if (!publicPages.includes(currentPath) && currentPath !== '/') {
                     console.log('Redirecting to login...');
@@ -142,7 +143,7 @@
                     return;
                 }
             }
-            
+
         })();
         if (typeof FilePond !== 'undefined') {
             // Register image preview plugin if loaded

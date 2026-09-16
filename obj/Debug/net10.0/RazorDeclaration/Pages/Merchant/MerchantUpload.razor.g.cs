@@ -138,7 +138,7 @@ IDisposable
         }
         #pragma warning restore 1998
 #nullable restore
-#line (114,8)-(352,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
+#line (114,8)-(370,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\MerchantUpload.razor"
 
     private List<byte[]> fileBytes = new();
     private List<string> fileNames = new();
@@ -173,7 +173,28 @@ IDisposable
     private DotNetObjectReference<MerchantUpload>? _dotNetRef; // TODO: replace "Upload" with your actual @code class name
     private bool _select2Initialized = false;
     // --------------------------
+  protected override void OnInitialized()
+    {
+        MenuNavigationService.OnChange += OnMenuChanged;
+    }
 
+    private void OnMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnChange -= OnMenuChanged;
+          _dotNetRef?.Dispose();
+
+    }
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+   
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -365,10 +386,7 @@ IDisposable
     }
 
     // --- Added for Select2 ---
-    public void Dispose()
-    {
-        _dotNetRef?.Dispose();
-    }
+ 
     // --------------------------
 
     public class FileData

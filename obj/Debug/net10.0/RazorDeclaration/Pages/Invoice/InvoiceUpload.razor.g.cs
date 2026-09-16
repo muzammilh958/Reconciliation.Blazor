@@ -136,7 +136,7 @@ using System.Text.Json
         }
         #pragma warning restore 1998
 #nullable restore
-#line (88,8)-(117,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (88,8)-(131,17) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 
     private bool isLoading = true;
     private bool ispostLoading = false;
@@ -157,6 +157,20 @@ using System.Text.Json
 
     private DotNetObjectReference<InvoiceUpload>? _dotNetRef; // TODO: replace "Upload" with your actual @code class name
     private bool _select2Initialized = false;
+    protected override void OnInitialized()
+    {
+        MenuNavigationService.OnMenuChanged += HandleMenuChanged;
+    }
+
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnMenuChanged -= HandleMenuChanged;
+    }
     private int SelectedInvoiceId
     {
         get => _selectedInvoiceId;
@@ -173,7 +187,7 @@ using System.Text.Json
 #nullable disable
 
 #nullable restore
-#line (118,64)-(292,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
+#line (132,64)-(306,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUpload.razor"
 
                 StateHasChanged();
             }

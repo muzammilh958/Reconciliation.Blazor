@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (139,8)-(349,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
+#line (139,8)-(347,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Payment\PaymentList.razor"
 
     private List<PaymentData> Paymentes = new();
     private bool showDeleteDialog = false;
@@ -146,6 +146,20 @@ using Reconciliation.Blazor.Layout.Partials
     private bool hasError = false;
     private bool dataReady = false;
     private bool isDataTableInitialized = false;
+    protected override void OnInitialized()
+    {
+        MenuNavigationService.OnChange += OnMenuChanged;
+    }
+
+    private void OnMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnChange -= OnMenuChanged;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -267,24 +281,16 @@ using Reconciliation.Blazor.Layout.Partials
         {
             showDeleteDialog = false;
             
-            // Destroy DataTable before reloading
             await DestroyDataTableAsync();
             
-            // Reload data
             await LoadPaymentes();
 
-            await ShowMessage(
-                result.message ?? "Payment deleted successfully.",
-                "alert-success"
-            );
+            await ShowMessage(result.message ?? "Payment deleted successfully.","alert-success");
         }
         else
         {
-             showDeleteDialog = false;
-            await ShowMessage(
-                result?.message ?? "Delete failed.",
-                "alert-danger"
-            );
+            showDeleteDialog = false;
+            await ShowMessage(result?.message ?? "Delete failed.","alert-danger");
         }
     }
 
@@ -295,9 +301,7 @@ using Reconciliation.Blazor.Layout.Partials
 
         if (string.IsNullOrWhiteSpace(editModel.name))
         {
-            await ShowMessage(
-                "Payment name is required.",
-                "alert-danger");
+            await ShowMessage("Payment name is required.","alert-danger");
             isLoading = false;
             return;
         }
@@ -308,17 +312,11 @@ using Reconciliation.Blazor.Layout.Partials
         {
             await LoadPaymentes();
 
-            await ShowMessage(
-                result.message ?? "Payment updated successfully.",
-                "alert-success"
-            );
+            await ShowMessage(result.message ?? "Payment updated successfully.","alert-success");
         }
         else
         {
-            await ShowMessage(
-                result?.message ?? "Failed to update Payment.",
-                "alert-danger"
-            );
+            await ShowMessage(result?.message ?? "Failed to update Payment.","alert-danger");
         }
         isLoading = false;
     }

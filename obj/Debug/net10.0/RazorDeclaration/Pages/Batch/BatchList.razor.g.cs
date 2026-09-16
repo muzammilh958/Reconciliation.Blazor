@@ -147,7 +147,7 @@ using global::Reconciliation.Blazor.Models.Batch
 #nullable disable
 
 #nullable restore
-#line (122,47)-(252,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
+#line (122,47)-(265,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Batch\BatchList.razor"
 
     private BatchDataDTO editModel = new();
     private int selectedBatchId;
@@ -168,7 +168,20 @@ using global::Reconciliation.Blazor.Models.Batch
             await _module.InvokeVoidAsync("loadDataTableAjax");
         }
     }
+    protected override void OnInitialized()
+    {
+        MenuNavigationService.OnChange += OnMenuChanged;
+    }
 
+    private void OnMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnChange -= OnMenuChanged;
+    }
     protected override async Task OnInitializedAsync()
     {
         try

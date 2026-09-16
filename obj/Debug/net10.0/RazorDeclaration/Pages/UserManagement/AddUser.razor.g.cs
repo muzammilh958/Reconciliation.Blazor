@@ -130,14 +130,14 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (109,8)-(214,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\AddUser.razor"
+#line (124,8)-(234,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\UserManagement\AddUser.razor"
 
     private bool isLoading = false;
 
     private CreateUserDto Model = new();
     private List<RolesDto>? roles = new();
     private string selectedRole = "";
-
+    private IJSObjectReference? _module;
     private string _selectedBatchId = "";
     private string SelectedBatchId
     {
@@ -146,7 +146,7 @@ using Reconciliation.Blazor.Layout.Partials
     }
 
     private List<string> errors = new();
-     // --- Added for Select2 ---
+    // --- Added for Select2 ---
     private DotNetObjectReference<AddUser>? _dotNetRef; // TODO: replace "AddUser" with your actual @code class name
     private bool _select2Initialized = false;
     // --------------------------
@@ -164,7 +164,10 @@ using Reconciliation.Blazor.Layout.Partials
             roles = new List<RolesDto>();
         }
     }
-     protected override async Task OnAfterRenderAsync(bool firstRender)
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
@@ -172,6 +175,8 @@ using Reconciliation.Blazor.Layout.Partials
             {
                 await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-fileupload.js");
                 await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/merchant-upload.js");
+                _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/form-select2.js");
+                await JsRuntime.InvokeVoidAsync("loadFormSelect");
             }
             catch (Exception ex)
             {

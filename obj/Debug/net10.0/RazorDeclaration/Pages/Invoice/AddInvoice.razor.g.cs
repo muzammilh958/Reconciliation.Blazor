@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (63,8)-(124,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\AddInvoice.razor"
+#line (63,8)-(138,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\AddInvoice.razor"
 
     private InvoiceType model = new();
     private bool isLoading = false;
@@ -140,6 +140,20 @@ using Reconciliation.Blazor.Layout.Partials
     private bool showMessage;
     private string messageText = "";
     private string messageClass = "";
+    protected override void OnInitialized()
+    {
+        MenuNavigationService.OnMenuChanged += HandleMenuChanged;
+    }
+
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnMenuChanged -= HandleMenuChanged;
+    }
     private async Task HandleSubmit()
     {
         isLoading = true;

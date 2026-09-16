@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (105,8)-(240,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
+#line (105,8)-(253,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceList.razor"
 
     private InvoiceTypeList InvoiceTypes = new();
     private bool showDeleteDialog = false;
@@ -144,7 +144,20 @@ using Reconciliation.Blazor.Layout.Partials
     private bool isLoading = true;
     private bool hasError = false;
     private bool dataReady = false;
+protected override void OnInitialized()
+    {
+        MenuNavigationService.OnMenuChanged += HandleMenuChanged;
+    }
 
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnMenuChanged -= HandleMenuChanged;
+    }
     private async Task InitDataTableAsync()
     {
         if (_module != null)

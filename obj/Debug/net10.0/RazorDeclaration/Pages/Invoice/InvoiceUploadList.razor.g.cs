@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (102,8)-(195,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUploadList.razor"
+#line (102,8)-(208,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Invoice\InvoiceUploadList.razor"
 
     InvoiceUploadedList invoiceUploadedList = new InvoiceUploadedList();
     private bool isLoading = true;
@@ -140,7 +140,20 @@ using Reconciliation.Blazor.Layout.Partials
     private int? downloadingInvoiceId = null;
 
     private IJSObjectReference? _module;
+     protected override void OnInitialized()
+    {
+        MenuNavigationService.OnChange += OnMenuChanged;
+    }
 
+    private void OnMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnChange -= OnMenuChanged;
+    }
     private async Task InitDataTableAsync()
     {
         if (_module != null)

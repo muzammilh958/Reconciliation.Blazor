@@ -130,7 +130,7 @@ using Reconciliation.Blazor.Layout.Partials
         }
         #pragma warning restore 1998
 #nullable restore
-#line (108,8)-(219,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
+#line (108,8)-(233,1) "e:\Project\ReconciliationSystem\Reconciliation.Blazor\Pages\Merchant\ExceptionList.razor"
 
     private bool showAlert = false;
     private string alertMessage = "";
@@ -142,6 +142,20 @@ using Reconciliation.Blazor.Layout.Partials
     private List<Models.Batch.BatchDataDTO> batchDataDTOs = new();
     private ExceptionlistDTO exceptionlistDTO = new();
     private IJSObjectReference? _module;
+    protected override void OnInitialized()
+    {
+        MenuNavigationService.OnMenuChanged += HandleMenuChanged;
+    }
+
+    private void HandleMenuChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MenuNavigationService.OnMenuChanged -= HandleMenuChanged;
+    }
     protected override async Task OnInitializedAsync()
     {
         try

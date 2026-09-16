@@ -82,6 +82,28 @@ window.openInvoiceModal = function (data) {
 };
 
 window.initUserSelect2 = function (dotNetRef) {
+     const el = document.getElementById('roleSelect');
+    if (!el || !window.jQuery) return;
+
+    // Destroy if already initialized to prevent duplicate/ghost instances
+    if (jQuery(el).data('select2')) {
+        jQuery(el).select2('destroy');
+    }
+
+    jQuery(el).select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select Role',
+        allowClear: false
+    });
+
+    jQuery(el).on('select2:select', function (e) {
+        dotNetRef.invokeMethodAsync('OnRoleSelected', e.params.data.id);
+    });
+
+    jQuery(el).on('select2:unselect', function () {
+        dotNetRef.invokeMethodAsync('OnRoleSelected', '');
+    });
     $('#roleSelect').select2({
         placeholder: "Select Role",
         width: '100%'
